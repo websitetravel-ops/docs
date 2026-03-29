@@ -59,14 +59,14 @@
           {
             "group": "Agent / Reseller API",
             "openapi": {
-              "source": "openapi/agent-reseller-api.json",
+              "source": "openapi/agent-reseller-api.mintlify.json",
               "directory": "api-reference/agent-reseller-api"
             }
           },
           {
             "group": "Freelance Agent API",
             "openapi": {
-              "source": "openapi/freelance-agent-api.json",
+              "source": "openapi/freelance-agent-api.mintlify.json",
               "directory": "api-reference/freelance-agent-api"
             }
           },
@@ -80,14 +80,14 @@
           {
             "group": "Freelance Internal API",
             "openapi": {
-              "source": "openapi/freelance-internal-api.yaml",
+              "source": "openapi/freelance-internal-api.mintlify.json",
               "directory": "api-reference/freelance-internal-api"
             }
           },
           {
             "group": "Website Travel Supplier API",
             "openapi": {
-              "source": "openapi/website-travel-supplier-api.json",
+              "source": "openapi/website-travel-supplier-api.mintlify.json",
               "directory": "api-reference/website-travel-supplier-api"
             }
           },
