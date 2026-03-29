@@ -2,6 +2,16 @@
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
   "name": "WebsiteTravel Developer Docs",
+  "api": {
+    "openapi": [
+      "openapi/agent-reseller-api.mintlify.json",
+      "openapi/ebs-supplier-api.json",
+      "openapi/tourbuilder-api.openapi.json",
+      "openapi/ibis-api.openapi.json",
+      "openapi/accomsoa-api.openapi.json",
+      "openapi/transportsoa-api.openapi.json"
+    ]
+  },
   "colors": {
     "primary": "#16A34A",
     "light": "#07C983",
