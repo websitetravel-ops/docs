@@ -5,3 +5,7 @@
 # Draft content
 drafts/
 *.draft.mdx
+
+# Unused starter API sample
+api-reference/endpoint/
+api-reference/openapi.json

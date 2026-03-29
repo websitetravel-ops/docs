@@ -64,31 +64,10 @@
             }
           },
           {
-            "group": "Freelance Agent API",
-            "openapi": {
-              "source": "openapi/freelance-agent-api.mintlify.json",
-              "directory": "api-reference/freelance-agent-api"
-            }
-          },
-          {
             "group": "EBS Supplier API",
             "openapi": {
               "source": "openapi/ebs-supplier-api.json",
               "directory": "api-reference/ebs-supplier-api"
-            }
-          },
-          {
-            "group": "Freelance Internal API",
-            "openapi": {
-              "source": "openapi/freelance-internal-api.mintlify.json",
-              "directory": "api-reference/freelance-internal-api"
-            }
-          },
-          {
-            "group": "Website Travel Supplier API",
-            "openapi": {
-              "source": "openapi/website-travel-supplier-api.mintlify.json",
-              "directory": "api-reference/website-travel-supplier-api"
             }
           },
           {
