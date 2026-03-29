@@ -6,6 +6,8 @@
     "openapi": [
       "openapi/agent-reseller-api.mintlify.json",
       "openapi/ebs-supplier-api.json",
+      "openapi/freelance-internal-api.mintlify.json",
+      "openapi/website-travel-supplier-api.mintlify.json",
       "openapi/tourbuilder-api.openapi.json",
       "openapi/ibis-api.openapi.json",
       "openapi/accomsoa-api.openapi.json",
