@@ -81,6 +81,20 @@
             }
           },
           {
+            "group": "Freelance Internal API",
+            "openapi": {
+              "source": "openapi/freelance-internal-api.mintlify.json",
+              "directory": "api-reference/freelance-internal-api"
+            }
+          },
+          {
+            "group": "Website Travel Supplier API",
+            "openapi": {
+              "source": "openapi/website-travel-supplier-api.mintlify.json",
+              "directory": "api-reference/website-travel-supplier-api"
+            }
+          },
+          {
             "group": "Tourbuilder API",
             "openapi": {
               "source": "openapi/tourbuilder-api.openapi.json",
