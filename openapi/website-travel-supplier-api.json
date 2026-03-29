@@ -1,0 +1,4195 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Website Travel Supplier API",
+    "version": "0.0.0",
+    "description": "Supplier-facing Website Travel API for authentication, products, media, cancellation policies, and vouchers."
+  },
+  "paths": {
+    "/apiv1/supplier/token": {
+      "post": {
+        "tags": [
+          "Version 1"
+        ],
+        "summary": "Grants an OAuth token",
+        "description": "<p>\nGrants an OAuth token to be used when querying the Website Travel API. This token should be provided as the\n<code>access_token</code> parameter to all other API calls.\n</p>",
+        "operationId": "grantOAuthToken",
+        "requestBody": {
+          "description": "Credentials",
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "properties": {
+                  "client_id": {
+                    "description": "Client ID",
+                    "type": "string"
+                  },
+                  "client_secret": {
+                    "description": "Client Secret",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Returned when successful"
+          },
+          "400": {
+            "description": "Returned when there is an issue with the data provided"
+          }
+        }
+      }
+    },
+    "/apiv1/supplier/agents": {
+      "get": {
+        "tags": [
+          "Version 1"
+        ],
+        "summary": "Fetch a list of agents",
+        "description": "## Fetch a list of agents ##\n\n<p>\nFetch a list of agents the authenticated supplier has access to.\n</p>\n\n#### Response ####\n\n**Top Level Result Object**\n\n <table class=\"fullwidth\">\n     <thead>\n         <tr>\n             <th>Field name</th>\n             <th>Nullable</th>\n             <th>Type</th>\n             <th>Description</th>\n         </tr>\n     </thead>\n     <tbody>\n         <tr>\n             <td>agentId</td><td>n</td><td>Integer</td><td>Agent identifer.</td>\n         </tr>\n         <tr>\n             <td>agentFatherId</td><td>n</td><td>Integer</td><td>Agent Father identifer.</td>\n         </tr>\n         <tr>\n             <td>agentCode</td><td>n</td><td>String</td><td>Three-letter Agent identifier.</td>\n         </tr>\n         <tr>\n             <td>name</td><td>n</td><td>String</td><td>Agent name.</td>\n         </tr>\n         <tr>\n             <td>emailAccounts</td><td>y</td><td>String</td><td>Agent accounts email address.</td>\n         </tr>\n         <tr>\n             <td>businessNumber</td><td>y</td><td>String</td><td>Agent business number.</td>\n         </tr>\n         <tr>\n             <td>street1</td><td>n</td><td>String</td><td>Street address of Agent.</td>\n         </tr>\n         <tr>\n             <td>street2</td><td>y</td><td>String</td><td>Secondary street address of Agent.</td>\n         </tr>\n         <tr>\n             <td>suburb</td><td>n</td><td>String</td><td>Agent suburb.</td>\n         </tr>\n         <tr>\n             <td>state</td><td>y</td><td>String</td><td>Agent state.</td>\n         </tr>\n         <tr>\n             <td>postcode</td><td>y</td><td>String</td><td>Agent postcode.</td>\n         </tr>\n         <tr>\n             <td>country</td><td>n</td><td>String</td><td>Agent Country.</td>\n         </tr>\n         <tr>\n             <td>workPhone</td><td>n</td><td>String</td><td>Agent work phone number.</td>\n         </tr>\n         <tr>\n             <td>currency</td><td>n</td><td>Object</td><td>Currency object.</td>\n         </tr>\n     </tbody>\n </table>\n\n **Currency Object**\n\n <table class=\"fullwidth\">\n     <thead>\n         <tr>\n             <th>Field name</th>\n             <th>Nullable</th>\n             <th>Type</th>\n             <th>Description</th>\n         </tr>\n     </thead>\n     <tbody>\n         <tr>\n             <td>isoCode</td><td>n</td><td>String</td><td>Agent's currency code (ISO-4217 three-character code).</td>\n         </tr>\n     </tbody>\n </table>",
+        "operationId": "get_api_agent_agent_getagents",
+        "responses": {
+          "200": {
+            "description": "Returned when successful."
+          },
+          "403": {
+            "description": "Returned when the user is not authorized."
+          },
+          "500": {
+            "description": "Internal error."
+          }
+        }
+      }
+    },
+    "/apiv1/supplier/agentFathers": {
+      "get": {
+        "tags": [
+          "Version 1"
+        ],
+        "summary": "Fetch a list of agent fathers",
+        "description": "## Fetch a list of agent fathers ##\n\n<p>\nFetch a list of agent fathers the authenticated supplier has access to.\n</p>\n\n#### Response ####\n\n**Top Level Result Object**\n\n <table class=\"fullwidth\">\n     <thead>\n         <tr>\n             <th>Field name</th>\n             <th>Nullable</th>\n             <th>Type</th>\n             <th>Description</th>\n         </tr>\n     </thead>\n     <tbody>\n         <tr>\n             <td>agentFatherId</td><td>n</td><td>Integer</td><td>Agent Father identifer.</td>\n         </tr>\n         <tr>\n             <td>agentFatherName</td><td>n</td><td>String</td><td>Agent Father name.</td>\n         </tr>\n     </tbody>\n </table>",
+        "operationId": "get_api_agent_agent_getagentfathers",
+        "responses": {
+          "200": {
+            "description": "Returned when successful."
+          },
+          "403": {
+            "description": "Returned when the user is not authorized."
+          },
+          "500": {
+            "description": "Internal error."
+          }
+        }
+      }
+    },
+    "/{supplierapi}/media/thumbnails": {
+      "get": {
+        "tags": [
+          "Version 1",
+          "Media"
+        ],
+        "summary": "Find all thumbnails for a Supplier",
+        "description": "## Find all thumbnails for a Supplier ##\n\n<p>\nThe returned result is an array of images. If no images are found a 404 response will be returned.\n</p>\n\n#### Response ####\n\n**Top Level Result Object**\n\n <table class=\"fullwidth\">\n     <thead>\n         <tr>\n             <th>Field name</th>\n             <th>Nullable</th>\n             <th>Type</th>\n             <th>Description</th>\n         </tr>\n     </thead>\n     <tbody>\n         <tr>\n             <td>mediaId</td><td>n</td><td>Integer</td><td>Media ID of the image.</td>\n         </tr>\n         <tr>\n             <td>path</td><td>n</td><td>String</td><td>Absolute URL path of image.</td>\n         </tr>\n         <tr>\n             <td>originalName</td><td>n</td><td>String</td><td>Original name of file.</td>\n         </tr>\n         <tr>\n             <td>caption</td><td>y</td><td>String</td><td>Optional image caption.</td>\n         </tr>\n         <tr>\n             <td>active</td><td>y</td><td>Null</td><td>Unused.</td>\n         </tr>\n         <tr>\n             <td>mimeType</td><td>y</td><td>String</td><td>Mime type of file.</td>\n         </tr>\n     </tbody>\n </table>",
+        "operationId": "get_api_media_media_getthumbnails",
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "query",
+            "description": "Optional Product ID to fetch. Equivalent to \"/supplier/product/{productId}/images?size=sm\"",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "supplierapi",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "supplier|apiv1/supplier"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returned when successful."
+          },
+          "403": {
+            "description": "User does not have access to the requested product"
+          },
+          "404": {
+            "description": "Product not found, or no images for the product found"
+          },
+          "500": {
+            "description": "Internal error."
+          }
+        }
+      }
+    },
+    "/{supplierapi}/media/{mediaId}": {
+      "get": {
+        "tags": [
+          "Version 1",
+          "Media"
+        ],
+        "summary": "Find a given Media Image by ID",
+        "description": "## Find a given Media Image by ID ##\n\nUsing a specific Media ID fetch the image associated.\n\n#### Response ####\n\n**Top Level Result Object**\n\n <table class=\"fullwidth\">\n     <thead>\n         <tr>\n             <th>Field name</th>\n             <th>Nullable</th>\n             <th>Type</th>\n             <th>Description</th>\n         </tr>\n     </thead>\n     <tbody>\n         <tr>\n             <td>mediaId</td><td>n</td><td>Integer</td><td>Media ID of the image.</td>\n         </tr>\n         <tr>\n             <td>path</td><td>n</td><td>String</td><td>Absolute URL path of image.</td>\n         </tr>\n         <tr>\n             <td>caption</td><td>y</td><td>String</td><td>Optional image caption.</td>\n         </tr>\n         <tr>\n             <td>active</td><td>y</td><td>Null</td><td>Unused.</td>\n         </tr>\n     </tbody>\n </table>",
+        "operationId": "get_media_image",
+        "parameters": [
+          {
+            "name": "size",
+            "in": "query",
+            "description": "Optional size of images to fetch. Defaults to small (sm).",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "sm",
+              "enum": [
+                "sm",
+                "med",
+                "lg"
+              ]
+            }
+          },
+          {
+            "name": "supplierapi",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "supplier|apiv1/supplier"
+            }
+          },
+          {
+            "name": "mediaId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "\\d+"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returned when successful."
+          },
+          "400": {
+            "description": "Returned when size requested does not match allowed sizes."
+          },
+          "403": {
+            "description": "Returned when you do not have access to the requested Image."
+          },
+          "404": {
+            "description": "Returned when Image not found."
+          },
+          "500": {
+            "description": "Internal error."
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Version 1",
+          "Media"
+        ],
+        "summary": "Delete a Media Image by ID",
+        "description": "## Delete a Media Image by ID ##\n\nUsing a specific Media ID delete the image associated.\n\n**Warning**: This removes the file from the filesystem entirely.",
+        "operationId": "delete_delete_media",
+        "parameters": [
+          {
+            "name": "supplierapi",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "supplier|apiv1/supplier"
+            }
+          },
+          {
+            "name": "mediaId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Returned when successful."
+          },
+          "400": {
+            "description": "Returned when image is still in use by a Product."
+          },
+          "403": {
+            "description": "Returned when you do not have access to the requested Image."
+          },
+          "404": {
+            "description": "Returned when Image not found."
+          },
+          "500": {
+            "description": "Internal error."
+          }
+        }
+      }
+    },
+    "/{supplierapi}/media": {
+      "post": {
+        "tags": [
+          "Version 1",
+          "Media"
+        ],
+        "summary": "Upload an Image",
+        "description": "## Upload a Image ##\n\n<p>\nFiles should be uploaded using the <code>Content-Type: multipart/form-data</code> HTTP header. Raw data is expected.\n</p>\n<p>\nSupported mime types are: <i>image/jpg</i> and <i>image/jpeg</i>. Maximum file size is 4Mb.\n</p>\n<p>\nAll image are resized as thumbnails to suit the system. Unless \"isLogo\" is true, then images will also be resized\nin system defined \"medium\" and \"large\" sizes. Original image will always remain.\n</p>\n\n#### Response ####\n\n**Top Level Result Object**\n\n <table class=\"fullwidth\">\n     <thead>\n         <tr>\n             <th>Field name</th>\n             <th>Nullable</th>\n             <th>Type</th>\n             <th>Description</th>\n         </tr>\n     </thead>\n     <tbody>\n         <tr>\n             <td>mediaId</td><td>n</td><td>Integer</td><td>Media ID of the image.</td>\n         </tr>\n         <tr>\n             <td>supplierId</td><td>n</td><td>String</td><td>Supplier ID associated with image.</td>\n         </tr>\n         <tr>\n             <td>caption</td><td>y</td><td>String</td><td>Optional image caption.</td>\n         </tr>\n         <tr>\n             <td>path</td><td>n</td><td>String</td><td>Absolute URL path of original sized image.</td>\n         </tr>\n     </tbody>\n </table>",
+        "operationId": "post_api_media_media_upload",
+        "parameters": [
+          {
+            "name": "file",
+            "in": "query",
+            "description": "Raw file data.",
+            "required": true,
+            "schema": {
+              "description": "image/jpg, image/jpeg, 4Mb max",
+              "type": "string",
+              "format": "binary"
+            }
+          },
+          {
+            "name": "caption",
+            "in": "query",
+            "description": "Optional caption text.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "isLogo",
+            "in": "query",
+            "description": "If true, smaller sizes of image provided will not be created.",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "supplierapi",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "supplier|apiv1/supplier"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returned when successful. Returns a media object."
+          },
+          "400": {
+            "description": "Returned when no file received."
+          },
+          "415": {
+            "description": "Returned when file type is invalid or size of file is too large."
+          },
+          "500": {
+            "description": "Internal error."
+          }
+        }
+      }
+    },
+    "/{supplierapi}/cancellationpolicies": {
+      "get": {
+        "tags": [
+          "Version 1"
+        ],
+        "summary": "Get all cancellation fee policies",
+        "description": "## Get all cancellation fee policies ##\n<p>\nRetrieves information about all of the supplier's cancellation fee policies. Output as for GET /cancellationpolicy/{cancellationFeePolicyId}.\n</p>",
+        "operationId": "get_api_product_cancellationpolicy_getpolicies",
+        "parameters": [
+          {
+            "name": "supplierapi",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "supplier|apiv1/supplier"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returned when successful."
+          },
+          "403": {
+            "description": "User does not have access to the requested product"
+          },
+          "500": {
+            "description": "Internal error."
+          }
+        }
+      }
+    },
+    "/{supplierapi}/cancellationpolicy/{cancellationFeePolicyId}": {
+      "get": {
+        "tags": [
+          "Version 1"
+        ],
+        "summary": "Get information about a cancellation fee policy",
+        "description": "## Get information about a cancellation fee policy ##\n<p>\nRetrieves information about the given cancellation fee policy.\n</p>\n\n#### Response ####\n\n**Top Level Result Object**\n\n <table class=\"fullwidth\">\n     <thead>\n         <tr>\n             <th>Field name</th>\n             <th>Nullable</th>\n             <th>Type</th>\n             <th>Description</th>\n         </tr>\n     </thead>\n     <tbody>\n         <tr>\n             <td>cancellationFeePolicyId</td><td>n</td><td>Integer</td><td>ID of this cancellation fee policy.</td>\n         </tr>\n         <tr>\n             <td>policyName</td><td>n</td><td>String</td><td>Name of the cancellation fee policy.</td>\n         </tr>\n         <tr>\n             <td>policyDescription</td><td>y</td><td>String</td><td>Description of cancellation fee policy.</td>\n         </tr>\n         <tr>\n             <td>usePercentMode</td><td>n</td><td>boolean</td><td>Whether the cancellation fee policy uses \"percent mode\" (true) or \"dollar mode\" (false).</td>\n         </tr>\n         <tr>\n             <td>cancellationFeeRules</td><td>n</td><td>array</td><td>Collection of CancellationFeeRule objects.</td>\n         </tr>\n         <tr>\n             <td>isDefault</td><td>n</td><td>boolean</td><td>Whether this is the default cancellation fee policy for this supplier.</td>\n         </tr>\n     </tbody>\n </table>\n\n**CancellationFeeRule Object**\n\n <table class=\"fullwidth\">\n     <thead>\n         <tr>\n             <th>Field name</th>\n             <th>Nullable</th>\n             <th>Type</th>\n             <th>Description</th>\n         </tr>\n     </thead>\n     <tbody>\n         <tr>\n             <td>daysBeforeTravelDate</td><td>n</td><td>Integer</td><td>Duration before voucher travel date that this rule will be in effect. For example, if there are two rules with daysBeforeTravelDate=2 and daysBeforeTravelDate=5, the first rule will be in effect if the voucher is cancelled within two days of travel, and the second rule will be in effect between three and five days before travel.</td>\n         </tr>\n         <tr>\n             <td>feeAmount</td><td>n</td><td>Float</td><td>Amount of cancellation fee. This value is a percentage between 0 and 100 if the policy is in \"percent mode\", or a monetary amount in the applicable fare's currency if the policy is in \"dollar mode\".</td>\n         </tr>\n     </tbody>\n </table>",
+        "operationId": "get_api_product_cancellationpolicy_getpolicy",
+        "parameters": [
+          {
+            "name": "supplierapi",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "supplier|apiv1/supplier"
+            }
+          },
+          {
+            "name": "cancellationFeePolicyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returned when successful."
+          },
+          "403": {
+            "description": "Returned when the user is not authorized"
+          },
+          "404": {
+            "description": "Cancellation fee policy not found"
+          },
+          "500": {
+            "description": "Internal error."
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Version 1"
+        ],
+        "summary": "Update a cancellation fee policy",
+        "description": "## Update a cancellation fee policy ##\n\n<p>\nUpdate a cancellation fee policy. All fields are optional; you only need to pass in the fields that you want\nto change.\n</p>\n\n#### Response ####\n201 response code on success.",
+        "operationId": "put_api_product_cancellationpolicy_savepolicy",
+        "parameters": [
+          {
+            "name": "supplierapi",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "supplier|apiv1/supplier"
+            }
+          },
+          {
+            "name": "cancellationFeePolicyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Fields to update a cancellation fee policy",
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "required": [
+                  "policyName",
+                  "usePercentMode"
+                ],
+                "properties": {
+                  "policyName": {
+                    "description": "Name of the cancellation fee policy.",
+                    "type": "string"
+                  },
+                  "policyDescription": {
+                    "description": "Optional description of the policy",
+                    "type": "string"
+                  },
+                  "usePercentMode": {
+                    "description": "Whether the policy uses percent mode",
+                    "type": "boolean"
+                  },
+                  "isDefault": {
+                    "description": "Whether this policy should become the default cancellation fee policy for this supplier.",
+                    "type": "boolean"
+                  },
+                  "cancellationFeeRules": {
+                    "description": "Array of CancellationFeeRule objects.",
+                    "type": "array",
+                    "items": {
+                      "required": [
+                        "daysBeforeTravelDate",
+                        "feeAmount"
+                      ],
+                      "properties": {
+                        "daysBeforeTravelDate": {
+                          "description": "Duration before travel date that this rule will be in effect",
+                          "type": "integer"
+                        },
+                        "feeAmount": {
+                          "description": "Amount of cancellation fee when rule applies (a percentage value when policy is in percent mode, or a monetary amount when in dollar mode)",
+                          "type": "number",
+                          "format": "float"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  }
+                },
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Policy updated successfully"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "403": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Cancellation fee policy not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Version 1"
+        ],
+        "summary": "Delete a Cancellation Fee Policy",
+        "description": "## Delete a Cancellation Fee Policy ##\n<p>\nDeletes the cancellation fee policy with the given and Cancellation Fee Policy ID.\n</p>",
+        "operationId": "delete_api_product_cancellationpolicy_deletepolicy",
+        "parameters": [
+          {
+            "name": "supplierapi",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "supplier|apiv1/supplier"
+            }
+          },
+          {
+            "name": "cancellationFeePolicyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/{supplierapi}/cancellationpolicy": {
+      "post": {
+        "tags": [
+          "Version 1"
+        ],
+        "summary": "Create a new cancellation fee policy",
+        "description": "## Create a new cancellation fee policy ##\n\n<p>\nCreates a new cancellation fee policy based on the JSON array of data provided.\n</p>\n\n## Response ##\n**Top Level Result Object**\n\n <table class=\"fullwidth\">\n     <thead>\n         <tr>\n             <th>Field name</th>\n             <th>Nullable</th>\n             <th>Type</th>\n             <th>Description</th>\n         </tr>\n     </thead>\n     <tbody>\n         <tr>\n             <td>cancellationFeePolicyId</td><td>n</td><td>Integer</td><td>ID of the new cancellation fee policy.</td>\n         </tr>\n     </tbody>\n </table>",
+        "operationId": "post_api_product_cancellationpolicy_createpolicy",
+        "parameters": [
+          {
+            "name": "supplierapi",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "supplier|apiv1/supplier"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Required fields to create a cancellation fee policy",
+          "content": {
+            "application/json": {
+              "schema": {
+                "required": [
+                  "policyName",
+                  "usePercentMode",
+                  "daysBeforeTravelDate",
+                  "feeAmount"
+                ],
+                "properties": {
+                  "policyName": {
+                    "description": "Name of the cancellation fee policy.",
+                    "type": "string"
+                  },
+                  "policyDescription": {
+                    "description": "Additional description information.",
+                    "type": "string"
+                  },
+                  "usePercentMode": {
+                    "description": "Whether the policy is in percent mode (true) or dollar mode (false).",
+                    "type": "boolean"
+                  },
+                  "isDefault": {
+                    "description": "Whether this policy should become the default cancellation fee policy for this supplier.",
+                    "type": "boolean"
+                  },
+                  "cancellationFeeRules": {
+                    "description": "Array of CancellationFeeRule objects.",
+                    "type": "array",
+                    "items": {
+                      "required": [
+                        "daysBeforeTravelDate",
+                        "feeAmount"
+                      ],
+                      "properties": {
+                        "daysBeforeTravelDate": {
+                          "description": "Duration before travel date that this rule will be in effect.",
+                          "type": "integer"
+                        },
+                        "feeAmount": {
+                          "description": "Amount of cancellation fee when rule applies (a percentage value when policy is in percent mode, or a monetary amount when in dollar mode).",
+                          "type": "number",
+                          "format": "float"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  }
+                },
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Returned when successful."
+          },
+          "400": {
+            "description": "Returned when there is an issue with the data provided."
+          },
+          "403": {
+            "description": "Returned when the user is not authorized"
+          },
+          "500": {
+            "description": "Returned when fatal issues are encountered."
+          }
+        }
+      }
+    },
+    "/{supplierapi}/category/{categoryIds}": {
+      "get": {
+        "tags": [
+          "Version 1"
+        ],
+        "summary": "Get categories by ID",
+        "description": "## Get categories by ID ##\n\n<p>\nRetrieves one or more categories by their ID.\n</p>",
+        "operationId": "get_api_product_category_getcategory",
+        "parameters": [
+          {
+            "name": "categoryIds",
+            "in": "query",
+            "description": "List of Category IDs to retrieve.",
+            "required": true,
+            "schema": {
+              "description": "Comma separated list of Category IDs",
+              "type": "string"
+            }
+          },
+          {
+            "name": "supplierapi",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "supplier|apiv1/supplier"
+            }
+          },
+          {
+            "name": "categoryIds",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returned when successful."
+          },
+          "403": {
+            "description": "Returned when the user is not authorized."
+          },
+          "404": {
+            "description": "No matching categories found."
+          },
+          "500": {
+            "description": "Internal error."
+          }
+        }
+      }
+    },
+    "/{supplierapi}/params/{paramType}": {
+      "get": {
+        "tags": [
+          "Version 1"
+        ],
+        "summary": "Returns a list of all Product Categories and ID's",
+        "description": "## Returns a list of all Product Categories and ID's ##\n\n<p>\nGet the a list of Product Categories and their ID's. Note at this point it may return Product Categories that the\nlogged in Agent has no Products in. Use the codes returned to limit search results to Products in those\nCategories. See documentation for /products.\n</p>\n\n#### Response ####\n\n **Top Level Result Object**\n\n <table class=\"fullwidth\">\n     <thead>\n         <tr>\n             <th>Field name</th>\n             <th>Nullable</th>\n             <th>Type</th>\n             <th>Description</th>\n         </tr>\n     </thead>\n     <tbody>\n         <tr>\n             <td>results</td><td>n</td><td>Array (Objects)</td><td>Array of Category objects.</td>\n         </tr>\n     </tbody>\n </table>\n\n **Category Object**\n\n <table class=\"fullwidth\">\n     <thead>\n         <tr>\n             <th>Field name</th>\n             <th>Nullable</th>\n             <th>Type</th>\n             <th>Description</th>\n         </tr>\n     </thead>\n     <tbody>\n         <tr>\n             <td>id</td><td>n</td><td>Integer</td><td>ID of Category.</td>\n         </tr>\n         <tr>\n             <td>text</td><td>n</td><td>String</td><td>Name of Category.</td>\n         </tr>\n     </tbody>\n </table>",
+        "operationId": "getParamsAction",
+        "parameters": [
+          {
+            "name": "paramType",
+            "in": "path",
+            "description": "One of<br/><strong>productclasses</strong> - List of Product Class Ids<br/><strong>faretypecategories</strong> - List of available Fare Type Category Ids<br><strong>faretags</strong> - List of available Fare Tags.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "productclasses|faretypecategories|faretags",
+              "enum": [
+                "productclasses",
+                "faretypecategories",
+                "faretags"
+              ]
+            }
+          },
+          {
+            "name": "supplierapi",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "supplier|apiv1/supplier"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returned when successful."
+          },
+          "403": {
+            "description": "Returned when the user is not authorized."
+          }
+        }
+      }
+    },
+    "/{supplierapi}/categories/{name}": {
+      "get": {
+        "tags": [
+          "Version 1"
+        ],
+        "summary": "Get a list of categories of a given type",
+        "description": "## Get a list of categories of a given type ##\n<p>\nReturns a list of IDs for the selected Category. Unlike Countries and productCategories the results can be\nfiltered in hierarchies for example passing in the Country code for Australia to the state query will limit the\nreturned states to just those in Australia. The same filtering works for region and locality and the transport\nactivity and accommodation results. In the case of the latter three for example you can return all activities in\na region by supplying the region(s) as an argument. Each hierarchy filter (except Country) can be applied\nmultiple times with different values. For example by passing the State ID's for NSW and Queensland to the\nactivities filter you can see all activities that are available in those two states. Note at this point you can\nnot filter by the activity, transport or accommodation type this means you can not get all states that kayaking\nis available in.\n</p>\n\n#### Response ####\n\n**Top Level Result Object**\n\n <table class=\"fullwidth\">\n     <thead>\n         <tr>\n             <th>Field name</th>\n             <th>Nullable</th>\n             <th>Type</th>\n             <th>Description</th>\n         </tr>\n     </thead>\n     <tbody>\n         <tr>\n             <td>results</td><td>n</td><td>Array (Objects)</td><td>Array of Category objects.</td>\n         </tr>\n     </tbody>\n </table>\n\n **Category Object**\n\n <table class=\"fullwidth\">\n     <thead>\n         <tr>\n             <th>Field name</th>\n             <th>Nullable</th>\n             <th>Type</th>\n             <th>Description</th>\n         </tr>\n     </thead>\n     <tbody>\n         <tr>\n             <td>id</td><td>n</td><td>Integer</td><td>ID of Category.</td>\n         </tr>\n         <tr>\n             <td>text</td><td>n</td><td>String</td><td>Name of Category.</td>\n         </tr>\n     </tbody>\n </table>",
+        "operationId": "get_api_product_category_getcategories",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "description": "The name of the Category to return. Can be (countries, states, regions, locations, transport (transport type), activities, accommodation)",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "term",
+            "in": "query",
+            "description": "Limit the returned results to those matching partially the term provided.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "countries",
+            "in": "query",
+            "description": "Limit results to countryId.",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "states",
+            "in": "query",
+            "description": "Limit results to localityIds comma delimited ID's (localities are towns and cities).",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "regions",
+            "in": "query",
+            "description": "Limit results to regionIds comma delimited ID's (regions are geographic regions Eg. Whitsunday's.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "supplierapi",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "supplier|apiv1/supplier"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returned when successful."
+          },
+          "403": {
+            "description": "Returned when the user is not authorized."
+          },
+          "400": {
+            "description": "Returned on an invalid request."
+          }
+        }
+      }
+    },
+    "/{supplierapi}/productCategories/{productId}": {
+      "get": {
+        "tags": [
+          "Version 1"
+        ],
+        "summary": "Get list of categories used in the product",
+        "description": "## Get list of categories used in the product ##\n\n<p>\nReturns a list of IDs for the selected Product.\n</p>\n\n#### Response ####\n\n**Top Level Result Object**\n\n <table class=\"fullwidth\">\n     <thead>\n         <tr>\n             <th>Field name</th>\n             <th>Nullable</th>\n             <th>Type</th>\n             <th>Description</th>\n         </tr>\n     </thead>\n     <tbody>\n         <tr>\n             <td>results</td><td>n</td><td>Array (Objects)</td><td>Array of Category objects.</td>\n         </tr>\n     </tbody>\n </table>\n\n **Category Object**\n\n <table class=\"fullwidth\">\n     <thead>\n         <tr>\n             <th>Field name</th>\n             <th>Nullable</th>\n             <th>Type</th>\n             <th>Description</th>\n         </tr>\n     </thead>\n     <tbody>\n         <tr>\n             <td>categoryId</td><td>n</td><td>Integer</td><td>ID of Category.</td>\n         </tr>\n         <tr>\n             <td>label</td><td>n</td><td>String</td><td>Name of Category.</td>\n         </tr>\n     </tbody>\n </table>",
+        "operationId": "get_api_product_category_getproductcategories",
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "description": "The ID of the Product to get categories for",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "pattern": "\\d+"
+            }
+          },
+          {
+            "name": "supplierapi",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "supplier|apiv1/supplier"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returned when successful."
+          },
+          "403": {
+            "description": "Returned when the user is not authorized."
+          },
+          "400": {
+            "description": "Returned on an invalid request."
+          }
+        }
+      }
+    },
+    "/{supplierapi}/package/{productPricesDetail}/options": {
+      "get": {
+        "tags": [
+          "Version 1"
+        ],
+        "summary": "Get information about a package",
+        "description": "## Get information about a package ##\n\n<p>\nRetrieves information about the given package.\n</p>\n\n#### Response ####\n\n**Top Level Result Object**\n\n <table class=\"fullwidth\">\n     <thead>\n         <tr>\n             <th>Field name</th>\n             <th>Nullable</th>\n             <th>Type</th>\n             <th>Description</th>\n         </tr>\n     </thead>\n     <tbody>\n         <tr>\n             <td>optionId</td><td>n</td><td>Integer</td><td>ID of the Package Option.</td>\n         </tr>\n         <tr>\n             <td>label</td><td>n</td><td>String</td><td>Label for the Package Option.</td>\n         </tr>\n         <tr>\n             <td>ordering</td><td>n</td><td>Integer</td><td>Sort order for the Package Option (affects order shown in UI).</td>\n         </tr>\n         <tr>\n             <td>packageProducts</td><td>n</td><td>Array</td><td>Array of Package Product objects.</td>\n         </tr>\n     </tbody>\n </table>\n\n**PackageProduct Object**\n\n <table class=\"fullwidth\">\n     <thead>\n         <tr>\n             <th>Field name</th>\n             <th>Nullable</th>\n             <th>Type</th>\n             <th>Description</th>\n         </tr>\n     </thead>\n     <tbody>\n         <tr>\n             <td>packageProductId</td><td>n</td><td>Integer</td><td>ID of the Package Product.</td>\n         </tr>\n         <tr>\n             <td>productPricesDetailId</td><td>n</td><td>Integer</td><td>ID of the ProductPricesDetail.</td>\n         </tr>\n         <tr>\n             <td>ordering</td><td>n</td><td>Integer</td><td>Sort order for the Package Product (affects order shown in UI).</td>\n         </tr>\n         <tr>\n             <td>quantity</td><td>n</td><td>Integer</td><td>Quantity of the ProductPricesDetail to be included in the package.</td>\n         </tr>\n         <tr>\n             <td>rrpDifference</td><td>y</td><td>Float</td><td>Amount to add onto package's base RRP if this Package Product is selected. If null, the difference between the RRP for this product and the RRP for the cheapest product in the option will be used. Must be null for the cheapest product in this package option.</td>\n         </tr>\n     </tbody>\n </table>",
+        "operationId": "get_api_product_package_getpackageoptions",
+        "parameters": [
+          {
+            "name": "productPricesDetail",
+            "in": "path",
+            "description": "The ID of the ProductPricesDetail",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "pattern": "\\d+"
+            }
+          },
+          {
+            "name": "supplierapi",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "supplier|apiv1/supplier"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returned when successful"
+          },
+          "403": {
+            "description": "Returned when the user is not authorized"
+          },
+          "404": {
+            "description": "Returned when the ProductPricesDetail is not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        }
+      }
+    },
+    "/{supplierapi}/package/{productPricesDetailId}/option": {
+      "post": {
+        "tags": [
+          "Packages"
+        ],
+        "summary": "Add an option to a Package",
+        "description": "## Add an option to a Package ##\n\n<p>\nAdds an option to the Package based on the JSON array of data provided.\n</p>\n\n## Response ##\n**Top Level Result Object**\n\n <table class=\"fullwidth\">\n     <thead>\n         <tr>\n             <th>Field name</th>\n             <th>Nullable</th>\n             <th>Type</th>\n             <th>Description</th>\n         </tr>\n     </thead>\n     <tbody>\n         <tr>\n             <td>optionId</td><td>n</td><td>Integer</td><td>ID of the newly created Package Option.</td>\n         </tr>\n     </tbody>\n </table>",
+        "operationId": "post_api_product_package_addpackageoption",
+        "parameters": [
+          {
+            "name": "productPricesDetailId",
+            "in": "path",
+            "description": "The ID of the ProductPricesDetail",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "pattern": "\\d+"
+            }
+          },
+          {
+            "name": "label",
+            "in": "query",
+            "description": "Label for the Package Option.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "ordering",
+            "in": "query",
+            "description": "Sort ordering for the Package Option. The ordering for other Options will be adjusted as necessary to accommodate the new Option's ordering.",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "supplierapi",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "supplier|apiv1/supplier"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Returned when successful."
+          },
+          "400": {
+            "description": "Returned when there is an issue with the data provided."
+          },
+          "403": {
+            "description": "Returned when the user is not authorized."
+          },
+          "404": {
+            "description": "Returned when the ProductPricesDetail is not found"
+          },
+          "500": {
+            "description": "Returned when fatal issues are encountered."
+          }
+        }
+      }
+    },
+    "/{supplierapi}/package/{productPricesDetailId}/option/{optionId}": {
+      "put": {
+        "tags": [
+          "Version 1"
+        ],
+        "summary": "Update a Package Option",
+        "description": "## Update a Package Option ##\n\n<p>\nUpdate a Package Option. All fields are optional; you only need to pass in the fields that you want to change.\n</p>\n\n#### Response ####\n204 on success",
+        "operationId": "updatePackageOptionAction",
+        "parameters": [
+          {
+            "name": "productPricesDetailId",
+            "in": "path",
+            "description": "The ID of the ProductPricesDetail",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "pattern": "\\d+"
+            }
+          },
+          {
+            "name": "optionId",
+            "in": "path",
+            "description": "The ID of the Package Option",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "pattern": "\\d+"
+            }
+          },
+          {
+            "name": "label",
+            "in": "query",
+            "description": "Label for the Package Option.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "ordering",
+            "in": "query",
+            "description": "Sort ordering for the Package Option. The ordering of other Options will be adjusted as needed to accommodate this.",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "supplierapi",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "supplier|apiv1/supplier"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Returned when the update was successful."
+          },
+          "400": {
+            "description": "Returned when there is an issue with the data provided."
+          },
+          "403": {
+            "description": "Returned when the user is not authorized."
+          },
+          "404": {
+            "description": "Returned when the ProductPricesDetail or PackageOption is not found"
+          },
+          "500": {
+            "description": "Returned when fatal issues are encountered."
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Packages"
+        ],
+        "summary": "Delete an Option from a Package",
+        "description": "## Delete an Option from a Package ##\n\n<p>\nDeletes the Option with the given ID.\n</p>",
+        "operationId": "deletePackageOptionAction",
+        "parameters": [
+          {
+            "name": "productPricesDetail",
+            "in": "path",
+            "description": "The ID of the ProductPricesDetail",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "optionId",
+            "in": "path",
+            "description": "The ID of the Package Option",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "supplierapi",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "supplier|apiv1/supplier"
+            }
+          },
+          {
+            "name": "productPricesDetailId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Returned when successful."
+          },
+          "400": {
+            "description": "Returned when there is an issue with the data provided."
+          },
+          "403": {
+            "description": "Returned when the user is not authorized."
+          },
+          "404": {
+            "description": "Returned when the ProductPricesDetail or PackageOption is not found"
+          },
+          "500": {
+            "description": "Returned when fatal issues are encountered."
+          }
+        }
+      }
+    },
+    "/{supplierapi}/package/{productPricesDetailId}/option/{optionId}/product": {
+      "post": {
+        "tags": [
+          "Packages"
+        ],
+        "summary": "Adds a product to a Package Option",
+        "description": "## Adds a product to a Package Option ##\n\n<p>\nAdds a product to the given Package Option.\n</p>\n\n#### Response ####\n<p>201 on success</p>\n\n**Top Level Result Object**\n\n <table class=\"fullwidth\">\n     <thead>\n         <tr>\n             <th>Field name</th>\n             <th>Nullable</th>\n             <th>Type</th>\n             <th>Description</th>\n         </tr>\n     </thead>\n     <tbody>\n         <tr>\n             <td>packageProductId</td><td>n</td><td>Integer</td><td>ID of the newly created Package Product.</td>\n         </tr>\n     </tbody>\n </table>",
+        "operationId": "addPackageProductAction",
+        "parameters": [
+          {
+            "name": "productPricesDetailId",
+            "in": "path",
+            "description": "ProductPricesDetail to be linked to the PackageProduct.",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "pattern": "\\d+"
+            }
+          },
+          {
+            "name": "optionId",
+            "in": "path",
+            "description": "The ID of the Package Option",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "pattern": "\\d+"
+            }
+          },
+          {
+            "name": "quantity",
+            "in": "query",
+            "description": "Quantity of the ProductPricesDetail to be included. Defaults to 1.",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "ordering",
+            "in": "query",
+            "description": "Sort ordering for the PackageProduct. The ordering for other PackageProducts will be adjusted as necessary to accommodate the new PackageProduct's ordering.",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "rrpDifference",
+            "in": "query",
+            "description": "Amount to add onto package's base RRP if this Package Product is selected. If null, the difference between the RRP for this product and the RRP for the cheapest product in the option will be used. Must be null for the cheapest product in this package option.",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "float"
+            }
+          },
+          {
+            "name": "supplierapi",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "supplier|apiv1/supplier"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Returned when successful."
+          },
+          "400": {
+            "description": "Returned when there is an issue with the data provided."
+          },
+          "403": {
+            "description": "Returned when the user is not authorized."
+          },
+          "404": {
+            "description": "Returned when the ProductPricesDetail or PackageOption is not found"
+          },
+          "500": {
+            "description": "Returned when fatal issues are encountered."
+          }
+        }
+      }
+    },
+    "/{supplierapi}/package/{productPricesDetailId}/option/{optionId}/product/{packageProductId}": {
+      "put": {
+        "tags": [
+          "Version 1"
+        ],
+        "summary": "Edit a Package Product",
+        "description": "## Edit a Package Product ##\n\n<p>\nEdits the given Package Product\n</p>\n\n#### Response ####\n<p>204 on success</p>",
+        "operationId": "put_api_product_package_editpackageproduct",
+        "parameters": [
+          {
+            "name": "productPricesDetailId",
+            "in": "path",
+            "description": "ProductPricesDetail to be linked to the PackageProduct.",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "optionId",
+            "in": "path",
+            "description": "The ID of the Package Option",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "packageProductId",
+            "in": "path",
+            "description": "The ID of the Package Product",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "quantity",
+            "in": "query",
+            "description": "Quantity of the ProductPricesDetail to be included. Defaults to 1.",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "ordering",
+            "in": "query",
+            "description": "Sort ordering for the PackageProduct. The ordering for other PackageProducts will be adjusted as necessary to accommodate new PackageProduct's ordering.",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "rrpDifference",
+            "in": "query",
+            "description": "Amount to add onto package's base RRP if this Package Product is selected. If null, the difference between the RRP for this product and the RRP for the cheapest product in the option will be used. Must be null for the cheapest product in this package option.",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "format": "float"
+            }
+          },
+          {
+            "name": "supplierapi",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "supplier|apiv1/supplier"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Returned when successful."
+          },
+          "400": {
+            "description": "Returned when there is an issue with the data provided."
+          },
+          "403": {
+            "description": "Returned when the user is not authorized."
+          },
+          "404": {
+            "description": "Returned when the ProductPricesDetail or PackageOption is not found"
+          },
+          "500": {
+            "description": "Returned when fatal issues are encountered."
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Packages"
+        ],
+        "summary": "Delete a Package Product",
+        "description": "## Delete a Package Product ##\n\n<p>\nDeletes the given Package Product\n</p>",
+        "operationId": "deletePackageProductAction",
+        "parameters": [
+          {
+            "name": "productPricesDetailId",
+            "in": "path",
+            "description": "The ID of the ProductPricesDetail",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "pattern": "\\d+"
+            }
+          },
+          {
+            "name": "optionId",
+            "in": "path",
+            "description": "The ID of the Package Option",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "pattern": "\\d+"
+            }
+          },
+          {
+            "name": "packageProductId",
+            "in": "path",
+            "description": "The ID of the Package Product",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "pattern": "\\d+"
+            }
+          },
+          {
+            "name": "supplierapi",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "supplier|apiv1/supplier"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Returned when successful."
+          },
+          "400": {
+            "description": "Returned when there is an issue with the data provided."
+          },
+          "403": {
+            "description": "Returned when the user is not authorized."
+          },
+          "404": {
+            "description": "Returned when the ProductPricesDetail or PackageOption is not found"
+          },
+          "500": {
+            "description": "Returned when fatal issues are encountered."
+          }
+        }
+      }
+    },
+    "/{supplierapi}/product/{productId}/allocations": {
+      "get": {
+        "tags": [
+          "Version 1",
+          "Booking Details"
+        ],
+        "summary": "Get information about the allocations for a product",
+        "description": "## Get information about the allocations for a product ##\n\n<p>\nRetrieves information about the allocations for the given product.\n</p>\n\n#### Response ####\n\n**Top Level Result Object**\n\n <table class=\"fullwidth\">\n     <thead>\n         <tr>\n             <th>Field name</th>\n             <th>Nullable</th>\n             <th>Type</th>\n             <th>Description</th>\n         </tr>\n     </thead>\n     <tbody>\n         <tr>\n             <td>results</td><td>n</td><td>Array</td><td>List of Allocations, formatted as per GET product/{productId}/allocation/{allocationId}.</td>\n         </tr>\n     </tbody>\n </table>",
+        "operationId": "getAvailabilityAllocationsAction",
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "description": "The ID of the Product",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "supplierapi",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "supplier|apiv1/supplier"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returned when successful."
+          },
+          "403": {
+            "description": "Returned when the user is not authorized."
+          },
+          "404": {
+            "description": "Product not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        }
+      }
+    },
+    "/{supplierapi}/product/{productId}/allocation/{allocationId}": {
+      "get": {
+        "tags": [
+          "Version 1",
+          "Booking Details"
+        ],
+        "summary": "Get information about the given allocation",
+        "description": "## Get information about the given allocation ##\n\n<p>\nRetrieves information about the given allocation.\n</p>\n\n#### Response ####\n\n**Top Level Result Object**\n\n <table class=\"fullwidth\">\n     <thead>\n         <tr>\n             <th>Field name</th>\n             <th>Nullable</th>\n             <th>Type</th>\n             <th>Description</th>\n         </tr>\n     </thead>\n     <tbody>\n         <tr>\n             <td>allocationId</td><td>n</td><td>Integer</td><td>ID of this Allocation.</td>\n         </tr>\n         <tr>\n             <td>allocationName</td><td>n</td><td>String</td><td>Name of the Allocation.</td>\n         </tr>\n         <tr>\n             <td>defaultQuantity</td><td>n</td><td>Integer</td><td>Default quantity for this Allocation.</td>\n         </tr>\n         <tr>\n             <td>startDate</td><td>n</td><td>String</td><td>Start date of this Allocation in format YYYY-MM-DD.</td>\n         </tr>\n         <tr>\n             <td>endDate</td><td>y</td><td>String</td><td>End date of this Allocation in format YYYY-MM-DD.</td>\n         </tr>\n         <tr>\n             <td>blockoutDays</td><td>y</td><td>String</td><td>Days of the week on which this product is not available. Comma-separated list of integers (eg '3,5') where 0 => Sunday, 1=> Monday etc.</td>\n         </tr>\n         <tr>\n             <td>bookingDetailId</td><td>y</td><td>Integer</td><td>ID of the BookingDetail Object for this allocation.</td>\n         </tr>\n         <tr>\n             <td>bookingBuffer</td><td>y</td><td>Integer</td><td>Number of days before booking date that reservations through Website Travel should be disabled.</td>\n         </tr>\n         <tr>\n             <td>productPricesDetailsIds</td><td>n</td><td>String</td><td>Comma-separated listed of IDs for the ProductPricesDetails that this Allocation should apply to.</td>\n         </tr>\n     </tbody>\n </table>",
+        "operationId": "getAvailabilityAllocationAction",
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "description": "The ID of the Product",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "allocationId",
+            "in": "path",
+            "description": "The ID of the Allocation",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "pattern": "\\d+"
+            }
+          },
+          {
+            "name": "supplierapi",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "supplier|apiv1/supplier"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returned when successful."
+          },
+          "403": {
+            "description": "Returned when the user is not authorized."
+          },
+          "404": {
+            "description": "Product or Allocation not found"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        }
+      }
+    },
+    "/{supplierapi}/product/{productId}/allocation": {
+      "post": {
+        "tags": [
+          "Version 1",
+          "Booking Details"
+        ],
+        "summary": "Create a new Allocation",
+        "description": "## Create a new Allocation ##\n\n<p>\nCreates a new Allocation for the given Product.\n</p>\n\n#### Response ####\n**Top Level Result Object**\n\n <table class=\"fullwidth\">\n     <thead>\n         <tr>\n             <th>Field name</th>\n             <th>Nullable</th>\n             <th>Type</th>\n             <th>Description</th>\n         </tr>\n     </thead>\n     <tbody>\n         <tr>\n             <td>allocationId</td><td>n</td><td>Integer</td><td>ID of the newly created Allocation.</td>\n         </tr>\n     </tbody>\n </table>",
+        "operationId": "addAvailabilityAllocationAction",
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "description": "The ID of the Product",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "supplierapi",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "supplier|apiv1/supplier"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Allocation details to create",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "required": [
+                  "allocationName",
+                  "defaultQuantity",
+                  "productPricesDetailsIds"
+                ],
+                "properties": {
+                  "allocationName": {
+                    "description": "Name of the Allocation.",
+                    "type": "string"
+                  },
+                  "defaultQuantity": {
+                    "description": "Default quantity for this Allocation.",
+                    "type": "integer"
+                  },
+                  "startDate": {
+                    "description": "Start date of this Allocation.",
+                    "type": "string"
+                  },
+                  "endDate": {
+                    "description": "End date of this Allocation.",
+                    "type": "string"
+                  },
+                  "blockoutDays": {
+                    "description": "Days of the week when the product is not available.",
+                    "type": "string"
+                  },
+                  "bookingDetailId": {
+                    "description": "ID for the BookingDetail Object for this allocation.",
+                    "type": "integer"
+                  },
+                  "bookingBuffer": {
+                    "description": "Number of days before booking date to disable reservations.",
+                    "type": "integer"
+                  },
+                  "productPricesDetailsIds": {
+                    "description": "IDs for the ProductPricesDetails that this Allocation should apply to.",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Returned when successful."
+          },
+          "400": {
+            "description": "Returned when there is an issue with the data provided."
+          },
+          "403": {
+            "description": "Returned when the user is not authorized."
+          },
+          "404": {
+            "description": "Returned when Product is not found."
+          },
+          "500": {
+            "description": "Returned when fatal issues are encountered."
+          }
+        }
+      }
+    },
+    "/{supplierapi}/product/{productId}/allocation/{productAllocationId}": {
+      "put": {
+        "tags": [
+          "Version 1",
+          "Booking Details"
+        ],
+        "summary": "Update an Allocation",
+        "description": "## Update an Allocation ##\n\n<p>\nUpdates an existing Allocation. All fields are optional: you only pass in the fields that you want to change. Note that you\ncannot remove existing ProductPrices from an Allocation, although you can add new ones. A ProductPrice can only belong to\none Allocation at a time, so adding it to one Allocation will have the effect of removing it from any previous Allocation\nthat it belonged to.\n</p>",
+        "operationId": "updateAvailabilityAllocationAction",
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "description": "The ID of the Product",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "productAllocationId",
+            "in": "path",
+            "description": "The ID of the Product Allocation",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "pattern": "\\d+"
+            }
+          },
+          {
+            "name": "supplierapi",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "supplier|apiv1/supplier"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Allocation details to update",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "required": [
+                  "startDate"
+                ],
+                "properties": {
+                  "allocationName": {
+                    "description": "Name of the Allocation.",
+                    "type": "string"
+                  },
+                  "defaultQuantity": {
+                    "description": "Default quantity for this Allocation.",
+                    "type": "integer"
+                  },
+                  "startDate": {
+                    "description": "Start date of this Allocation.",
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "endDate": {
+                    "description": "End date of this Allocation.",
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "blockoutDays": {
+                    "description": "Days of the week when the product is not available.",
+                    "type": "string"
+                  },
+                  "bookingDetailId": {
+                    "description": "ID for the BookingDetail Object for this allocation.",
+                    "type": "integer"
+                  },
+                  "bookingBuffer": {
+                    "description": "Number of days before booking date to disable reservations.",
+                    "type": "integer"
+                  },
+                  "newProductPricesDetailsIds": {
+                    "description": "IDs for the ProductPricesDetails to add to this Allocation.",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Returned when successful."
+          },
+          "400": {
+            "description": "Returned when there is an issue with the data provided."
+          },
+          "403": {
+            "description": "Returned when the user is not authorized."
+          },
+          "404": {
+            "description": "Returned when Product or Allocation is not found."
+          },
+          "500": {
+            "description": "Returned when fatal issues are encountered."
+          }
+        }
+      }
+    },
+    "/{supplierapi}/bookingdetails": {
+      "get": {
+        "tags": [
+          "Version 1",
+          "Booking Details"
+        ],
+        "summary": "Get information about the supplier's BookingDetails Objects",
+        "description": "## Get information about the supplier's BookingDetails Objects ##\n\n<p>\nRetrieves information about the supplier's BookingDetails Objects.\n</p>\n\n#### Response ####\n\n**Top Level Result Object**\n\n <table class=\"fullwidth\">\n     <thead>\n         <tr>\n             <th>Field name</th>\n             <th>Nullable</th>\n             <th>Type</th>\n             <th>Description</th>\n         </tr>\n     </thead>\n     <tbody>\n         <tr>\n             <td>results</td><td>n</td><td>Array</td><td>List of BookingDetails objects,formatted as per GET bookingDetails/{bookingDetailsId}.</td>\n         </tr>\n     </tbody>\n </table>",
+        "operationId": "getBookingDetailsAction",
+        "parameters": [
+          {
+            "name": "supplierapi",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "supplier|apiv1/supplier"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returned when successful."
+          },
+          "403": {
+            "description": "Returned when the user is not authorized."
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        }
+      }
+    },
+    "/{supplierapi}/bookingdetail/{bookingDetailId}": {
+      "get": {
+        "tags": [
+          "Version 1",
+          "Booking Details"
+        ],
+        "summary": "Get information about the given BookingDetail Object",
+        "description": "## Get information about the given BookingDetail Object ##\n\n<p>\nRetrieves information about the given BookingDetail Object.\n</p>\n\n#### Response ####\n\n**Top Level Result Object**\n\n <table class=\"fullwidth\">\n     <thead>\n         <tr>\n             <th>Field name</th>\n             <th>Nullable</th>\n             <th>Type</th>\n             <th>Description</th>\n         </tr>\n     </thead>\n     <tbody>\n         <tr>\n             <td>bookingDetailId</td><td>n</td><td>Integer</td><td>ID of this BookingDetail Object.</td>\n         </tr>\n         <tr>\n             <td>name</td><td>n</td><td>String</td><td>Name of BookingDetail Object.</td>\n         </tr>\n         <tr>\n             <td>pickups</td><td>n</td><td>Array</td><td>List of Pickup objects.</td>\n         </tr>\n         <tr>\n             <td>supplierBookingDetailsOptionalFields</td><td>n</td><td>Array</td><td>List of SupplierBookingDetailsOptionalField objects.</td>\n         </tr>\n     </tbody>\n </table>\n\n\n**Pickup Object**\n\n <table class=\"fullwidth\">\n     <thead>\n         <tr>\n             <th>Field name</th>\n             <th>Nullable</th>\n             <th>Type</th>\n             <th>Description</th>\n         </tr>\n     </thead>\n     <tbody>\n         <tr>\n             <td>pickupTime</td><td>n</td><td>String</td><td>Time in format HH:ii.</td>\n         </tr>\n         <tr>\n             <td>pickupLocation</td><td>n</td><td>String</td><td>Name of pickup location.</td>\n         </tr>\n     </tbody>\n </table>\n\n **SupplierBookingDetailsOptionalField**\n <table class=\"fullwidth\">\n     <thead>\n         <tr>\n             <th>Field name</th>\n             <th>Nullable</th>\n             <th>Type</th>\n             <th>Description</th>\n         </tr>\n     </thead>\n     <tbody>\n         <tr>\n             <td>supplierBookingDetailsOptionalFieldId</td><td>n</td><td>Integer</td><td>Unique identifier.</td>\n         </tr>\n         <tr>\n             <td>title</td><td>n</td><td>String</td><td>Name of the optional field.</td>\n         </tr>\n     </tbody>\n </table>",
+        "operationId": "getBookingDetailAction",
+        "parameters": [
+          {
+            "name": "bookingDetailId",
+            "in": "path",
+            "description": "The ID of the Booking Detail",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "pattern": "\\d+"
+            }
+          },
+          {
+            "name": "supplierapi",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "supplier|apiv1/supplier"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returned when successful."
+          },
+          "403": {
+            "description": "Returned when the user is not authorized."
+          },
+          "404": {
+            "description": "BookingDetail not found."
+          },
+          "500": {
+            "description": "Internal error."
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Version 1",
+          "Booking Details"
+        ],
+        "summary": "Update a BookingDetail Object",
+        "description": "## Update a BookingDetail Object ##\n\n<p>\nUpdates an existing BookingDetail Object.\n</p>",
+        "operationId": "editBookingDetailAction",
+        "parameters": [
+          {
+            "name": "supplierapi",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "supplier|apiv1/supplier"
+            }
+          },
+          {
+            "name": "bookingDetailId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "\\d+"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Detail to update BookingDetail.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "required": [
+                  "name",
+                  "pickups"
+                ],
+                "properties": {
+                  "name": {
+                    "description": "Name of the BookingDetail.",
+                    "type": "string"
+                  },
+                  "pickups": {
+                    "description": "Array of Pickup objects.",
+                    "type": "array",
+                    "items": {
+                      "required": [
+                        "pickupTime",
+                        "pickupLocation"
+                      ],
+                      "properties": {
+                        "pickupTime": {
+                          "description": "Pickup time.",
+                          "type": "string"
+                        },
+                        "pickupLocation": {
+                          "description": "Name of pickup location.",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  },
+                  "supplierBookingDetailsOptionalFields": {
+                    "description": "Array of supplierBookingDetailsOptionalFields objects.",
+                    "type": "array",
+                    "items": {
+                      "required": [
+                        "title"
+                      ],
+                      "properties": {
+                        "supplierBookingDetailsOptionalFieldId": {
+                          "description": "Unique identifier of the optional field.",
+                          "type": "string"
+                        },
+                        "title": {
+                          "description": "Title of optional field",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  }
+                },
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Returned when successful."
+          },
+          "400": {
+            "description": "Returned when there is an issue with the data provided."
+          },
+          "403": {
+            "description": "Returned when the user is not authorized."
+          },
+          "404": {
+            "description": "Returned when BookingDetail is not found."
+          },
+          "500": {
+            "description": "Returned when fatal issues are encountered."
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Version 1",
+          "Booking Details"
+        ],
+        "summary": "Delete a BookingDetail Object",
+        "description": "## Delete a BookingDetail Object ##\n\n<p>\nDeletes the given BookingDetail Object.\n</p>",
+        "operationId": "deleteBookingDetailAction",
+        "parameters": [
+          {
+            "name": "supplierapi",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "supplier|apiv1/supplier"
+            }
+          },
+          {
+            "name": "bookingDetailId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Returned when successful."
+          },
+          "400": {
+            "description": "Returned when there is an issue with the data provided."
+          },
+          "403": {
+            "description": "Returned when the user is not authorized."
+          },
+          "404": {
+            "description": "Returned when no matching record found."
+          },
+          "500": {
+            "description": "Returned when fatal issues are encountered."
+          }
+        }
+      }
+    },
+    "/{supplierapi}/bookingdetail": {
+      "post": {
+        "tags": [
+          "Version 1",
+          "Booking Details"
+        ],
+        "summary": "Create a new BookingDetail Object",
+        "description": "## Create a new BookingDetail Object ##\n\n<p>\nCreates a new BookingDetail Object.\n</p>\n\n## Response ##\n**Top Level Result Object**\n\n <table class=\"fullwidth\">\n     <thead>\n         <tr>\n             <th>Field name</th>\n             <th>Nullable</th>\n             <th>Type</th>\n             <th>Description</th>\n         </tr>\n     </thead>\n     <tbody>\n         <tr>\n             <td>bookingDetailId</td><td>n</td><td>Integer</td><td>ID of the newly created Booking Detail.</td>\n         </tr>\n     </tbody>\n </table>",
+        "operationId": "createBookingDetailAction",
+        "parameters": [
+          {
+            "name": "supplierapi",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "supplier|apiv1/supplier"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Allocation details to update",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "required": [
+                  "name",
+                  "pickups"
+                ],
+                "properties": {
+                  "name": {
+                    "description": "Name of pickup set.",
+                    "type": "string"
+                  },
+                  "pickups": {
+                    "description": "Array of Pickup objects.",
+                    "type": "array",
+                    "items": {
+                      "required": [
+                        "pickupTime",
+                        "pickupLocation"
+                      ],
+                      "properties": {
+                        "pickupTime": {
+                          "description": "Pickup time.",
+                          "type": "string"
+                        },
+                        "pickupLocation": {
+                          "description": "Name of pickup location.",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  },
+                  "supplierBookingDetailsOptionalFields": {
+                    "description": "Array of supplierBookingDetailsOptionalFields objects.",
+                    "type": "array",
+                    "items": {
+                      "properties": {
+                        "title": {
+                          "description": "Title of optional field",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  }
+                },
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Returned when successful."
+          },
+          "400": {
+            "description": "Returned when there is an issue with the data provided."
+          },
+          "403": {
+            "description": "Returned when the user is not authorized."
+          },
+          "500": {
+            "description": "Returned when fatal issues are encountered."
+          }
+        }
+      }
+    },
+    "/{supplierapi}/bookingdetail/{bookingDetailId}/{optionalFieldId}": {
+      "delete": {
+        "tags": [
+          "Version 1",
+          "Booking Details"
+        ],
+        "summary": "Deletes an Optional Field from a BookingDetail Object",
+        "description": "## Deletes an Optional Field from a BookingDetail Object ##\n\n<p>\nDeletes an Optional Field from a BookingDetail Object.  Any existing bookings made when this optional field was in use\nwill continue to hold data for this field.  However, following a successful delete, the optional field will\nnot be available for future bookings.\n</p>",
+        "operationId": "deleteOptionalFieldFromBookingDetailsAction",
+        "parameters": [
+          {
+            "name": "supplierapi",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "supplier|apiv1/supplier"
+            }
+          },
+          {
+            "name": "bookingDetailId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "optionalFieldId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Returned when successful."
+          },
+          "400": {
+            "description": "Returned when there is an issue with the data provided."
+          },
+          "403": {
+            "description": "Returned when the user is not authorized."
+          },
+          "404": {
+            "description": "Returned when no matching record found."
+          },
+          "500": {
+            "description": "Returned when fatal issues are encountered."
+          }
+        }
+      }
+    },
+    "/{supplierapi}/bookings": {
+      "get": {
+        "tags": [
+          "Version 1",
+          "Booking Details"
+        ],
+        "summary": "Get a list of bookings",
+        "description": "## Get a list of bookings ##\n\n<p>\nRetrieve a list of bookings matching the search criteria. If no search criteria are provided, the default search\nreturns a list of all bookings for activities on or after today's date.\n</p>\n\n#### Response ####\n\n**Top Level Result Object**\n\n <table class=\"fullwidth\">\n     <thead>\n         <tr>\n             <th>Field name</th>\n             <th>Nullable</th>\n             <th>Type</th>\n             <th>Description</th>\n         </tr>\n     </thead>\n     <tbody>\n         <tr>\n             <td>totalMatchingRecords</td><td>n</td><td>Integer</td><td>Total number of bookings found that match the search criteria.</td>\n         </tr>\n         <tr>\n             <td>fetchedRecords</td><td>n</td><td>Integer</td><td>Number of bookings returned in this response.</td>\n         </tr>\n         <tr>\n             <td>results</td><td>n</td><td>Array</td><td>List of Booking objects.</td>\n         </tr>\n     </tbody>\n </table>\n\n**Booking Object**\n\n <table class=\"fullwidth\">\n     <thead>\n         <tr>\n             <th>Field name</th>\n             <th>Nullable</th>\n             <th>Type</th>\n             <th>Description</th>\n         </tr>\n     </thead>\n     <tbody>\n         <tr>\n             <td>bookingId</td><td>n</td><td>Integer</td><td>Unique identifier for this booking.</td>\n         </tr>\n         <tr>\n             <td>fareName</td><td>n</td><td>String</td><td>Name of the fare type that this booking was made for.</td>\n         </tr>\n         <tr>\n             <td>allocationName</td><td>n</td><td>String</td><td>Name of the availability allocation group that this booking was made for.</td>\n         </tr>\n         <tr>\n             <td>bookingDate</td><td>n</td><td>Date<br/><em>(yyyy-mm-dd)</em></td><td>Date that the booking is for.</td>\n         </tr>\n         <tr>\n             <td>createdDate</td><td>n</td><td>Date<br/><em>(ISO8601 format)</em></td><td>Date and time of the booking request</td>\n         </tr>\n         <tr>\n             <td>redeemers</td><td>n</td><td>Array of Redeemer Objects</td><td>Customers associated with this booking</td>\n         </tr>\n         <tr>\n             <td>pax</td><td>n</td><td>Integer</td><td>Number of people on this booking.</td>\n         </tr>\n         <tr>\n             <td>NetRate</td><td>n</td><td>Float</td><td>Value of this booking to the operator. (per qty)</td>\n         </tr>\n         <tr>\n             <td>RRP</td><td>n</td><td>Float</td><td>Operator retail price of this booking (per qty)</td>\n         </tr>\n         <tr>\n             <td>voucherNumber</td><td>n</td><td>String</td><td>Voucher number for this booking.<br/>Note that one voucher may have multiple bookings.<br/>For example if the booking is for multiple nights of accommodation.</td>\n         </tr>\n         <tr>\n             <td>cancelledDate</td><td>y</td><td>Date<br/><em>(ISO8601 format)</em></td><td>Date and time  that the booking was cancelled.</td>\n         </tr>\n         <tr>\n             <td>cancelledReason</td><td>y</td><td>String</td><td>Reason that booking was cancelled.</td>\n         </tr>\n     </tbody>\n </table>\n\n**Redeemer Object**\n\n <table class=\"fullwidth\">\n     <thead>\n         <tr>\n             <th>Field name</th>\n             <th>Nullable</th>\n             <th>Type</th>\n             <th>Description</th>\n         </tr>\n     </thead>\n     <tbody>\n         <tr>\n             <td>name</td><td>n</td><td>String</td><td>Customer Name.</td>\n         </tr>\n         <tr>\n             <td>email</td><td>n</td><td>String</td><td>Customer email address</td>\n         </tr>\n         <tr>\n             <td>phone</td><td>n</td><td>String</td><td>Customer contact number</td>\n         </tr>\n         <tr>\n             <td>pickup</td><td>y</td><td>String</td><td>Pickup details for this customer</td>\n         </tr>\n         <tr>\n             <td>comment</td><td>y</td><td>String</td><td>Additional information</td>\n         </tr>\n         <tr>\n             <td>optionalFields</td><td>n</td><td>Array of Optional Field Objects</td><td>Further requested information</td>\n         </tr>\n     </tbody>\n </table>\n\n**Optional Field Object**\n\n <table class=\"fullwidth\">\n     <thead>\n         <tr>\n             <th>Field name</th>\n             <th>Nullable</th>\n             <th>Type</th>\n             <th>Description</th>\n         </tr>\n     </thead>\n     <tbody>\n         <tr>\n             <td>question</td><td>n</td><td>String</td><td>Optional field question</td>\n         </tr>\n         <tr>\n             <td>answer</td><td>n</td><td>String</td><td>Customer answer</td>\n         </tr>\n     </tbody>\n </table>",
+        "operationId": "getBookingsAction",
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "query",
+            "description": "Only return bookings for the product with this ID.",
+            "required": false
+          },
+          {
+            "name": "redeemer",
+            "in": "query",
+            "description": "Only return bookings that partially match this redeemer name.",
+            "required": false
+          },
+          {
+            "name": "voucherNumber",
+            "in": "query",
+            "description": "Only return bookings that match this voucher number.",
+            "required": false
+          },
+          {
+            "name": "bookingDateAfter",
+            "in": "query",
+            "description": "Only return bookings for activities on or after this date.",
+            "required": false
+          },
+          {
+            "name": "bookingDateBefore",
+            "in": "query",
+            "description": "Only return bookings for activities before this date.",
+            "required": false
+          },
+          {
+            "name": "createdDateAfter",
+            "in": "query",
+            "description": "Only return bookings which were placed on or after this date.",
+            "required": false
+          },
+          {
+            "name": "createdDateBefore",
+            "in": "query",
+            "description": "Only return bookings which were placed before this date.",
+            "required": false
+          },
+          {
+            "name": "cancelledDateAfter",
+            "in": "query",
+            "description": "Only return bookings which have been cancelled on or after this date.",
+            "required": false
+          },
+          {
+            "name": "cancelledDateBefore",
+            "in": "query",
+            "description": "Only return bookings which have been cancelled before this date.",
+            "required": false
+          },
+          {
+            "name": "cancelled",
+            "in": "query",
+            "description": "Only return bookings which have/have not been cancelled.",
+            "required": false
+          },
+          {
+            "name": "sortBy",
+            "in": "query",
+            "description": "Sort the results by this field.",
+            "required": false,
+            "example": "bookingId"
+          },
+          {
+            "name": "sortDirection",
+            "in": "query",
+            "description": "Sort the results in this direction.",
+            "required": false,
+            "example": "desc"
+          },
+          {
+            "name": "recordsStart",
+            "in": "query",
+            "description": "Position of first result to return.",
+            "required": false,
+            "example": 0
+          },
+          {
+            "name": "recordsLength",
+            "in": "query",
+            "description": "Number of results to return.",
+            "required": false,
+            "example": 50
+          },
+          {
+            "name": "supplierapi",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "supplier|apiv1/supplier"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returned when successful"
+          },
+          "400": {
+            "description": "Invalid parameters provided"
+          },
+          "403": {
+            "description": "Returned when the user is not authorized"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        }
+      }
+    },
+    "/{supplierapi}/product/{productId}/allocation/{productAllocationId}/adjustments": {
+      "put": {
+        "tags": [
+          "Version 1",
+          "Booking Details"
+        ],
+        "summary": "Make adjustments to an Allocation's availability",
+        "description": "## Make adjustments to an Allocation's availability ##\n\n<p>\nSets an adjusted availability for a given date range. For example, if the default availability is 20 and an adjustment\nof -5 is passed in, availability during that date range will be adjusted to 15. Each call to this method will replace\nthe previous adjustment for the dates provided, if any. Adjustments will NOT be changed if the default availability for\nthe Allocation is changed.\n</p>",
+        "operationId": "setAvailabilityAdjustmentAction",
+        "parameters": [
+          {
+            "name": "supplierapi",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "supplier|apiv1/supplier"
+            }
+          },
+          {
+            "name": "productId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "productAllocationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Detail to update the Allocation.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "required": [
+                  "dateRanges"
+                ],
+                "properties": {
+                  "dateRanges": {
+                    "description": "Array of DateRange objects.",
+                    "type": "array",
+                    "items": {
+                      "required": [
+                        "startDate",
+                        "adjustment"
+                      ],
+                      "properties": {
+                        "startDate": {
+                          "description": "Start date for adjustment to be applied to.",
+                          "type": "string",
+                          "format": "date"
+                        },
+                        "endDate": {
+                          "description": "End date for adjustment to be applied to. Defaults to startDate.",
+                          "type": "string",
+                          "format": "date"
+                        },
+                        "adjustment": {
+                          "description": "Amount to adjust the default quantity by.",
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  }
+                },
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Returned when successful."
+          },
+          "400": {
+            "description": "Returned when there is an issue with the data provided."
+          },
+          "403": {
+            "description": "Returned when the user is not authorized."
+          },
+          "404": {
+            "description": "Returned when Product or Allocation is not found."
+          },
+          "500": {
+            "description": "Returned when fatal issues are encountered."
+          }
+        }
+      }
+    },
+    "/{supplierapi}/product/{productId}/price/{productPricesDetailId}": {
+      "get": {
+        "tags": [
+          "Version 1",
+          "Product Prices"
+        ],
+        "summary": "Get information about a price",
+        "description": "Get information about a Price",
+        "operationId": "getPriceAction",
+        "parameters": [
+          {
+            "name": "supplierapi",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "supplier|apiv1/supplier"
+            }
+          },
+          {
+            "name": "productId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "\\d+"
+            }
+          },
+          {
+            "name": "productPricesDetailId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "\\d+"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returned when successful"
+          },
+          "400": {
+            "description": "Product or product price not found"
+          },
+          "403": {
+            "description": "Returned when the user is not authorized"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        }
+      }
+    },
+    "/{supplierapi}/product/{productId}/prices": {
+      "get": {
+        "tags": [
+          "Version 1",
+          "Product Prices"
+        ],
+        "summary": "Get all prices for a Product",
+        "description": "Get all prices for a Product",
+        "operationId": "getPricesAction",
+        "parameters": [
+          {
+            "name": "supplierapi",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "supplier|apiv1/supplier"
+            }
+          },
+          {
+            "name": "productId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "\\d+"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returned when successful."
+          },
+          "400": {
+            "description": "Product or product price not found."
+          },
+          "403": {
+            "description": "Returned when the user is not authorized."
+          },
+          "500": {
+            "description": "Internal error."
+          }
+        }
+      }
+    },
+    "/{supplierapi}/product/{productId}/price": {
+      "post": {
+        "tags": [
+          "Version 1",
+          "Product Prices"
+        ],
+        "summary": "Add a price to a Product",
+        "description": "## Add a price to a Product ##\n\n<p>\nAdds a price to the Product based on the JSON array of data provided.\n</p>\n\n## Response ##\n**Top Level Result Object**\n\n <table class=\"fullwidth\">\n     <thead>\n         <tr>\n             <th>Field name</th>\n             <th>Nullable</th>\n             <th>Type</th>\n             <th>Description</th>\n         </tr>\n     </thead>\n     <tbody>\n         <tr>\n             <td>productPricesDetailsId</td><td>n</td><td>Integer</td><td>ID of the newly created Product Prices Detail.</td>\n         </tr>\n     </tbody>\n </table>",
+        "operationId": "post_api_product_productprice_addprice",
+        "parameters": [
+          {
+            "name": "supplierapi",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "supplier|apiv1/supplier"
+            }
+          },
+          {
+            "name": "productId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "\\d+"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Add price details for a product.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "required": [
+                  "fareName",
+                  "fareTypeCategoryId",
+                  "currency",
+                  "pax",
+                  "duration",
+                  "periodStart",
+                  "rrp",
+                  "netRate",
+                  "levy"
+                ],
+                "properties": {
+                  "agents": {
+                    "description": "Ids of the agents that have access to this price.",
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    }
+                  },
+                  "allowEmptyRedeemerDetails": {
+                    "description": "Allow empty redeemer details.",
+                    "type": "boolean"
+                  },
+                  "allowOpenDated": {
+                    "description": "Allow open dated bookings.",
+                    "type": "boolean"
+                  },
+                  "bookingSystemMapping": {
+                    "description": "Fields used to map product to an external reservation system.",
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "cancellationFeePolicyId": {
+                    "description": "ID of product's cancellation fee policy.",
+                    "type": "integer"
+                  },
+                  "childMaxAge": {
+                    "description": "Maximum age for children to be eligible.",
+                    "type": "integer"
+                  },
+                  "childMinAge": {
+                    "description": "Minimum age for children to be eligible.",
+                    "type": "integer"
+                  },
+                  "defaultFare": {
+                    "description": "Is this the default fare for the Product?",
+                    "type": "boolean"
+                  },
+                  "duration": {
+                    "description": "Duration of the tour in days.",
+                    "type": "integer"
+                  },
+                  "durationNights": {
+                    "description": "Duration of the tour in nights.",
+                    "type": "integer"
+                  },
+                  "earlyBirdLeadDays": {
+                    "description": "Lead time that fare must be booked in advance.",
+                    "type": "integer"
+                  },
+                  "fareName": {
+                    "description": "Name of the Fare Type.",
+                    "type": "string"
+                  },
+                  "fareQtyRestrictions": {
+                    "description": "Total quantity this fare that agents must select.",
+                    "type": "integer"
+                  },
+                  "fareTypeCategoryId": {
+                    "description": "ID of Fare Type Category.",
+                    "type": "integer"
+                  },
+                  "levy": {
+                    "description": "Any levy charged on top of RRP at point of travel.",
+                    "type": "number",
+                    "format": "float"
+                  },
+                  "levyDescription": {
+                    "description": "Description of levy.",
+                    "type": "string"
+                  },
+                  "netRate": {
+                    "description": "Net or wholesale price.",
+                    "type": "number",
+                    "format": "float"
+                  },
+                  "note": {
+                    "description": "Any special comments made by Supplier.",
+                    "type": "string"
+                  },
+                  "numAdults": {
+                    "description": "Number of adults who are eligible to travel on this fare.",
+                    "type": "integer"
+                  },
+                  "numChildren": {
+                    "description": "Number of children who are eligible to travel on this fare.",
+                    "type": "integer"
+                  },
+                  "pax": {
+                    "description": "Number of people the price covers.",
+                    "type": "integer"
+                  },
+                  "periodEnd": {
+                    "description": "End date of the active period.",
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "periodStart": {
+                    "description": "Start date of the active period.",
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "packageOnlyFare": {
+                    "description": "Is this a Package only fare?",
+                    "type": "boolean"
+                  },
+                  "rrp": {
+                    "description": "Recommended retail price.",
+                    "type": "number",
+                    "format": "float"
+                  },
+                  "travelEnd": {
+                    "description": "End date of the travel period.",
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "travelStart": {
+                    "description": "Start date of the travel period.",
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "currency": {
+                    "description": "ISO 4217 currency code.",
+                    "type": "string"
+                  },
+                  "fareTagIds": {
+                    "description": "IDs of Fare Tag as array. Get ID of Fare Tag using /categories/faretags",
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    }
+                  }
+                },
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Returned when successful."
+          },
+          "403": {
+            "description": "Returned when the user is not authorized."
+          },
+          "400": {
+            "description": "Returned when there is an issue with the data provided."
+          },
+          "500": {
+            "description": "Returned when fatal issues are encountered."
+          }
+        }
+      }
+    },
+    "/{supplierapi}/product/{productId}/price/{productPricesDetailsId}": {
+      "put": {
+        "tags": [
+          "Version 1",
+          "Product Prices"
+        ],
+        "summary": "Update a Price",
+        "description": "## Update a Price ##\n\n<p>\nUpdate a Price. All fields are optional; you only need to pass in the fields that you want to change. When\nediting a live price, a copy will be made of the price in draft status, and the ID of this new price will\nbe returned in the response body. This means that the existing live price will remain in effect until the\nnew draft price has gone through our product approval process. On the other hand, edits to draft prices and to\nMarketPlace prices which have been directly negotiated between supplier and agent will be made to the existing\nPrice, and no response body will be returned.\n</p>\n\n#### Response ####\n\n**Top Level Result Object**\n\n <table class=\"fullwidth\">\n     <thead>\n         <tr>\n             <th>Field name</th>\n             <th>Nullable</th>\n             <th>Type</th>\n             <th>Description</th>\n         </tr>\n     </thead>\n     <tbody>\n         <tr>\n             <td>productPricesDetailsId</td><td>n</td><td>Integer</td><td>ID of new Price (if any).</td>\n         </tr>\n     </tbody>\n </table>",
+        "operationId": "updatePriceAction",
+        "parameters": [
+          {
+            "name": "supplierapi",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "supplier|apiv1/supplier"
+            }
+          },
+          {
+            "name": "productId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "\\d+"
+            }
+          },
+          {
+            "name": "productPricesDetailsId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "\\d+"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Update price details for a product.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "required": [
+                  "fareTypeCategoryId"
+                ],
+                "properties": {
+                  "agents": {
+                    "description": "Ids of the agents that have access to this price.",
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    }
+                  },
+                  "allowEmptyRedeemerDetails": {
+                    "description": "Allow empty redeemer details.",
+                    "type": "boolean"
+                  },
+                  "allowOpenDated": {
+                    "description": "Allow open dated bookings.",
+                    "type": "boolean"
+                  },
+                  "bookingSystemMapping": {
+                    "description": "Fields used to map product to an external reservation system.",
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "cancellationFeePolicyId": {
+                    "description": "ID of product's cancellation fee policy.",
+                    "type": "integer"
+                  },
+                  "childMaxAge": {
+                    "description": "Maximum age for children to be eligible.",
+                    "type": "integer"
+                  },
+                  "childMinAge": {
+                    "description": "Minimum age for children to be eligible.",
+                    "type": "integer"
+                  },
+                  "defaultFare": {
+                    "description": "Is this the default fare for the Product?",
+                    "type": "boolean"
+                  },
+                  "duration": {
+                    "description": "Duration of the tour in days.",
+                    "type": "integer"
+                  },
+                  "durationNights": {
+                    "description": "Duration of the tour in nights.",
+                    "type": "integer"
+                  },
+                  "earlyBirdLeadDays": {
+                    "description": "Lead time that fare must be booked in advance.",
+                    "type": "integer"
+                  },
+                  "fareName": {
+                    "description": "Name of the Fare Type.",
+                    "type": "string"
+                  },
+                  "fareQtyRestrictions": {
+                    "description": "Total quantity this fare that agents must select.",
+                    "type": "integer"
+                  },
+                  "fareTypeCategoryId": {
+                    "description": "ID of Fare Type Category.",
+                    "type": "integer"
+                  },
+                  "levy": {
+                    "description": "Any levy charged on top of RRP at point of travel.",
+                    "type": "number",
+                    "format": "float"
+                  },
+                  "levyDescription": {
+                    "description": "Description of levy.",
+                    "type": "string"
+                  },
+                  "netRate": {
+                    "description": "Net or wholesale price.",
+                    "type": "number",
+                    "format": "float"
+                  },
+                  "note": {
+                    "description": "Any special comments made by Supplier.",
+                    "type": "string"
+                  },
+                  "numAdults": {
+                    "description": "Number of adults who are eligible to travel on this fare.",
+                    "type": "integer"
+                  },
+                  "numChildren": {
+                    "description": "Number of children who are eligible to travel on this fare.",
+                    "type": "integer"
+                  },
+                  "pax": {
+                    "description": "Number of people the price covers.",
+                    "type": "integer"
+                  },
+                  "periodEnd": {
+                    "description": "End date of the active period.",
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "periodStart": {
+                    "description": "Start date of the active period.",
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "packageOnlyFare": {
+                    "description": "Is this a Package only fare?",
+                    "type": "boolean"
+                  },
+                  "rrp": {
+                    "description": "Recommended retail price.",
+                    "type": "number",
+                    "format": "float"
+                  },
+                  "travelEnd": {
+                    "description": "End date of the travel period.",
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "travelStart": {
+                    "description": "Start date of the travel period.",
+                    "type": "string",
+                    "format": "date"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Returned when new draft price created successfully."
+          },
+          "204": {
+            "description": "Returned when existing draft price updated successfully."
+          },
+          "403": {
+            "description": "Returned when the user is not authorized."
+          },
+          "400": {
+            "description": "Returned when there is an issue with the data provided."
+          },
+          "500": {
+            "description": "Returned when fatal issues are encountered."
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Version 1",
+          "Product Prices"
+        ],
+        "summary": "Delete a Price from a Product",
+        "description": "## Delete a Price from a Product ##\n\n<p>\nDeletes the Price with the given Product ID and Product Prices Details ID.\n</p>",
+        "operationId": "delete_api_product_productprice_deleteprice",
+        "parameters": [
+          {
+            "name": "supplierapi",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "supplier|apiv1/supplier"
+            }
+          },
+          {
+            "name": "productId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "\\d+"
+            }
+          },
+          {
+            "name": "productPricesDetailsId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "\\d+"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Returned when successful."
+          },
+          "403": {
+            "description": "Returned when the user is not authorized."
+          },
+          "400": {
+            "description": "Returned when there is an issue with the data provided."
+          },
+          "500": {
+            "description": "Returned when fatal issues are encountered."
+          }
+        }
+      }
+    },
+    "/{supplierapi}/product/{productId}/price/{productPricesDetailsId}/makedraft": {
+      "post": {
+        "tags": [
+          "Version 1",
+          "Product Prices"
+        ],
+        "summary": "Create a draft version of the product price",
+        "description": "## Create a draft version of the product price ##\n\n<p>\nCreates a draft version of the product price which can be used to make further edits. While the main route to\nPUT changes to a product price will automatically create a new draft when necessary and return the new ID,\nsome other routes (e.g. to manage package options) do not.\n</p>\n<p>\nThe exact behaviour depends on the current status of the product prices detail passed in: <ul>\n<li>If it's already in Draft state no action will be taken</li>\n<li>If it's in Candidate or Approved state, it will be reverted to Draft state</li>\n<li>If it's in Live or History state, a duplicate Draft version of the price will be created</li>\n<li>If it's in Delete Pending or Delete Approved state, an 422 error will be returned</li>\n</ul>\n</p>",
+        "operationId": "post_api_product_productprice_makedraftprice",
+        "parameters": [
+          {
+            "name": "supplierapi",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "supplier|apiv1/supplier"
+            }
+          },
+          {
+            "name": "productId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "\\d+"
+            }
+          },
+          {
+            "name": "productPricesDetailsId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "\\d+"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Returned when successful."
+          },
+          "400": {
+            "description": "Returned when there is an issue with the data provided."
+          },
+          "403": {
+            "description": "Returned when the user is not authorized."
+          },
+          "404": {
+            "description": "Returned when the product or price is not found."
+          },
+          "422": {
+            "description": "Returned when there is an issue with the data provided."
+          },
+          "500": {
+            "description": "Returned when fatal issues are encountered."
+          }
+        }
+      }
+    },
+    "/{supplierapi}/products": {
+      "get": {
+        "tags": [
+          "Version 1",
+          "Products"
+        ],
+        "summary": "Get information about the supplier's products",
+        "description": "## Get information about the supplier's products ##\n\n<p>\nRetrieves information about the products that belong to the logged-in supplier. Note that the records returned are\n\"productdetails\", not products, so there may be multiple records in different statuses with the same product ID.\n</p>\n\n#### Response ####\n\n**Top Level Result Object**\n\n <table class=\"fullwidth\">\n     <thead>\n         <tr>\n             <th>Field name</th>\n             <th>Nullable</th>\n             <th>Type</th>\n             <th>Description</th>\n         </tr>\n     </thead>\n     <tbody>\n         <tr>\n             <td>fetchedRecords</td><td>n</td><td>Integer</td><td>Number of records returned in this response.</td>\n         </tr>\n         <tr>\n             <td>totalMatchingRecords</td><td>n</td><td>Integer</td><td>Total number of matching records found.</td>\n         </tr>\n         <tr>\n             <td>results</td><td>n</td><td>Array</td><td>List of ProductsDetails objects.</td>\n         </tr>\n     </tbody>\n </table>\n\n**ProductsDetails Object**\n\n <table class=\"fullwidth\">\n     <thead>\n         <tr>\n             <th>Field name</th>\n             <th>Nullable</th>\n             <th>Type</th>\n             <th>Description</th>\n         </tr>\n     </thead>\n     <tbody>\n         <tr>\n             <td>productId</td><td>n</td><td>Integer</td><td>Product ID</td>\n         </tr>\n         <tr>\n             <td>productName</td><td>n</td><td>String</td><td>Product name</td>\n         </tr>\n         <tr>\n             <td>productStatusCode</td><td>n</td><td>Character</td><td>Product status code</td>\n         </tr>\n         <tr>\n             <td>productStatus</td><td>n</td><td>String</td><td>Product status name</td>\n         </tr>\n         <tr>\n             <td>deletePending</td><td>n</td><td>Boolean</td><td>This product has a delete request pending</td>\n         </tr>\n     </tbody>\n </table>",
+        "operationId": "get_api_product_supplierproduct_getproductdetails",
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "query",
+            "description": "Only return productsdetails for the product with this ID.",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "productName",
+            "in": "query",
+            "description": "Only return productsdetails that partially match this name.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "productStatusCode",
+            "in": "query",
+            "description": "Only return productsdetails that are in this status.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sortBy",
+            "in": "query",
+            "description": "Sort the results by this field.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sortDirection",
+            "in": "query",
+            "description": "Sort the results in this direction.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "recordsStart",
+            "in": "query",
+            "description": "Position of first result to return.",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "recordsLength",
+            "in": "query",
+            "description": "Number of results to return.",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "supplierapi",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "supplier|apiv1/supplier"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returned when successful"
+          },
+          "403": {
+            "description": "Returned when the user is not authorized"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        }
+      }
+    },
+    "/{supplierapi}/product/{productId}/{productStatusCode}": {
+      "get": {
+        "tags": [
+          "Version 1",
+          "Products"
+        ],
+        "summary": "Get information about a ProductsDetail",
+        "description": "## Get information about a ProductsDetail ##\n\n<p>\nRetrieves information about the given ProductsDetail\n</p>\n\n#### Response ####\n\n**Top Level Result Object**\n\n <table class=\"fullwidth\">\n     <thead>\n         <tr>\n             <th>Field name</th>\n             <th>Nullable</th>\n             <th>Type</th>\n             <th>Description</th>\n         </tr>\n     </thead>\n     <tbody>\n         <tr>\n             <td>productId</td><td>n</td><td>Integer</td><td>Product ID</td>\n         </tr>\n         <tr>\n             <td>productStatusCode</td><td>n</td><td>string</td><td>One-character product status code</td>\n         </tr>\n         <tr>\n             <td>productStatus</td><td>n</td><td>String</td><td>Product status name</td>\n         </tr>\n         <tr>\n             <td>productName</td><td>n</td><td>String</td><td>Product name</td>\n         </tr>\n         <tr>\n             <td>productCountry</td><td>n</td><td>String</td><td>2-character ISO 3166 Country code</td>\n         </tr>\n         <tr>\n             <td>productTimezone</td><td>y</td><td>String</td><td>String (e.g. 'Australia/Sydney') representing products timezone. Based on timezone database @ https://www.iana.org/time-zones</td>\n         </tr>\n         <tr>\n             <td>productClassId</td><td>n</td><td>Integer</td><td>Product class ID</td>\n         </tr>\n         <tr>\n             <td>rating</td><td>y</td><td>Decimal</td><td>Valid only for Accommodation products. A 'star' rating in the range of 1-5.</td>\n         </tr>\n         <tr>\n             <td>productClass</td><td>n</td><td>String</td><td>Name of product class</td>\n         </tr>\n         <tr>\n             <td>teaser</td><td>n</td><td>String</td><td>Short product description</td>\n         </tr>\n         <tr>\n             <td>description</td><td>n</td><td>String</td><td>Long product description</td>\n         </tr>\n         <tr>\n             <td>itineraryDetails</td><td>y</td><td>Array (Object)</td><td>Array of itineraryDetails Objects. Example:\n<br><br>\n\"itineraryDetails\": [<br>\n &nbsp;{<br>\n &nbsp;&nbsp;&nbsp;&nbsp;    \"itineraryTitle\": \"day1\",<br>\n &nbsp;&nbsp;&nbsp;&nbsp;    \"itineraryBreakfast\": 0,<br>\n &nbsp;&nbsp;&nbsp;&nbsp;    \"itineraryLunch\": 1,<br>\n &nbsp;&nbsp;&nbsp;&nbsp;    \"itineraryDinner\": 0,<br>\n &nbsp;&nbsp;&nbsp;&nbsp;    \"itineraryDescription\": \"day1 details\"<br>\n &nbsp;},<br>\n &nbsp;{<br>\n &nbsp;&nbsp;&nbsp;&nbsp;    \"itineraryTitle\": \"day2\",<br>\n &nbsp;&nbsp;&nbsp;&nbsp;    \"itineraryBreakfast\": 1,<br>\n &nbsp;&nbsp;&nbsp;&nbsp;    \"itineraryLunch\": 0,<br>\n &nbsp;&nbsp;&nbsp;&nbsp;    \"itineraryDinner\": 0,<br>\n &nbsp;&nbsp;&nbsp;&nbsp;    \"itineraryDescription\": \"day2 details\"<br>\n &nbsp;}<br>\n]<br>  For itineraryBreakfast / itineraryLunch / itineraryDinner: 1 - meal provided, 0 - not provided.</td>\n         <tr>\n         <tr>\n             <td>departuresPickups</td><td>n</td><td>String</td><td>Information about pickups, departures or opening hours</td>\n         </tr>\n         <tr>\n             <td>extras</td><td>n</td><td>String</td><td>Information about extras which can be added to the product</td>\n         </tr>\n         <tr>\n             <td>voucherInstructions</td><td>n</td><td>String</td><td>Instructions to be printed on the voucher</td>\n         </tr>\n         <tr>\n             <td>voucherInformationContactDetailsBits</td><td>n</td><td>Integer</td>\n             <td>\n                 Combined bitwise value of address contact details to be printed on voucher. Depending on your\n                 supplier setup this will either be the details of your supplier account or contact details\n                 specific to this product. Combination of:<br>\n                 <br>\n                 Work phone = 1<br>\n                 Free phone = 2<br>\n                 Address line one = 4<br>\n                 Address line two = 8<br>\n                 Suburb/city = 16<br>\n                 State = 32<br>\n                 Postcode = 64<br>\n                 Country = 128<br>\n                 Email = 256<br>\n             </td>\n         </tr>\n         <tr>\n             <td>agentInstructions</td><td>n</td><td>String</td><td>Instructions to be made available to agents when placing orders</td>\n         </tr>\n         <tr>\n             <td>noRefunds</td><td>n</td><td>Boolean</td><td>Whether refunds should be permitted for this product. Default value is true.</td>\n         </tr>\n         <tr>\n             <td>noRefundsMessage</td><td>n</td><td>String</td><td>Message to be displayed when an attempt is made to get a refund for a no-refunds product</td>\n         </tr>\n         <tr>\n             <td>contactEmail</td><td>y</td><td>String</td><td>Contact email address set for product</td>\n         </tr>\n         <tr>\n             <td>contactPhone</td><td>y</td><td>String</td><td>Contact phone number set for product</td>\n         </tr>\n         <tr>\n             <td>addressLineOne</td><td>n</td><td>String</td><td>First line of product address</td>\n         </tr>\n         <tr>\n             <td>addressLineTwo</td><td>n</td><td>String</td><td>Second line of product address</td>\n         </tr>\n         <tr>\n             <td>addressSuburb</td><td>n</td><td>String</td><td>Suburb line of product address</td>\n         </tr>\n         <tr>\n             <td>addressCity</td><td>n</td><td>String</td><td>city line of product address</td>\n         </tr>\n         <tr>\n             <td>addressState</td><td>n</td><td>String</td><td>State line of product address</td>\n         </tr>\n         <tr>\n             <td>addressPostcode</td><td>n</td><td>String</td><td>Postcode of product address</td>\n         </tr>\n         <tr>\n             <td>mediaPath</td><td>n</td><td>Array</td><td>Path to product's thumbnail image</td>\n         </tr>\n         <tr>\n             <td>mediaId</td><td>n</td><td>Integer</td><td>Media ID of product's thumbnail image</td>\n         </tr>\n         <tr>\n             <td>countries</td><td>n</td><td>Array</td><td>List of IDs of countries associated with this product</td>\n         </tr>\n         <tr>\n             <td>states</td><td>n</td><td>Array</td><td>List of IDs of states associated with this product</td>\n         </tr>\n         <tr>\n             <td>regions</td><td>n</td><td>Array</td><td>List of IDs of regions associated with this product</td>\n         </tr>\n         <tr>\n             <td>locations</td><td>n</td><td>Array</td><td>List of IDs of locations associated with this product</td>\n         </tr>\n         <tr>\n             <td>accommodation</td><td>n</td><td>Array</td><td>List of IDs of accommodation categories associated with this product</td>\n         </tr>\n         <tr>\n             <td>activities</td><td>n</td><td>Array</td><td>List of IDs of activity categories associated with this product</td>\n         </tr>\n         <tr>\n             <td>transport</td><td>n</td><td>Array</td><td>List of IDs of transport categories associated with this product</td>\n         </tr>\n         <tr>\n             <td>startLocation</td><td>y</td><td>Integer</td><td>Location ID of product start location</td>\n         </tr>\n         <tr>\n             <td>endLocation</td><td>y</td><td>Array</td><td>Location ID of product end location</td>\n         </tr>\n         <tr>\n             <td>minAgeRecommendation</td><td>n</td><td>Integer</td><td>Minimum recommended age.</td>\n         </tr>\n         <tr>\n             <td>maxAgeRecommendation</td><td>n</td><td>Integer</td><td>Maximum recommended age.</td>\n         </tr>\n         <tr>\n             <td>ageRestriction</td><td>n</td><td>String</td><td>Description of any age restrictions (e.g. for an R18 hostel).</td>\n         </tr>\n         <tr>\n             <td>fitnessRequirement</td><td>n</td><td>String</td><td>Description of fitness requirements.</td>\n         </tr>\n         <tr>\n             <td>minGroupSize</td><td>n</td><td>Integer</td><td>Minimum tour group size.</td>\n         </tr>\n         <tr>\n             <td>maxGroupSize</td><td>n</td><td>Integer</td><td>Maximum tour group size.</td>\n         </tr>\n         <tr>\n             <td>dietaryRequirements</td><td>n</td><td>Integer</td><td>Dietary requirements.</td>\n         </tr>\n         <tr>\n             <td>luggageRequirements</td><td>n</td><td>String</td><td>Luggage requirements.</td>\n         </tr>\n         <tr>\n             <td>includedItems</td><td>n</td><td>Array(String)</td><td>Description of items included in fare.</td>\n         </tr>\n         <tr>\n             <td>bringItems</td><td>n</td><td>Array(String)</td><td>Description of items the guest is expected to bring.</td>\n         </tr>\n         <tr>\n             <td>voucherTerms</td><td>y</td><td>String</td><td>Description of terms and conditions, disclaimers etc.</td>\n         </tr>\n         <tr>\n             <td>weekDays</td><td>y</td><td>Array(String)</td><td>Comma-separated list of days of the week that trip departs. This field is \"Deprecated\", recommended to use \"departureDates\" field. </td>\n         </tr>\n         <tr>\n             <td>departureDates</td><td>y</td><td>String</td><td>Comma-separated tour departure dates.</td>\n         </tr>\n         <tr>\n             <td>recurrenceDate</td><td>y</td><td>String</td><td>Frequency of departure recurrence (e.g. \"Weekly\", \"Daily\", \"Monthly\"). This field is \"Deprecated\", recommended to use \"departureDates\" field.</td>\n         </tr>\n         <tr>\n             <td>specialCircumstanceDate</td><td>y</td><td>String</td><td>Description of special dates which affect departure info (e.g. Christmas Day)..  This field is \"Deprecated\", recommended to use \"departureDates\" field.</td>\n         </tr>\n         <tr>\n             <td>operatingPartner</td><td>y</td><td>String</td><td>Operating partner.</td>\n         </tr>\n         <tr>\n             <td>tourCode</td><td>y</td><td>String</td><td>Tour code.</td>\n         </tr>\n         <tr>\n             <td>mandatoryFieldCheckout</td><td>y</td><td>Array</td><td>Array of customer fields absolutely necessary to make the booking. Customer field names: title, phone, emailAddress, dateOfBirth, redeemerCountry, postcode.</td>\n         </tr>\n     </tbody>\n </table>\n**itineraryDetails Object**\n\n <table class=\"fullwidth\">\n     <thead>\n         <tr>\n             <th>Field name</th>\n             <th>Nullable</th>\n             <th>Type</th>\n             <th>Description</th>\n         </tr>\n     </thead>\n     <tbody>\n         <tr>\n             <td>itineraryTitle</td><td>y</td><td>String</td><td>itinerary Title Example day 1</td>\n         </tr>\n         <tr>\n             <td>itineraryBreakfast</td><td>y</td><td>Integer</td><td>1 - meal provided. 0 - not provided</td>\n         </tr>\n         <tr>\n             <td>itineraryLunch</td><td>y</td><td>Integer</td><td>1 - meal provided. 0 - not provided</td>\n         </tr>\n         <tr>\n             <td>itineraryDinner</td><td>y</td><td>Integer</td><td>1 - meal provided. 0 - not provided</td>\n         </tr>\n         <tr>\n             <td>itineraryDescription</td><td>y</td><td>String</td><td>Details of the specific day</td>\n         </tr>\n     </tbody>\n </table>",
+        "operationId": "get_api_product_supplierproduct_getproductdetail",
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "description": "ID of the product",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "pattern": "\\d+"
+            }
+          },
+          {
+            "name": "productStatusCode",
+            "in": "path",
+            "description": "Status code of the product",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "[A-Z]"
+            }
+          },
+          {
+            "name": "supplierapi",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "supplier|apiv1/supplier"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returned when successful"
+          },
+          "403": {
+            "description": "Returned when the user is not authorized"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        }
+      }
+    },
+    "/{supplierapi}/product": {
+      "post": {
+        "tags": [
+          "Version 1",
+          "Products"
+        ],
+        "summary": "Create a Product",
+        "description": "## Create a Product ##\n\n<p>\nCreates a new Product with the details provided.\n</p>\n\n#### Response ####\n**Top Level Result Object**\n\n <table class=\"fullwidth\">\n     <thead>\n         <tr>\n             <th>Field name</th>\n             <th>Nullable</th>\n             <th>Type</th>\n             <th>Description</th>\n         </tr>\n     </thead>\n     <tbody>\n         <tr>\n             <td>productId</td><td>n</td><td>Integer</td><td>ID of the newly created Product.</td>\n         </tr>\n     </tbody>\n </table>\n\n<p>\nNote that HTML text fields support a very limited subset of HTML - &lt;p&gt;, &lt;ol&gt;, &lt;ul&gt;, &lt;li&gt; and &lt;br&gt; elements only are\npermitted, and no attributes may be used on any of these elements. This helps us to prevent malicious content and\nensure a consistent visual presentation for all products in our TravelDesk™ system.</p>",
+        "operationId": "post_api_product_supplierproduct_addproduct",
+        "parameters": [
+          {
+            "name": "supplierapi",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "supplier|apiv1/supplier"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Create a Product",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "required": [
+                  "productName",
+                  "country",
+                  "productClassId",
+                  "addressLineOne",
+                  "addressCity",
+                  "addressPostcode"
+                ],
+                "properties": {
+                  "productName": {
+                    "description": "Name of the Product.",
+                    "type": "string"
+                  },
+                  "mediaId": {
+                    "description": "ID of the Media Image use as Product thumbnail.",
+                    "type": "integer"
+                  },
+                  "country": {
+                    "description": "2-character Country code.",
+                    "type": "string",
+                    "format": "ISO 3166"
+                  },
+                  "timezone": {
+                    "description": "String (e.g. \"Australia/Sydney\") representing products timezone. If left empty, will default to Suppliers timezone. Based on timezone database @ https://www.iana.org/time-zones",
+                    "type": "string"
+                  },
+                  "productClassId": {
+                    "description": "ID of Product Class (see output from /categories/productclasses).",
+                    "type": "integer"
+                  },
+                  "apiProviderId": {
+                    "description": "Internal use only, if you've been given a value to use for this property then please do so here.",
+                    "type": "integer"
+                  },
+                  "externalId": {
+                    "description": "Internal use only, if you've been given a value to use for this property then please do so here.",
+                    "type": "integer"
+                  },
+                  "rating": {
+                    "description": "Valid only for Accommodation products. A 'star' rating in the range of 1-5 and accepting of half values e.g. '3.5'.",
+                    "type": "string"
+                  },
+                  "teaser": {
+                    "description": "Brief product description (up to 300 characters).",
+                    "type": "string",
+                    "format": "HTML"
+                  },
+                  "description": {
+                    "description": "Longer product description.",
+                    "type": "string",
+                    "format": "HTML"
+                  },
+                  "itineraryDetails": {
+                    "description": "Array of itinerary details in objects.",
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "departuresPickups": {
+                    "description": "Information about departures or pickups.",
+                    "type": "string",
+                    "format": "HTML"
+                  },
+                  "extras": {
+                    "description": "Information about extras which are not included in product price - eg airport transfers, meals.",
+                    "type": "string",
+                    "format": "HTML"
+                  },
+                  "voucherInstructions": {
+                    "description": "Information for customer, including phone numbers and confirmation instructions",
+                    "type": "string",
+                    "format": "HTML"
+                  },
+                  "voucherInformationContactDetailsBits": {
+                    "description": "Combined bitwise value of contact details to be printed on voucher.",
+                    "type": "integer"
+                  },
+                  "agentInstructions": {
+                    "description": "Additional information for the agent.",
+                    "type": "string",
+                    "format": "HTML"
+                  },
+                  "noRefunds": {
+                    "description": "Disables refunds for the product.",
+                    "type": "boolean"
+                  },
+                  "noRefundsMessage": {
+                    "description": "Message explaining why refunds are not available.",
+                    "type": "string",
+                    "format": "HTML"
+                  },
+                  "cancellationFeePolicyId": {
+                    "description": "ID of product's cancellation fee policy (not applicable if noRefunds is turned on).",
+                    "type": "integer"
+                  },
+                  "contactPhone": {
+                    "description": "Contact phone number.",
+                    "type": "string"
+                  },
+                  "contactEmail": {
+                    "description": "Contact email address.",
+                    "type": "string"
+                  },
+                  "addressLineOne": {
+                    "description": "First line of Product Address.",
+                    "type": "string"
+                  },
+                  "addressLineTwo": {
+                    "description": "Second line of Product Address.",
+                    "type": "string"
+                  },
+                  "addressSuburb": {
+                    "description": "Suburb of Product Address.",
+                    "type": "string"
+                  },
+                  "addressCity": {
+                    "description": "City of Product Address.",
+                    "type": "string"
+                  },
+                  "addressState": {
+                    "description": "State of Product Address.",
+                    "type": "string"
+                  },
+                  "addressPostcode": {
+                    "description": "Postcode of Product Address.",
+                    "type": "string"
+                  },
+                  "startLocation": {
+                    "description": "Category ID of Product start location.",
+                    "type": "integer"
+                  },
+                  "secondaryLocation": {
+                    "description": "Category ID of Product's secondary location.",
+                    "type": "integer"
+                  },
+                  "endLocation": {
+                    "description": "Category ID of end location.",
+                    "type": "integer"
+                  },
+                  "activityTypes": {
+                    "description": "Array of Category ID's (Integers) of activity type.",
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    }
+                  },
+                  "accommodationTypes": {
+                    "description": "Array of Category ID's (Integers) of accommodation types.",
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    }
+                  },
+                  "transportTypes": {
+                    "description": "Array of Category ID's (Integers) of transport types.",
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    }
+                  },
+                  "minAgeRecommendation": {
+                    "description": "Minimum recommended age.",
+                    "type": "integer"
+                  },
+                  "maxAgeRecommendation": {
+                    "description": "Maximum recommended age.",
+                    "type": "integer"
+                  },
+                  "ageRestriction": {
+                    "description": "Description of any age restrictions (e.g. for an R18 hostel).",
+                    "type": "string"
+                  },
+                  "fitnessRequirements": {
+                    "description": "Description of fitness requirements.",
+                    "type": "string"
+                  },
+                  "minGroupSize": {
+                    "description": "Minimum group size.",
+                    "type": "integer"
+                  },
+                  "maxGroupSize": {
+                    "description": "Maximum group size.",
+                    "type": "integer"
+                  },
+                  "dietaryRequirements": {
+                    "description": "Description of dietary requirements.",
+                    "type": "string"
+                  },
+                  "luggageRequirements": {
+                    "description": "Description of luggage requirements.",
+                    "type": "string"
+                  },
+                  "includedItems": {
+                    "description": "Array of items included in the fare.",
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "bringItems": {
+                    "description": "Array of items that guest is expected to bring.",
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "voucherTerms": {
+                    "description": "Description of terms and conditions, disclaimers etc.",
+                    "type": "string"
+                  },
+                  "weekDays": {
+                    "description": "Array of days of week that trip departs.",
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "departureDates": {
+                    "description": "Comma-separated tour departure dates",
+                    "type": "string"
+                  },
+                  "recurrenceDate": {
+                    "description": "Frequency of departure recurrence (e.g. 'Weekly' or 'Monthly').",
+                    "type": "string"
+                  },
+                  "specialCircumstanceDate": {
+                    "description": "Description of special dates which affect departure info (e.g. Christmas Day).",
+                    "type": "string"
+                  },
+                  "operatingPartner": {
+                    "description": "Operating partner.",
+                    "type": "string"
+                  },
+                  "tourCode": {
+                    "description": "Tour code.",
+                    "type": "string"
+                  },
+                  "mandatoryFieldCheckout": {
+                    "description": "Array of customer fields absolutely necessary to make the booking. Customer field names: title, phone, emailAddress, dateOfBirth, redeemerCountry, postcode.",
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Returned when successful."
+          },
+          "403": {
+            "description": "Returned when the user is not authorized."
+          },
+          "400": {
+            "description": "Returned when there is an issue with the data provided."
+          },
+          "500": {
+            "description": "Returned when fatal issues are encountered."
+          }
+        }
+      }
+    },
+    "/{supplierapi}/product/{productId}": {
+      "put": {
+        "tags": [
+          "Version 1",
+          "Products"
+        ],
+        "summary": "Update a Product",
+        "description": "## Update a Product ##\n\n<p>\nUpdates a product with the details provided. Changes will be made to the Draft ProductsDetail - a new Draft\nProductsDetail will be created if the product does not already have one. The draft must be submitted using the\nPOST /product/{productId}/submit method and go through an approval process before the changes take effect. All fields\nare optional - only pass in the ones which you wish to change.\n</p>",
+        "operationId": "updateProductAction",
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "supplierapi",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "supplier|apiv1/supplier"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "The message to send",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "productName": {
+                    "description": "Name of the Product.",
+                    "type": "string"
+                  },
+                  "mediaId": {
+                    "description": "ID of the Media Image use as Product thumbnail.",
+                    "type": "integer"
+                  },
+                  "country": {
+                    "description": "2-character Country code.",
+                    "type": "string"
+                  },
+                  "timezone": {
+                    "description": "String representing products timezone.",
+                    "type": "string"
+                  },
+                  "productClassId": {
+                    "description": "ID of Product Class.",
+                    "type": "integer"
+                  },
+                  "rating": {
+                    "description": "A rating in the range of 1-5 and accepting of half values.",
+                    "type": "number",
+                    "format": "float"
+                  },
+                  "teaser": {
+                    "description": "Brief product description (up to 300 characters).",
+                    "type": "string"
+                  },
+                  "description": {
+                    "description": "Longer product description.",
+                    "type": "string"
+                  },
+                  "itineraryDetails": {
+                    "description": "Array of itinerary details in objects.",
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "departuresPickups": {
+                    "description": "Information about departures or pickups.",
+                    "type": "string"
+                  },
+                  "extras": {
+                    "description": "Information about extras which are not included in product price.",
+                    "type": "string"
+                  },
+                  "voucherInstructions": {
+                    "description": "Information for customer, including phone numbers and confirmation instructions etc.",
+                    "type": "string"
+                  },
+                  "voucherInformationContactDetailsBits": {
+                    "description": "Combined bitwise value of address contact details to be printed on voucher.",
+                    "type": "integer"
+                  },
+                  "agentInstructions": {
+                    "description": "Additional information for the agent.",
+                    "type": "string"
+                  },
+                  "noRefunds": {
+                    "description": "Disables refunds for the product.",
+                    "type": "boolean"
+                  },
+                  "noRefundsMessage": {
+                    "description": "Message explaining why refunds are not available.",
+                    "type": "string"
+                  },
+                  "cancellationFeePolicyId": {
+                    "description": "ID of product's cancellation fee policy.",
+                    "type": "integer"
+                  },
+                  "contactPhone": {
+                    "description": "Contact phone number.",
+                    "type": "string"
+                  },
+                  "contactEmail": {
+                    "description": "Contact email address.",
+                    "type": "string"
+                  },
+                  "addressLineOne": {
+                    "description": "First line of Product Address.",
+                    "type": "string"
+                  },
+                  "addressLineTwo": {
+                    "description": "Second line of Product Address.",
+                    "type": "string"
+                  },
+                  "addressSuburb": {
+                    "description": "Suburb of Product Address.",
+                    "type": "string"
+                  },
+                  "addressCity": {
+                    "description": "City of Product Address.",
+                    "type": "string"
+                  },
+                  "addressState": {
+                    "description": "State of Product Address.",
+                    "type": "string"
+                  },
+                  "addressPostcode": {
+                    "description": "Postcode of Product Address.",
+                    "type": "string"
+                  },
+                  "startLocation": {
+                    "description": "Category ID of Product start location.",
+                    "type": "integer"
+                  },
+                  "secondaryLocation": {
+                    "description": "Category ID of Product's secondary location.",
+                    "type": "integer"
+                  },
+                  "endLocation": {
+                    "description": "Category ID of end location.",
+                    "type": "integer"
+                  },
+                  "activityTypes": {
+                    "description": "Array of Category ID's (Integers) of activity type.",
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    }
+                  },
+                  "accommodationTypes": {
+                    "description": "Array of Category ID's (Integers) of accommodation types.",
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    }
+                  },
+                  "transportTypes": {
+                    "description": "Array of Category ID's (Integers) of transport types.",
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    }
+                  },
+                  "minAgeRecommendation": {
+                    "description": "Minimum recommended age.",
+                    "type": "integer"
+                  },
+                  "maxAgeRecommendation": {
+                    "description": "Maximum recommended age.",
+                    "type": "integer"
+                  },
+                  "ageRestriction": {
+                    "description": "Description of any age restrictions.",
+                    "type": "string"
+                  },
+                  "fitnessRequirements": {
+                    "description": "Description of fitness requirements.",
+                    "type": "string"
+                  },
+                  "minGroupSize": {
+                    "description": "Minimum group size.",
+                    "type": "integer"
+                  },
+                  "maxGroupSize": {
+                    "description": "Maximum group size.",
+                    "type": "integer"
+                  },
+                  "dietaryRequirements": {
+                    "description": "Description of dietary requirements.",
+                    "type": "string"
+                  },
+                  "luggageRequirements": {
+                    "description": "Description of luggage requirements.",
+                    "type": "string"
+                  },
+                  "includedItems": {
+                    "description": "Array of items included in the fare.",
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "bringItems": {
+                    "description": "Array of items that guest is expected to bring.",
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "voucherTerms": {
+                    "description": "Description of terms and conditions.",
+                    "type": "string"
+                  },
+                  "weekDays": {
+                    "description": "Array of days of week that trip departs.",
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "departureDates": {
+                    "description": "Comma-separated tour departure dates",
+                    "type": "string"
+                  },
+                  "recurrenceDate": {
+                    "description": "Frequency of departure recurrence (e.g. 'Weekly' or 'Monthly').",
+                    "type": "string"
+                  },
+                  "specialCircumstanceDate": {
+                    "description": "Description of special dates which affect departure info (e.g. Christmas Day).",
+                    "type": "string"
+                  },
+                  "operatingPartner": {
+                    "description": "Operating partner.",
+                    "type": "string"
+                  },
+                  "tourCode": {
+                    "description": "Tour code.",
+                    "type": "string"
+                  },
+                  "mandatoryFieldCheckout": {
+                    "description": "Array of customer fields absolutely necessary to make the booking. Customer field names: title, phone, emailAddress, dateOfBirth, redeemerCountry, postcode.",
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Returned when successful."
+          },
+          "400": {
+            "description": "Returned when there is an issue with the data provided."
+          },
+          "403": {
+            "description": "Returned when the user is not authorized."
+          },
+          "500": {
+            "description": "Returned when fatal issues are encountered."
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Version 1",
+          "Products"
+        ],
+        "summary": "Delete a Product",
+        "description": "## Delete a Product ##\n\n<p>\nMarks the specified Product for delete. The behaviour of this API method depends on the current state of the\nProduct's ProductsDetails. In some cases it will not be deleted straight away, but a request for the\nProduct to be deleted will be lodged with the Website Travel product management team.\n</p>",
+        "operationId": "deleteProductAction",
+        "parameters": [
+          {
+            "name": "supplierapi",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "supplier|apiv1/supplier"
+            }
+          },
+          {
+            "name": "productId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "\\d+"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Reason for deleting the product",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "required": [
+                  "reason"
+                ],
+                "properties": {
+                  "reason": {
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Returned when successful."
+          },
+          "400": {
+            "description": "Returned when there is an issue with the data provided."
+          },
+          "403": {
+            "description": "Returned when the user is not authorized."
+          },
+          "404": {
+            "description": "Returned when no matching record is found."
+          },
+          "500": {
+            "description": "Returned when fatal issues are encountered."
+          }
+        }
+      }
+    },
+    "/{supplierapi}/product/abandonchanges/{productId}": {
+      "put": {
+        "tags": [
+          "Version 1",
+          "Products"
+        ],
+        "summary": "Abandon Changes to a Product",
+        "description": "## Abandon Changes to a Product ##\n\n<p>\n Abandons all changes to a product including products in Candidate, approved, Delete_Pending and Delete_Approved\n</p>",
+        "operationId": "abandonChangesAction",
+        "parameters": [
+          {
+            "name": "supplierapi",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "supplier|apiv1/supplier"
+            }
+          },
+          {
+            "name": "productId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "\\d+"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Returned when successful."
+          },
+          "400": {
+            "description": "Returned when there is an issue with the data provided."
+          },
+          "403": {
+            "description": "Returned when the user is not authorized."
+          },
+          "404": {
+            "description": "Returned when no matching record is found."
+          },
+          "500": {
+            "description": "Returned when fatal issues are encountered."
+          }
+        }
+      }
+    },
+    "/{supplierapi}/product/{productId}/images": {
+      "get": {
+        "tags": [
+          "Version 1",
+          "Products"
+        ],
+        "summary": "Find Product images for a given Product ID",
+        "description": "## Find Product images for a given Product ID ##\n\nThe returned result is an array of images. If no images are found a 404 response will be returned.\n\n#### Example ####\n\n`/supplier/product/554/images` will return any gallery images attached to the product with ID 554.\n\n#### Response ####\n\n**Top Level Result Object**\n\n <table class=\"fullwidth\">\n     <thead>\n         <tr>\n             <th>Field name</th>\n             <th>Nullable</th>\n             <th>Type</th>\n             <th>Description</th>\n         </tr>\n     </thead>\n     <tbody>\n         <tr>\n             <td>mediaId</td><td>n</td><td>Integer</td><td>Media ID of the image.</td>\n         </tr>\n         <tr>\n             <td>path</td><td>n</td><td>String</td><td>Absolute URL path of image.</td>\n         </tr>\n         <tr>\n             <td>caption</td><td>y</td><td>String</td><td>Optional image caption.</td>\n         </tr>\n         <tr>\n             <td>active</td><td>y</td><td>Boolean</td><td>True on first image in set.</td>\n         </tr>\n     </tbody>\n </table>",
+        "operationId": "getProductImagesAction",
+        "parameters": [
+          {
+            "name": "size",
+            "in": "query",
+            "description": "Optional size of images to fetch. Defaults to small (sm).",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "sm",
+              "enum": [
+                "sm",
+                "med",
+                "lg"
+              ]
+            }
+          },
+          {
+            "name": "supplierapi",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "supplier|apiv1/supplier"
+            }
+          },
+          {
+            "name": "productId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "\\d+"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returned when successful."
+          },
+          "403": {
+            "description": "Returned when you do not have access to the requested Product."
+          },
+          "404": {
+            "description": "Returned when Product not found, or no images for the Product are found."
+          },
+          "500": {
+            "description": "Internal error."
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Version 1",
+          "Products"
+        ],
+        "summary": "Set Product Images",
+        "description": "## Set Product Images ##\n\nAssociates already uploaded images to a Product.\n\n#### Response ####\n\nSee **Status Codes**",
+        "operationId": "put_api_product_supplierproduct_setproductimages",
+        "parameters": [
+          {
+            "name": "mediaIds",
+            "in": "query",
+            "description": "Comma separated list of Media ID's. Maximum of 10 per product. If some images were already set, then only the first X will be used to fill the remaining spaces.",
+            "required": true
+          },
+          {
+            "name": "supplierapi",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "supplier|apiv1/supplier"
+            }
+          },
+          {
+            "name": "productId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "\\d+"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Returned when successful."
+          },
+          "204": {
+            "description": "Returned when Media ID's supplied matched existing ID's set against Product (no-change)."
+          },
+          "400": {
+            "description": "No Media ID's were received."
+          },
+          "403": {
+            "description": "Returned when you do not have access to the requested Product."
+          },
+          "404": {
+            "description": "Returned when Product not found or Media ID's supplied were not found."
+          },
+          "413": {
+            "description": "Returned when maximum number of Product images has already been set."
+          },
+          "500": {
+            "description": "Internal error."
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Version 1",
+          "Products"
+        ],
+        "summary": "Delete Product Images",
+        "description": "## Delete Product Images ##\n\nDeletes images from being associated with a Product. Does NOT remove the file entirely.\n\n#### Response ####\n\nSee **Status Codes**",
+        "operationId": "deleteProductImagesAction",
+        "parameters": [
+          {
+            "name": "mediaIds",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "description": "Comma separated list of Media ID's",
+              "type": "string",
+              "example": "1,2,3"
+            }
+          },
+          {
+            "name": "supplierapi",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "supplier|apiv1/supplier"
+            }
+          },
+          {
+            "name": "productId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "\\d+"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Returned when successful."
+          },
+          "400": {
+            "description": "No Media ID's were received."
+          },
+          "403": {
+            "description": "Returned when you do not have access to the requested Product."
+          },
+          "404": {
+            "description": "Returned when Product not found or Media ID's supplied were not found."
+          },
+          "500": {
+            "description": "Internal error."
+          }
+        }
+      }
+    },
+    "/{supplierapi}/product/{productId}/{productStatusCode}/message": {
+      "post": {
+        "tags": [
+          "Version 1",
+          "Products"
+        ],
+        "summary": "Send a message about a ProductsDetail",
+        "description": "## Send a message about a ProductsDetail ##\n\n<p>\nAllows you to send a message to the WT team about a specific ProductsDetail record.\n</p>",
+        "operationId": "addProductMessageAction",
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "pattern": "\\d+"
+            }
+          },
+          {
+            "name": "productStatusCode",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "[A-Z]"
+            }
+          },
+          {
+            "name": "message",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "supplierapi",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "supplier|apiv1/supplier"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "The message to send",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "message": {
+                    "description": "Message to be sent",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Returned when successful."
+          },
+          "400": {
+            "description": "Returned when there is an issue with the data provided."
+          },
+          "403": {
+            "description": "Returned when the user is not authorized."
+          },
+          "404": {
+            "description": "Returned when no matching record found."
+          },
+          "500": {
+            "description": "Returned when fatal issues are encountered."
+          }
+        }
+      }
+    },
+    "/{supplierapi}/product/{productId}/submit": {
+      "post": {
+        "tags": [
+          "Version 1",
+          "Products"
+        ],
+        "summary": "Submit a draft for approval",
+        "description": "## Submit a draft for approval ##\n\n<p>\nSubmits the draft ProductsDetail to be made available for agents to purchase. When this request is made the\ndraft will be moved to candidate status, and then to approved status and finally live status as it moves\nthrough the Website Travel approval process.\n</p>",
+        "operationId": "submitDraftAction",
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "pattern": "\\d+"
+            }
+          },
+          {
+            "name": "supplierapi",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "supplier|apiv1/supplier"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Returned when successful."
+          },
+          "403": {
+            "description": "Returned when the user is not authorized."
+          },
+          "404": {
+            "description": "Returned when no draft productsdetail is found."
+          },
+          "500": {
+            "description": "Returned when fatal issues are encountered."
+          }
+        }
+      }
+    },
+    "/apiv1/supplier/voucherDetails": {
+      "get": {
+        "tags": [
+          "Version 1",
+          "Vouchers"
+        ],
+        "summary": "Get Voucher Details",
+        "description": "## Get Voucher Details ##\n\nGiven a voucher code, returns information regarding that voucher",
+        "operationId": "get_api_rest_v1_getvoucherdetails",
+        "parameters": [
+          {
+            "name": "voucher",
+            "in": "path",
+            "description": "Voucher code",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returned when successful.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Voucher and order details",
+                  "properties": {
+                    "voucher": {
+                      "description": "Voucher Code",
+                      "type": "string"
+                    },
+                    "bookingReference": {
+                      "description": "Associated Order Booking Reference",
+                      "type": "string"
+                    },
+                    "fareName": {
+                      "description": "Name of the ordered product",
+                      "type": "string"
+                    },
+                    "quantity": {
+                      "description": "Quantity of the ordered product",
+                      "type": "integer"
+                    },
+                    "claimStatus": {
+                      "description": "Status of voucher claim",
+                      "type": "string"
+                    },
+                    "netRate": {
+                      "description": "Net Rate (per quantity, in operator's fare currency)",
+                      "type": "number",
+                      "format": "float"
+                    },
+                    "rrp": {
+                      "description": "Recommended Retail Price at time of sale (per quantity, in operator's fare currency)",
+                      "type": "number",
+                      "format": "float"
+                    },
+                    "discounted": {
+                      "description": "Denotes whether this voucher's Net and RRP were overridden",
+                      "type": "boolean"
+                    },
+                    "currency": {
+                      "description": "Fare currency",
+                      "type": "string"
+                    },
+                    "redeemers": {
+                      "description": "Customers associated with this voucher",
+                      "type": "array",
+                      "items": {
+                        "properties": {
+                          "firstName": {
+                            "description": "Customer First Name",
+                            "type": "string"
+                          },
+                          "lastName": {
+                            "description": "Customer Last Name",
+                            "type": "string"
+                          },
+                          "contact": {
+                            "description": "Customer contact phone number",
+                            "type": "string"
+                          },
+                          "email": {
+                            "description": "Customer email address",
+                            "type": "string"
+                          },
+                          "quantity": {
+                            "description": "Quantity of the voucher belonging to this particular Customer",
+                            "type": "integer"
+                          }
+                        },
+                        "type": "object"
+                      }
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Returned when required arguments not provided."
+          },
+          "403": {
+            "description": "Returned when the user is not authorized."
+          },
+          "404": {
+            "description": "Returned when the voucher details are not accessible."
+          },
+          "500": {
+            "description": "Internal error."
+          }
+        }
+      }
+    },
+    "/apiv1/supplier/makeClaim": {
+      "post": {
+        "tags": [
+          "Version 1",
+          "Vouchers"
+        ],
+        "summary": "API implementation of Claim Vouchers.",
+        "description": "<p>\nCall this route to claim voucher(s) directly.\n</p>\n<ul>\n<li> There must be either Voucher Id or Ticket Number or Booking Reference Number specified for each travel date. </li>\n<li> Each row should have minimum of Voucher Id and Quantity. </li>\n<li> Travel Date is <b>optional</b> if claim is based on voucher number. </li>\n<li> Travel Date is <b>mandatory</b> if claim is based on ticket number. </li>\n</ul>\n\n\n**Example Request Parameters**\n\n<pre>\n{\n  \"claims\":[\n    { \"voucherId\":\"RED57887647\", \"travelDate\":\"2017-06-12\", \"quantity\":1, \"ticketNumber\":\"2342342\" },\n    { \"voucherId\":\"RED57887648\", \"travelDate\":\"2017-01-28\", \"quantity\":1 },\n    { \"voucherId\":\"RED57887650\", \"quantity\":1 },\n    { \"travelDate\":\"2017-06-30\", \"quantity\":2, \"ticketNumber\":\"2331658\" },\n    { \"travelDate\":\"2019-02-26\", \"quantity\":2, \"bookingReference\":\"WTT15468-032507\"}\n  ]\n}\n</pre>\n\n#### Response ####\n\n**Top Level Result Object** - Array of\n\n <table class=\"fullwidth\">\n     <thead>\n         <tr>\n             <th>Field name</th>\n             <th>Nullable</th>\n             <th>Type</th>\n             <th>Description</th>\n         </tr>\n     </thead>\n     <tbody>\n         <tr>\n             <td>voucherId</td><td>n</td><td>string</td><td>Voucher Id or Ticket Number (if claim is based on ticket number)</td>\n         </tr>\n         <tr>\n             <td>success</td><td>n</td><td>boolean</td><td>true - successfully claimed, false - could not be claimed</td>\n         </tr>\n         <tr>\n             <td>message</td><td>n</td><td>string</td><td>A detailed explanation of the attempted claim's condition.<br/><em><strong>Note:</strong> Even successfully claimed items can have further detail/instruction. You should review all messages</em></td>\n         </tr>\n     </tbody>\n </table>",
+        "operationId": "post_api_rest_v1_makeclaim",
+        "requestBody": {
+          "description": "Voucher claims",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "description": "Information about a voucher claim",
+                "properties": {
+                  "claims": {
+                    "description": "Array of ClaimItem(s)",
+                    "type": "array",
+                    "items": {
+                      "properties": {
+                        "voucherId": {
+                          "description": "Voucher Id, mandatory if ticket number is empty",
+                          "type": "string"
+                        },
+                        "quantity": {
+                          "description": "Number of this Voucher being claimed",
+                          "type": "integer"
+                        },
+                        "travelDate": {
+                          "description": "Travel Date of the voucher, optional if claim is based on voucher id",
+                          "type": "string",
+                          "format": "date"
+                        },
+                        "ticketNumber": {
+                          "description": "Ticket Number, mandatory if voucher id is empty",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  }
+                },
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Returned when successful. All claim requests processed successfully. Still should check \"message\" in the response for further details"
+          },
+          "202": {
+            "description": "Returned when partially successful (multiple claims in a single request). Check both \"success\" and \"message\" in response for further details on individual items"
+          },
+          "400": {
+            "description": "Returned when all claim items produce an error. Returned when required arguments not provided."
+          },
+          "403": {
+            "description": "Returned when the user is not authorized."
+          },
+          "500": {
+            "description": "Internal error."
+          }
+        }
+      }
+    },
+    "/apiv1/ota/": {
+      "get": {
+        "operationId": "get_api_ota_ota_index",
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      },
+      "post": {
+        "operationId": "post_api_ota_ota_index",
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Version 1",
+      "description": "Version 1"
+    },
+    {
+      "name": "Media",
+      "description": "Media"
+    },
+    {
+      "name": "Packages",
+      "description": "Packages"
+    },
+    {
+      "name": "Booking Details",
+      "description": "Booking Details"
+    },
+    {
+      "name": "Product Prices",
+      "description": "Product Prices"
+    },
+    {
+      "name": "Products",
+      "description": "Products"
+    },
+    {
+      "name": "Vouchers",
+      "description": "Vouchers"
+    }
+  ]
+}

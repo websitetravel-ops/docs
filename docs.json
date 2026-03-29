@@ -1,7 +1,7 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "Mint Starter Kit",
+  "name": "WebsiteTravel Developer Docs",
   "colors": {
     "primary": "#16A34A",
     "light": "#07C983",
@@ -51,19 +51,73 @@
         "tab": "API reference",
         "groups": [
           {
-            "group": "API documentation",
+            "group": "Overview",
             "pages": [
               "api-reference/introduction"
             ]
           },
           {
-            "group": "Endpoint examples",
-            "pages": [
-              "api-reference/endpoint/get",
-              "api-reference/endpoint/create",
-              "api-reference/endpoint/delete",
-              "api-reference/endpoint/webhook"
-            ]
+            "group": "Agent / Reseller API",
+            "openapi": {
+              "source": "openapi/agent-reseller-api.json",
+              "directory": "api-reference/agent-reseller-api"
+            }
+          },
+          {
+            "group": "Freelance Agent API",
+            "openapi": {
+              "source": "openapi/freelance-agent-api.json",
+              "directory": "api-reference/freelance-agent-api"
+            }
+          },
+          {
+            "group": "EBS Supplier API",
+            "openapi": {
+              "source": "openapi/ebs-supplier-api.json",
+              "directory": "api-reference/ebs-supplier-api"
+            }
+          },
+          {
+            "group": "Freelance Internal API",
+            "openapi": {
+              "source": "openapi/freelance-internal-api.yaml",
+              "directory": "api-reference/freelance-internal-api"
+            }
+          },
+          {
+            "group": "Website Travel Supplier API",
+            "openapi": {
+              "source": "openapi/website-travel-supplier-api.json",
+              "directory": "api-reference/website-travel-supplier-api"
+            }
+          },
+          {
+            "group": "Tourbuilder API",
+            "openapi": {
+              "source": "openapi/tourbuilder-api.openapi.json",
+              "directory": "api-reference/tourbuilder-api"
+            }
+          },
+          {
+            "group": "Ibis API",
+            "openapi": {
+              "source": "openapi/ibis-api.openapi.json",
+              "directory": "api-reference/ibis-api"
+            }
+          },
+          {
+            "group": "AccomSOA API",
+            "openapi": {
+              "source": "openapi/accomsoa-api.openapi.json",
+              "directory": "api-reference/accomsoa-api"
+            }
+          },
+          {
+            "group": "TransportSOA API",
+            "openapi": {
+              "source": "openapi/transportsoa-api.openapi.json",
+              "directory": "api-reference/transportsoa-api"
+            }
           }
         ]
       }
@@ -71,14 +125,14 @@
     "global": {
       "anchors": [
         {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
-          "icon": "book-open-cover"
+          "anchor": "API overview",
+          "href": "/api-reference/introduction",
+          "icon": "terminal"
         },
         {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
+          "anchor": "Mintlify docs",
+          "href": "https://mintlify.com/docs",
+          "icon": "book-open-cover"
         }
       ]
     }
@@ -91,13 +145,13 @@
     "links": [
       {
         "label": "Support",
-        "href": "mailto:hi@mintlify.com"
+        "href": "mailto:api@websitetravel.com"
       }
     ],
     "primary": {
       "type": "button",
-      "label": "Dashboard",
-      "href": "https://dashboard.mintlify.com"
+      "label": "View APIs",
+      "href": "/api-reference/introduction"
     }
   },
   "contextual": {
@@ -111,12 +165,5 @@
      "cursor",
      "vscode"
    ]
-  },
-  "footer": {
-    "socials": {
-      "x": "https://x.com/mintlify",
-      "github": "https://github.com/mintlify",
-      "linkedin": "https://linkedin.com/company/mintlify"
-    }
   }
 }

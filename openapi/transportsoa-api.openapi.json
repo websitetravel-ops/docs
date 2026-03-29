@@ -1,0 +1,2407 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "description": "TransportSOA API for rental availability, quotes, reservations, and transport-related test utilities.",
+        "version": "1.0",
+        "title": "TransportSOA API",
+        "termsOfService": "urn:tos",
+        "contact": {},
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0"
+        }
+    },
+    "tags": [
+        {
+            "name": "rental-controller",
+            "description": "Rental Controller"
+        },
+        {
+            "name": "test-controller",
+            "description": "Test Controller"
+        }
+    ],
+    "paths": {
+        "/rentalapi/v1/book": {
+            "post": {
+                "tags": [
+                    "rental-controller"
+                ],
+                "summary": "book",
+                "operationId": "bookUsingPOST",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/BookRequest"
+                            }
+                        }
+                    },
+                    "description": "bookRequest",
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SuccessResponseDTO_BookingResponse_"
+                                }
+                            }
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/rentalapi/v1/cancel": {
+            "post": {
+                "tags": [
+                    "rental-controller"
+                ],
+                "summary": "cancel",
+                "operationId": "cancelUsingPOST",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CancelRequest"
+                            }
+                        }
+                    },
+                    "description": "cancelRequest",
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SuccessResponseDTO_string_"
+                                }
+                            }
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/rentalapi/v1/createQuote": {
+            "post": {
+                "tags": [
+                    "rental-controller"
+                ],
+                "summary": "createQuote",
+                "operationId": "createQuoteUsingPOST",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/QuoteCreationRequest"
+                            }
+                        }
+                    },
+                    "description": "requestDTO",
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SuccessResponseDTO_CreateQuoteResponse_"
+                                }
+                            }
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/rentalapi/v1/getAvailabilityByCriteria": {
+            "get": {
+                "tags": [
+                    "rental-controller"
+                ],
+                "summary": "getAvailabilityByCriteria",
+                "operationId": "getAvailabilityByCriteriaUsingGET",
+                "parameters": [
+                    {
+                        "name": "campaignCode",
+                        "in": "query",
+                        "description": "campaignCode",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "driverAge",
+                        "in": "query",
+                        "description": "driverAge",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "dropOffDate",
+                        "in": "query",
+                        "description": "dropOffDate",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "dropOffLocationName",
+                        "in": "query",
+                        "description": "dropOffLocationName",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "pickUpDate",
+                        "in": "query",
+                        "description": "pickUpDate",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "pickUpLocationName",
+                        "in": "query",
+                        "description": "pickUpLocationName",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "vehicleType",
+                        "in": "query",
+                        "description": "vehicleType",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SuccessResponseDTO_List_AvailabilityResponse_"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/rentalapi/v1/getLocations": {
+            "get": {
+                "tags": [
+                    "rental-controller"
+                ],
+                "summary": "getLocations",
+                "operationId": "getLocationsUsingGET",
+                "parameters": [
+                    {
+                        "name": "country",
+                        "in": "query",
+                        "description": "country",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SuccessResponseDTO_Set_string_"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/rentalapi/v1/getRentalCountries": {
+            "get": {
+                "tags": [
+                    "rental-controller"
+                ],
+                "summary": "getRentalCountries",
+                "operationId": "getRentalCountriesUsingGET",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SuccessResponseDTO_Set_string_"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/rentalapi/v1/getReservation": {
+            "get": {
+                "tags": [
+                    "rental-controller"
+                ],
+                "summary": "getReservation",
+                "operationId": "getReservationUsingGET",
+                "parameters": [
+                    {
+                        "name": "ref",
+                        "in": "query",
+                        "description": "ref",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SuccessResponseDTO_ReservationResponse_"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/rentalapi/v1/getVehicleTypes": {
+            "get": {
+                "tags": [
+                    "rental-controller"
+                ],
+                "summary": "getVehicleTypes",
+                "operationId": "getVehicleTypesUsingGET",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SuccessResponseDTO_Set_string_"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/rentalapi/v1/ping": {
+            "get": {
+                "tags": [
+                    "rental-controller"
+                ],
+                "summary": "Ping Test Call",
+                "operationId": "pingUsingGET",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "boolean"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Failed"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/rentalapi/v1/products": {
+            "get": {
+                "tags": [
+                    "rental-controller"
+                ],
+                "summary": "getProducts",
+                "operationId": "getProductsUsingGET",
+                "parameters": [
+                    {
+                        "name": "apiName",
+                        "in": "query",
+                        "description": "apiName",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "pageNumber",
+                        "in": "query",
+                        "description": "pageNumber",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    },
+                    {
+                        "name": "pageSize",
+                        "in": "query",
+                        "description": "pageSize",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SuccessResponseDTO_PageResponseDTO_ProductResponseDTO_"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/rentalapi/v1/updateQuote": {
+            "post": {
+                "tags": [
+                    "rental-controller"
+                ],
+                "summary": "updateQuote",
+                "operationId": "updateQuoteUsingPOST",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/QuoteUpdatingRequest"
+                            }
+                        }
+                    },
+                    "description": "requestDTO",
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SuccessResponseDTO_CreateQuoteResponse_"
+                                }
+                            }
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/rentalapi/v1/updateReservation": {
+            "patch": {
+                "tags": [
+                    "rental-controller"
+                ],
+                "summary": "updateReservation",
+                "operationId": "updateReservationUsingPATCH",
+                "parameters": [
+                    {
+                        "name": "reservationRef",
+                        "in": "query",
+                        "description": "reservationRef",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ValidateUpdateRequest"
+                            }
+                        }
+                    },
+                    "description": "updateRequest",
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SuccessResponseDTO_UpdateReservationResponseDTO_"
+                                }
+                            }
+                        }
+                    },
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/rentalapi/v1/validateUpdateReservation": {
+            "post": {
+                "tags": [
+                    "rental-controller"
+                ],
+                "summary": "validateUpdateReservation",
+                "operationId": "validateUpdateReservationUsingPOST",
+                "parameters": [
+                    {
+                        "name": "reservationRef",
+                        "in": "query",
+                        "description": "reservationRef",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ValidateUpdateRequest"
+                            }
+                        }
+                    },
+                    "description": "validateRequest",
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SuccessResponseDTO_ValidateUpdateResponseDTO_"
+                                }
+                            }
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/testapi/v1/importJucyFleetTypes": {
+            "get": {
+                "tags": [
+                    "test-controller"
+                ],
+                "summary": "importJucyFleetTypes",
+                "operationId": "importJucyFleetTypesUsingGET",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SuccessResponseDTO_string_"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/testapi/v1/importJucyLocations": {
+            "get": {
+                "tags": [
+                    "test-controller"
+                ],
+                "summary": "importJucyLocations",
+                "operationId": "importJucyLocationsUsingGET",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SuccessResponseDTO_string_"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/testapi/v1/importJucyProducts": {
+            "get": {
+                "tags": [
+                    "test-controller"
+                ],
+                "summary": "importJucyProducts",
+                "operationId": "importJucyProductsUsingGET",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SuccessResponseDTO_string_"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/testapi/v1/importRcmFleetTypes": {
+            "get": {
+                "tags": [
+                    "test-controller"
+                ],
+                "summary": "importRcmFleetTypes",
+                "operationId": "importRcmFleetTypesUsingGET",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SuccessResponseDTO_string_"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/testapi/v1/importRcmProducts": {
+            "get": {
+                "tags": [
+                    "test-controller"
+                ],
+                "summary": "importRcmProducts",
+                "operationId": "importRcmProductsUsingGET",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SuccessResponseDTO_string_"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        }
+    },
+    "servers": [
+        {
+            "url": "//tstest.websitetravel.com/transportsoa"
+        }
+    ],
+    "components": {
+        "schemas": {
+            "AddressDTO": {
+                "type": "object",
+                "properties": {
+                    "City": {
+                        "type": "string"
+                    },
+                    "Country": {
+                        "type": "string"
+                    },
+                    "Latitude": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "Line1": {
+                        "type": "string"
+                    },
+                    "Longitude": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "Name": {
+                        "type": "string"
+                    },
+                    "PostCode": {
+                        "type": "string"
+                    }
+                },
+                "title": "AddressDTO"
+            },
+            "AvailabilityResponse": {
+                "type": "object",
+                "properties": {
+                    "agentCommissionRate": {
+                        "type": "number",
+                        "format": "float"
+                    },
+                    "agentPaymentType": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "availability": {
+                        "type": "string"
+                    },
+                    "availableMessage": {
+                        "type": "string"
+                    },
+                    "campaignCode": {
+                        "type": "string"
+                    },
+                    "campaignId": {
+                        "type": "string"
+                    },
+                    "categoryCode": {
+                        "type": "string"
+                    },
+                    "dailyRate": {
+                        "$ref": "#/components/schemas/PriceResponse"
+                    },
+                    "dealText": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "discountPercentageApplied": {
+                        "type": "number",
+                        "format": "float"
+                    },
+                    "dropOffLocationAddress": {
+                        "$ref": "#/components/schemas/LocationDTO"
+                    },
+                    "dropOffTimes": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "id": {
+                        "type": "string"
+                    },
+                    "isAfterHourPickUp": {
+                        "type": "boolean"
+                    },
+                    "isAfterHoursDropOffAvailable": {
+                        "type": "boolean"
+                    },
+                    "isAfterHoursPickUpAvailable": {
+                        "type": "boolean"
+                    },
+                    "mandatoryFees": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ItemResponse"
+                        }
+                    },
+                    "minimumHirePeriod": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "pickUpLocationAddress": {
+                        "$ref": "#/components/schemas/LocationDTO"
+                    },
+                    "pickupTimes": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "rentalDays": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "source": {
+                        "type": "string"
+                    },
+                    "total": {
+                        "$ref": "#/components/schemas/PriceResponse"
+                    },
+                    "type": {
+                        "type": "string"
+                    },
+                    "typeSlug": {
+                        "type": "string"
+                    }
+                },
+                "title": "AvailabilityResponse"
+            },
+            "BookRequest": {
+                "type": "object",
+                "properties": {
+                    "agentVoucherReference": {
+                        "type": "string"
+                    },
+                    "arrivalFlight": {
+                        "type": "string"
+                    },
+                    "country": {
+                        "type": "string"
+                    },
+                    "dateOfBirth": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "deposit": {
+                        "type": "boolean"
+                    },
+                    "extraKmsId": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "insuranceId": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "licenseCountry": {
+                        "type": "string"
+                    },
+                    "licenseExpiry": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "licenseNumber": {
+                        "type": "string"
+                    },
+                    "marketingAllowed": {
+                        "type": "boolean"
+                    },
+                    "numberOfTravelling": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "optionalsFee": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/OrderRQ"
+                        }
+                    },
+                    "quoteId": {
+                        "type": "string"
+                    },
+                    "reservationReference": {
+                        "type": "string"
+                    },
+                    "source": {
+                        "type": "string"
+                    }
+                },
+                "title": "BookRequest"
+            },
+            "BookingRS": {
+                "type": "object",
+                "properties": {
+                    "agentBalanceDue": {
+                        "$ref": "#/components/schemas/PriceRS"
+                    },
+                    "agentCollects": {
+                        "$ref": "#/components/schemas/PriceRS"
+                    },
+                    "agentCommission": {
+                        "$ref": "#/components/schemas/PriceRS"
+                    },
+                    "balanceDue": {
+                        "$ref": "#/components/schemas/PriceRS"
+                    },
+                    "dateCreated": {
+                        "type": "string"
+                    },
+                    "driverAge": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "dropOffDate": {
+                        "type": "string"
+                    },
+                    "dropOffLocation": {
+                        "type": "string"
+                    },
+                    "dropOffLocationAddress": {
+                        "$ref": "#/components/schemas/LocationDTO"
+                    },
+                    "fleetCategory": {
+                        "$ref": "#/components/schemas/FleetCategoryRS"
+                    },
+                    "hirerDetails": {
+                        "$ref": "#/components/schemas/HirerDetailRS"
+                    },
+                    "lines": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ItemRS"
+                        }
+                    },
+                    "pickUpDate": {
+                        "type": "string"
+                    },
+                    "pickUpLocation": {
+                        "type": "string"
+                    },
+                    "pickUpLocationAddress": {
+                        "$ref": "#/components/schemas/LocationDTO"
+                    },
+                    "quoteId": {
+                        "type": "string"
+                    },
+                    "rentalDays": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "reservationId": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "reservationReference": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string"
+                    },
+                    "totalPrice": {
+                        "$ref": "#/components/schemas/PriceRS"
+                    },
+                    "voucherReference": {
+                        "type": "string"
+                    }
+                },
+                "title": "BookingRS"
+            },
+            "BookingResponse": {
+                "type": "object",
+                "properties": {
+                    "bookingId": {
+                        "type": "string"
+                    },
+                    "bookingReference": {
+                        "type": "string"
+                    },
+                    "source": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string"
+                    }
+                },
+                "title": "BookingResponse"
+            },
+            "CancelRequest": {
+                "type": "object",
+                "properties": {
+                    "reservationNumber": {
+                        "type": "string"
+                    },
+                    "source": {
+                        "type": "string"
+                    }
+                },
+                "title": "CancelRequest"
+            },
+            "CreateQuoteResponse": {
+                "type": "object",
+                "properties": {
+                    "agentBalanceDue": {
+                        "$ref": "#/components/schemas/PriceResponse"
+                    },
+                    "agentCollects": {
+                        "$ref": "#/components/schemas/PriceResponse"
+                    },
+                    "agentCommission": {
+                        "$ref": "#/components/schemas/PriceResponse"
+                    },
+                    "balanceDue": {
+                        "$ref": "#/components/schemas/PriceResponse"
+                    },
+                    "balanceDueWithCCFee": {
+                        "$ref": "#/components/schemas/PriceResponse"
+                    },
+                    "ccSurchargePercentage": {
+                        "type": "number",
+                        "format": "float"
+                    },
+                    "fleetCategory": {
+                        "$ref": "#/components/schemas/FleetCategoryResponse"
+                    },
+                    "insuranceProducts": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ProductResponse"
+                        }
+                    },
+                    "kmCharges": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/KmChargeResponse"
+                        }
+                    },
+                    "lines": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ItemResponse"
+                        }
+                    },
+                    "quoteId": {
+                        "type": "string"
+                    },
+                    "rentalDays": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "reservationId": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "reservationReference": {
+                        "type": "string"
+                    },
+                    "secondaryProducts": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ProductResponse"
+                        }
+                    },
+                    "source": {
+                        "type": "string"
+                    },
+                    "totalPrice": {
+                        "$ref": "#/components/schemas/PriceResponse"
+                    }
+                },
+                "title": "CreateQuoteResponse"
+            },
+            "FleetCategoryRS": {
+                "type": "object",
+                "properties": {
+                    "availability": {
+                        "type": "string"
+                    },
+                    "availabilityMessage": {
+                        "type": "string"
+                    },
+                    "categoryCode": {
+                        "type": "string"
+                    },
+                    "code": {
+                        "type": "string"
+                    },
+                    "dailyRate": {
+                        "$ref": "#/components/schemas/PriceRS"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "fleetTypeCode": {
+                        "type": "string"
+                    },
+                    "id": {
+                        "type": "string"
+                    },
+                    "isAfterHourPickUp": {
+                        "type": "boolean"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "rentalDays": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "total": {
+                        "$ref": "#/components/schemas/PriceRS"
+                    },
+                    "type": {
+                        "type": "string"
+                    }
+                },
+                "title": "FleetCategoryRS"
+            },
+            "FleetCategoryResponse": {
+                "type": "object",
+                "properties": {
+                    "agentCommissionRate": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "agentPaymentType": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "availability": {
+                        "type": "string"
+                    },
+                    "campaignCode": {
+                        "type": "string"
+                    },
+                    "campaignId": {
+                        "type": "string"
+                    },
+                    "categoryCode": {
+                        "type": "string"
+                    },
+                    "dailyRate": {
+                        "$ref": "#/components/schemas/PriceResponse"
+                    },
+                    "dealText": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "discountPercentageApplied": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "freeDays": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "id": {
+                        "type": "string"
+                    },
+                    "isAfterHourPickUp": {
+                        "type": "boolean"
+                    },
+                    "mandatoryFees": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/MandatoryFee"
+                        }
+                    },
+                    "minimumHirePeriod": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "priceDifference": {
+                        "type": "string"
+                    },
+                    "rentalDays": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "total": {
+                        "$ref": "#/components/schemas/PriceResponse"
+                    },
+                    "type": {
+                        "type": "string"
+                    },
+                    "typeSlug": {
+                        "type": "string"
+                    }
+                },
+                "title": "FleetCategoryResponse"
+            },
+            "HirerDetailRS": {
+                "type": "object",
+                "properties": {
+                    "email": {
+                        "type": "string"
+                    },
+                    "firstName": {
+                        "type": "string"
+                    },
+                    "lastName": {
+                        "type": "string"
+                    },
+                    "mailingList": {
+                        "type": "boolean"
+                    },
+                    "mobileNumber": {
+                        "type": "string"
+                    }
+                },
+                "title": "HirerDetailRS"
+            },
+            "HirerDetails": {
+                "type": "object",
+                "properties": {
+                    "acceptedTerms": {
+                        "type": "boolean"
+                    },
+                    "driversLicenceCountry": {
+                        "type": "string"
+                    },
+                    "email": {
+                        "type": "string"
+                    },
+                    "firstName": {
+                        "type": "string"
+                    },
+                    "lastName": {
+                        "type": "string"
+                    },
+                    "mailingList": {
+                        "type": "boolean"
+                    },
+                    "mobilePhone": {
+                        "type": "string"
+                    }
+                },
+                "title": "HirerDetails"
+            },
+            "HirerDetailsResponse": {
+                "type": "object",
+                "properties": {
+                    "arrivalFlightNumber": {
+                        "type": "string"
+                    },
+                    "dateOfBirth": {
+                        "type": "string"
+                    },
+                    "departureFlightNumber": {
+                        "type": "string"
+                    },
+                    "driversLicenceCountry": {
+                        "type": "string"
+                    },
+                    "driversLicenceExpiry": {
+                        "type": "string"
+                    },
+                    "driversLicenceNumber": {
+                        "type": "string"
+                    },
+                    "email": {
+                        "type": "string"
+                    },
+                    "firstName": {
+                        "type": "string"
+                    },
+                    "homeAddress": {
+                        "$ref": "#/components/schemas/HomeAddressResponse"
+                    },
+                    "lastName": {
+                        "type": "string"
+                    },
+                    "lucyClubNumber": {
+                        "type": "string"
+                    },
+                    "mobileNumber": {
+                        "type": "string"
+                    },
+                    "numberOfPeople": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "optIn": {
+                        "type": "boolean"
+                    }
+                },
+                "title": "HirerDetailsResponse"
+            },
+            "HomeAddressResponse": {
+                "type": "object",
+                "properties": {
+                    "city": {
+                        "type": "string"
+                    },
+                    "country": {
+                        "type": "string"
+                    },
+                    "postCode": {
+                        "type": "string"
+                    },
+                    "state": {
+                        "type": "string"
+                    },
+                    "street": {
+                        "type": "string"
+                    }
+                },
+                "title": "HomeAddressResponse"
+            },
+            "ItemKmChargeResponse": {
+                "type": "object",
+                "properties": {
+                    "dailyRate": {
+                        "$ref": "#/components/schemas/PriceResponse"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "feeForEachAdditionalKm": {
+                        "$ref": "#/components/schemas/PriceResponse"
+                    },
+                    "id": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "isDefault": {
+                        "type": "boolean"
+                    },
+                    "maximumPrice": {
+                        "$ref": "#/components/schemas/PriceResponse"
+                    },
+                    "mileageDesc": {
+                        "type": "string"
+                    },
+                    "notes": {
+                        "type": "string"
+                    },
+                    "numberOfDays": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "numberOfKmsFree": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "totalAmount": {
+                        "$ref": "#/components/schemas/PriceResponse"
+                    }
+                },
+                "title": "ItemKmChargeResponse"
+            },
+            "ItemRS": {
+                "type": "object",
+                "properties": {
+                    "allowMultiple": {
+                        "type": "boolean"
+                    },
+                    "category": {
+                        "type": "string"
+                    },
+                    "commissionable": {
+                        "type": "boolean"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "excess": {
+                        "$ref": "#/components/schemas/PriceRS"
+                    },
+                    "excessType": {
+                        "type": "string"
+                    },
+                    "isMandatory": {
+                        "type": "boolean"
+                    },
+                    "isPercentageOnTotalCost": {
+                        "type": "boolean"
+                    },
+                    "maxPrice": {
+                        "$ref": "#/components/schemas/PriceRS"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "numberOfDaysCalculated": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "price": {
+                        "$ref": "#/components/schemas/PriceRS"
+                    },
+                    "productCode": {
+                        "type": "string"
+                    },
+                    "productId": {
+                        "type": "string"
+                    },
+                    "productType": {
+                        "type": "string"
+                    },
+                    "qty": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "rentalDays": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "total": {
+                        "$ref": "#/components/schemas/PriceRS"
+                    }
+                },
+                "title": "ItemRS"
+            },
+            "ItemResponse": {
+                "type": "object",
+                "properties": {
+                    "allowMultiple": {
+                        "type": "boolean"
+                    },
+                    "category": {
+                        "type": "string"
+                    },
+                    "commissionable": {
+                        "type": "boolean"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "excess": {
+                        "$ref": "#/components/schemas/PriceResponse"
+                    },
+                    "excessType": {
+                        "type": "string"
+                    },
+                    "gst": {
+                        "type": "boolean"
+                    },
+                    "isDefault": {
+                        "type": "boolean"
+                    },
+                    "isMandatory": {
+                        "type": "boolean"
+                    },
+                    "isPercentageOnTotalCost": {
+                        "type": "boolean"
+                    },
+                    "maxPrice": {
+                        "$ref": "#/components/schemas/PriceResponse"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "numberOfDaysCalculated": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "payAgency": {
+                        "type": "boolean"
+                    },
+                    "price": {
+                        "$ref": "#/components/schemas/PriceResponse"
+                    },
+                    "productCode": {
+                        "type": "string"
+                    },
+                    "productId": {
+                        "type": "string"
+                    },
+                    "productType": {
+                        "type": "string"
+                    },
+                    "qty": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "rentalDays": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "stampduty": {
+                        "type": "boolean"
+                    },
+                    "total": {
+                        "$ref": "#/components/schemas/PriceResponse"
+                    }
+                },
+                "title": "ItemResponse"
+            },
+            "KmChargeResponse": {
+                "type": "object",
+                "properties": {
+                    "allowMultiple": {
+                        "type": "boolean"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "group": {
+                        "type": "string"
+                    },
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ItemKmChargeResponse"
+                        }
+                    },
+                    "required": {
+                        "type": "boolean"
+                    },
+                    "webCategory": {
+                        "type": "string"
+                    }
+                },
+                "title": "KmChargeResponse"
+            },
+            "LocationDTO": {
+                "type": "object",
+                "properties": {
+                    "siteAddress": {
+                        "$ref": "#/components/schemas/AddressDTO"
+                    },
+                    "siteLocation": {
+                        "type": "string"
+                    }
+                },
+                "title": "LocationDTO"
+            },
+            "MandatoryFee": {
+                "type": "object",
+                "properties": {
+                    "AllowMultiple": {
+                        "type": "boolean"
+                    },
+                    "Category": {
+                        "type": "string"
+                    },
+                    "Commissionable": {
+                        "type": "boolean"
+                    },
+                    "Description": {
+                        "type": "string"
+                    },
+                    "IsMandatory": {
+                        "type": "boolean"
+                    },
+                    "MaxPrice": {
+                        "$ref": "#/components/schemas/Price"
+                    },
+                    "Name": {
+                        "type": "string"
+                    },
+                    "NumberOfDaysCalculated": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "Price": {
+                        "$ref": "#/components/schemas/Price"
+                    },
+                    "ProductId": {
+                        "type": "string"
+                    },
+                    "ProductType": {
+                        "type": "string"
+                    },
+                    "Qty": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "RentalDays": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "Total": {
+                        "$ref": "#/components/schemas/Price"
+                    }
+                },
+                "title": "MandatoryFee"
+            },
+            "OrderRQ": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "qty": {
+                        "type": "integer",
+                        "format": "int32"
+                    }
+                },
+                "title": "OrderRQ"
+            },
+            "Price": {
+                "type": "object",
+                "properties": {
+                    "CurrencyCode": {
+                        "type": "string"
+                    },
+                    "Value": {
+                        "type": "number",
+                        "format": "float"
+                    }
+                },
+                "title": "Price"
+            },
+            "PriceRS": {
+                "type": "object",
+                "properties": {
+                    "currencyCode": {
+                        "type": "string"
+                    },
+                    "value": {
+                        "type": "number",
+                        "format": "float"
+                    }
+                },
+                "title": "PriceRS"
+            },
+            "PriceResponse": {
+                "type": "object",
+                "properties": {
+                    "currencyCode": {
+                        "type": "string"
+                    },
+                    "value": {
+                        "type": "number",
+                        "format": "float"
+                    }
+                },
+                "title": "PriceResponse"
+            },
+            "ProductRS": {
+                "type": "object",
+                "properties": {
+                    "allowMultiple": {
+                        "type": "boolean"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "group": {
+                        "type": "string"
+                    },
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ItemRS"
+                        }
+                    },
+                    "required": {
+                        "type": "boolean"
+                    },
+                    "webCategory": {
+                        "type": "string"
+                    }
+                },
+                "title": "ProductRS"
+            },
+            "ProductResponse": {
+                "type": "object",
+                "properties": {
+                    "allowMultiple": {
+                        "type": "boolean"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "group": {
+                        "type": "string"
+                    },
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ItemResponse"
+                        }
+                    },
+                    "required": {
+                        "type": "boolean"
+                    },
+                    "webCategory": {
+                        "type": "string"
+                    }
+                },
+                "title": "ProductResponse"
+            },
+            "ProductResponseDTO": {
+                "type": "object",
+                "properties": {
+                    "apiName": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "emailImage": {
+                        "type": "string"
+                    },
+                    "excessReductionDescription": {
+                        "type": "string"
+                    },
+                    "excessReductionFeatures": {
+                        "type": "string"
+                    },
+                    "features": {
+                        "type": "string"
+                    },
+                    "featuresDescription": {
+                        "type": "string"
+                    },
+                    "fleetType": {
+                        "type": "string"
+                    },
+                    "fleetTypeId": {
+                        "type": "string"
+                    },
+                    "fleetTypeSlug": {
+                        "type": "string"
+                    },
+                    "floorPlans": {
+                        "type": "string"
+                    },
+                    "gallery": {
+                        "type": "string"
+                    },
+                    "id": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "includedWith": {
+                        "type": "string"
+                    },
+                    "keyFeatures": {
+                        "type": "string"
+                    },
+                    "modifiedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "pages": {
+                        "type": "string"
+                    },
+                    "productCode": {
+                        "type": "string"
+                    },
+                    "productId": {
+                        "type": "string"
+                    },
+                    "productName": {
+                        "type": "string"
+                    },
+                    "region": {
+                        "type": "string"
+                    },
+                    "shortDescription": {
+                        "type": "string"
+                    },
+                    "specifications": {
+                        "type": "string"
+                    },
+                    "specificationsDescription": {
+                        "type": "string"
+                    }
+                },
+                "title": "ProductResponseDTO"
+            },
+            "QuoteCreationRequest": {
+                "type": "object",
+                "properties": {
+                    "campaignCode": {
+                        "type": "string"
+                    },
+                    "categoryCode": {
+                        "type": "string"
+                    },
+                    "driverAge": {
+                        "type": "string"
+                    },
+                    "dropOffDateTime": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "dropOffLocationName": {
+                        "type": "string"
+                    },
+                    "email": {
+                        "type": "string"
+                    },
+                    "firstName": {
+                        "type": "string"
+                    },
+                    "lastName": {
+                        "type": "string"
+                    },
+                    "mobilePhone": {
+                        "type": "string"
+                    },
+                    "numberOfTravelling": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "pickUpDateTime": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "pickUpLocationName": {
+                        "type": "string"
+                    },
+                    "source": {
+                        "type": "string"
+                    }
+                },
+                "title": "QuoteCreationRequest"
+            },
+            "QuoteUpdatingRequest": {
+                "type": "object",
+                "properties": {
+                    "extraKmsId": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "insuranceId": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "numberOfTravelling": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "optionalsFee": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/OrderRQ"
+                        }
+                    },
+                    "quoteId": {
+                        "type": "string"
+                    },
+                    "reservationReference": {
+                        "type": "string"
+                    },
+                    "secondaryProductsAndInsuranceMap": {
+                        "type": "string"
+                    },
+                    "source": {
+                        "type": "string"
+                    }
+                },
+                "title": "QuoteUpdatingRequest"
+            },
+            "ReservationResponse": {
+                "type": "object",
+                "properties": {
+                    "agentBalanceDue": {
+                        "$ref": "#/components/schemas/PriceResponse"
+                    },
+                    "agentCollects": {
+                        "$ref": "#/components/schemas/PriceResponse"
+                    },
+                    "agentCommission": {
+                        "$ref": "#/components/schemas/PriceResponse"
+                    },
+                    "agentVoucherReference": {
+                        "$ref": "#/components/schemas/PriceResponse"
+                    },
+                    "balanceDue": {
+                        "$ref": "#/components/schemas/PriceResponse"
+                    },
+                    "balanceDueWithCCFee": {
+                        "$ref": "#/components/schemas/PriceResponse"
+                    },
+                    "bookingStatus": {
+                        "type": "string"
+                    },
+                    "ccSurchargePercentage": {
+                        "type": "number",
+                        "format": "float"
+                    },
+                    "dateCreated": {
+                        "type": "string"
+                    },
+                    "dropOffDate": {
+                        "type": "string"
+                    },
+                    "dropOffLocation": {
+                        "type": "string"
+                    },
+                    "dropOffLocationAddress": {
+                        "$ref": "#/components/schemas/LocationDTO"
+                    },
+                    "dropOffTimes": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "fleetCategory": {
+                        "$ref": "#/components/schemas/FleetCategoryResponse"
+                    },
+                    "hirerDetails": {
+                        "$ref": "#/components/schemas/HirerDetailsResponse"
+                    },
+                    "insuranceProducts": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ProductResponse"
+                        }
+                    },
+                    "lines": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ItemResponse"
+                        }
+                    },
+                    "pickUpDate": {
+                        "type": "string"
+                    },
+                    "pickUpLocation": {
+                        "type": "string"
+                    },
+                    "pickUpLocationAddress": {
+                        "$ref": "#/components/schemas/LocationDTO"
+                    },
+                    "pickupTimes": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "quoteId": {
+                        "type": "string"
+                    },
+                    "quoteName": {
+                        "type": "string"
+                    },
+                    "rentalDays": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "reservationId": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "reservationReference": {
+                        "type": "string"
+                    },
+                    "secondaryProducts": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ProductResponse"
+                        }
+                    },
+                    "status": {
+                        "type": "string"
+                    },
+                    "totalPrice": {
+                        "$ref": "#/components/schemas/PriceResponse"
+                    }
+                },
+                "title": "ReservationResponse"
+            },
+            "TripDetailsRS": {
+                "type": "object",
+                "properties": {
+                    "dropOffDate": {
+                        "type": "string"
+                    },
+                    "dropOffLocation": {
+                        "type": "string"
+                    },
+                    "dropOffTimes": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "fleetCategory": {
+                        "$ref": "#/components/schemas/FleetCategoryRS"
+                    },
+                    "insuranceProducts": {
+                        "$ref": "#/components/schemas/ProductRS"
+                    },
+                    "lines": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ItemRS"
+                        }
+                    },
+                    "pickUpDate": {
+                        "type": "string"
+                    },
+                    "pickUpLocation": {
+                        "type": "string"
+                    },
+                    "pickupTimes": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "rentalDays": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "secondaryProducts": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ProductRS"
+                        }
+                    },
+                    "totalPrice": {
+                        "$ref": "#/components/schemas/PriceRS"
+                    }
+                },
+                "title": "TripDetailsRS"
+            },
+            "UpdateReservationResponseDTO": {
+                "type": "object",
+                "properties": {
+                    "booking": {
+                        "$ref": "#/components/schemas/BookingRS"
+                    },
+                    "bookingNo": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "reference": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string"
+                    }
+                },
+                "title": "UpdateReservationResponseDTO"
+            },
+            "ValidateUpdateRequest": {
+                "type": "object",
+                "properties": {
+                    "campaignCode": {
+                        "type": "string"
+                    },
+                    "categoryCode": {
+                        "type": "string"
+                    },
+                    "driverAge": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "dropOffDateTime": {
+                        "type": "string"
+                    },
+                    "dropOffLocationName": {
+                        "type": "string"
+                    },
+                    "hirerDetails": {
+                        "$ref": "#/components/schemas/HirerDetails"
+                    },
+                    "insurance": {
+                        "type": "string"
+                    },
+                    "pascal": {
+                        "type": "boolean"
+                    },
+                    "pickUpDateTime": {
+                        "type": "string"
+                    },
+                    "pickUpLocationName": {
+                        "type": "string"
+                    },
+                    "secondaryProducts": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    },
+                    "voucherReference": {
+                        "type": "string"
+                    }
+                },
+                "title": "ValidateUpdateRequest"
+            },
+            "ValidateUpdateResponseDTO": {
+                "type": "object",
+                "properties": {
+                    "bookingNo": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "message": {
+                        "type": "string"
+                    },
+                    "original": {
+                        "$ref": "#/components/schemas/BookingRS"
+                    },
+                    "reference": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string"
+                    },
+                    "updates": {
+                        "$ref": "#/components/schemas/TripDetailsRS"
+                    }
+                },
+                "title": "ValidateUpdateResponseDTO"
+            },
+            "PageResponseDTO_ProductResponseDTO_": {
+                "type": "object",
+                "properties": {
+                    "pageNumber": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "pageSize": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "rows": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ProductResponseDTO"
+                        }
+                    },
+                    "totalElements": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "totalPage": {
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                },
+                "title": "PageResponseDTO«ProductResponseDTO»"
+            },
+            "SuccessResponseDTO_BookingResponse_": {
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "$ref": "#/components/schemas/BookingResponse"
+                    },
+                    "message": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "integer",
+                        "format": "int32"
+                    }
+                },
+                "title": "SuccessResponseDTO«BookingResponse»"
+            },
+            "SuccessResponseDTO_CreateQuoteResponse_": {
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "$ref": "#/components/schemas/CreateQuoteResponse"
+                    },
+                    "message": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "integer",
+                        "format": "int32"
+                    }
+                },
+                "title": "SuccessResponseDTO«CreateQuoteResponse»"
+            },
+            "SuccessResponseDTO_List_AvailabilityResponse_": {
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/AvailabilityResponse"
+                        }
+                    },
+                    "message": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "integer",
+                        "format": "int32"
+                    }
+                },
+                "title": "SuccessResponseDTO«List«AvailabilityResponse»»"
+            },
+            "SuccessResponseDTO_PageResponseDTO_ProductResponseDTO_": {
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "$ref": "#/components/schemas/PageResponseDTO_ProductResponseDTO_"
+                    },
+                    "message": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "integer",
+                        "format": "int32"
+                    }
+                },
+                "title": "SuccessResponseDTO«PageResponseDTO«ProductResponseDTO»»"
+            },
+            "SuccessResponseDTO_ReservationResponse_": {
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "$ref": "#/components/schemas/ReservationResponse"
+                    },
+                    "message": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "integer",
+                        "format": "int32"
+                    }
+                },
+                "title": "SuccessResponseDTO«ReservationResponse»"
+            },
+            "SuccessResponseDTO_Set_string_": {
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "message": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "integer",
+                        "format": "int32"
+                    }
+                },
+                "title": "SuccessResponseDTO«Set«string»»"
+            },
+            "SuccessResponseDTO_UpdateReservationResponseDTO_": {
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "$ref": "#/components/schemas/UpdateReservationResponseDTO"
+                    },
+                    "message": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "integer",
+                        "format": "int32"
+                    }
+                },
+                "title": "SuccessResponseDTO«UpdateReservationResponseDTO»"
+            },
+            "SuccessResponseDTO_ValidateUpdateResponseDTO_": {
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "$ref": "#/components/schemas/ValidateUpdateResponseDTO"
+                    },
+                    "message": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "integer",
+                        "format": "int32"
+                    }
+                },
+                "title": "SuccessResponseDTO«ValidateUpdateResponseDTO»"
+            },
+            "SuccessResponseDTO_string_": {
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "type": "string"
+                    },
+                    "message": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "integer",
+                        "format": "int32"
+                    }
+                },
+                "title": "SuccessResponseDTO«string»"
+            }
+        }
+    }
+}

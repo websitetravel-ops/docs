@@ -1,0 +1,1084 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "EBS Supplier API",
+    "version": "0.0.0",
+    "description": "Supplier-side EBS integration endpoints for authentication, availability, booking, and cancellations."
+  },
+  "paths": {
+    "/cms/ebs/token": {
+      "post": {
+        "tags": [
+          "Version 1",
+          "Authentication / Authorisation"
+        ],
+        "summary": "Request an authorisation token from the remote system.",
+        "description": "Grants a Token",
+        "operationId": "post_cms_core_ebs_authenticate",
+        "parameters": [
+          {
+            "name": "client_id",
+            "in": "query",
+            "description": "Client ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "client_secret",
+            "in": "query",
+            "description": "Client secret",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returned when successful.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "access_token": {
+                      "description": "Token to be used to authorise future requests.",
+                      "type": "string"
+                    },
+                    "expires_in": {
+                      "description": "Number of seconds before the token will expire.",
+                      "type": "integer"
+                    },
+                    "error_description": {
+                      "description": "Set after unsuccessful authentication attempt.",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Not 200, will all be treated as a failure. Use an appropriate code and detailed error message."
+          }
+        }
+      }
+    },
+    "/cms/ebs/bookingdetails/{productIdentifier}": {
+      "get": {
+        "tags": [
+          "Version 1",
+          "Booking Parameters"
+        ],
+        "summary": "The booking details route should provide a list of booking times, pickup locations and additional customer\nfields for the product.",
+        "description": "Retrieve Product Booking Details / Options",
+        "operationId": "get_cms_core_ebs_getbookingdetails",
+        "parameters": [
+          {
+            "name": "productIdentifier",
+            "in": "path",
+            "description": "Identifier for the fare/product being booked on the external booking system",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returned when successful.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Booking Details Response Parameters",
+                  "properties": {
+                    "bookingTimes": {
+                      "description": "List of booking times for the product",
+                      "type": "array",
+                      "items": {
+                        "properties": {
+                          "bookingTimeId": {
+                            "description": "Identifier for booking time",
+                            "type": "string"
+                          },
+                          "bookingTime": {
+                            "description": "Label for booking time",
+                            "type": "string"
+                          },
+                          "default": {
+                            "description": "Whether this booking time should be the default time for the product",
+                            "type": "boolean"
+                          }
+                        },
+                        "type": "object"
+                      }
+                    },
+                    "pickupLocations": {
+                      "description": "List of pickup locations for the product",
+                      "type": "array",
+                      "items": {
+                        "properties": {
+                          "pickupLocationId": {
+                            "description": "Identifier for pickup location",
+                            "type": "string"
+                          },
+                          "pickupLocation": {
+                            "description": "Label for pickup location",
+                            "type": "string"
+                          },
+                          "pickupTime": {
+                            "description": "Label for pickup time",
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      }
+                    },
+                    "additionalFields": {
+                      "description": "List of additional customer fields for the product",
+                      "type": "array",
+                      "items": {
+                        "properties": {
+                          "additionalFieldId": {
+                            "description": "Identifier for additional field",
+                            "type": "string"
+                          },
+                          "additionalFieldTitle": {
+                            "description": "Title for additional field",
+                            "type": "string"
+                          },
+                          "mandatory": {
+                            "description": "Determine if the field is mandatory or not",
+                            "type": "boolean"
+                          },
+                          "type": {
+                            "description": "Determine the type of the input",
+                            "type": "string"
+                          },
+                          "options": {
+                            "description": "Options for the input if it is of type select",
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          }
+                        },
+                        "type": "object"
+                      }
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Not 200, will all be treated as a failure. Use an appropriate code and detailed error message."
+          }
+        }
+      }
+    },
+    "/cms/ebs/availability/{productIdentifier}": {
+      "get": {
+        "tags": [
+          "Version 1",
+          "Availability"
+        ],
+        "summary": "Availability requests will be sent to the booking system in order to find out the current availability for the\ngiven product and booking time.",
+        "description": "Request Availability",
+        "operationId": "get_cms_core_ebs_getavailabilityfordate",
+        "parameters": [
+          {
+            "name": "productIdentifier",
+            "in": "path",
+            "description": "Identifier for the fare/product being booked on the external booking system",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "startDate",
+            "in": "query",
+            "description": "Start of date range to check availability for, in YYYY-MM-DD format.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "description": "End of date range to check availability for, in YYYY-MM-DD format.  Both dates are inclusive; if the startDate is the same as the endDate, availability should be returned for that date.<br/>Please note that the TravelDesk system will only request up to 14 days maximum",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "bookingTimeId",
+            "in": "query",
+            "description": "Identifier of booking time to check availability for, as provided in the Booking Details response.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returned when successful.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Availability Response Parameters",
+                  "properties": {
+                    "availability": {
+                      "description": "Array of Availability objects, one for each date included in the request date range",
+                      "type": "array",
+                      "items": {
+                        "properties": {
+                          "date": {
+                            "description": "Date in YYYY-MM-DD format",
+                            "type": "string"
+                          },
+                          "quantityAvailable": {
+                            "description": "Quantity of tickets available for purchase for this date",
+                            "type": "integer"
+                          },
+                          "notApplicable": {
+                            "description": "True if the product is not offered on the date provided",
+                            "type": "boolean"
+                          },
+                          "rrp": {
+                            "description": "A recommended price for the product on this date",
+                            "type": "number",
+                            "format": "float"
+                          },
+                          "net": {
+                            "description": "A net price for the product on this date",
+                            "type": "number",
+                            "format": "float"
+                          }
+                        },
+                        "type": "object"
+                      }
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Not 200, will all be treated as a failure. Use an appropriate code and detailed error message."
+          }
+        }
+      }
+    },
+    "/cms/ebs/booking/{productIdentifier}": {
+      "post": {
+        "tags": [
+          "Version 1",
+          "Booking"
+        ],
+        "summary": "Booking requests will be sent to the booking system when a customer has purchased the product through the\nWebsite Travel platform.",
+        "description": "Each booking request will be for a single date only.  If multiple dates are booked as part of the same order,\none request will be made per date booked, and each request will have the same voucherNumber.",
+        "operationId": "post_cms_core_ebs_makebooking",
+        "parameters": [
+          {
+            "name": "productIdentifier",
+            "in": "path",
+            "description": "Identifier for the fare/product being booked on the external booking system",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Booking Request Parameters",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "description": "Booking Request Parameters",
+                "properties": {
+                  "voucherNumber": {
+                    "description": "Website Travel voucher number for this booking",
+                    "type": "string"
+                  },
+                  "orderReference": {
+                    "description": "Website Travel reference for the order which contains the booking/voucher",
+                    "type": "string"
+                  },
+                  "quantity": {
+                    "description": "The quantity of product being booked for this date",
+                    "type": "integer"
+                  },
+                  "bookingDate": {
+                    "description": "Date of booking in YYYY-MM-DD format",
+                    "type": "string"
+                  },
+                  "bookingTimeId": {
+                    "description": "Identifier of booking time to make booking for",
+                    "type": "string"
+                  },
+                  "pickupLocationId": {
+                    "description": "Identifier of pickup location to make booking for",
+                    "type": "string"
+                  },
+                  "additionalFields": {
+                    "description": "Array of key-value pairs",
+                    "type": "object"
+                  },
+                  "customers": {
+                    "description": "List of customers included on this booking request",
+                    "type": "array",
+                    "items": {
+                      "description": "Details of customer",
+                      "properties": {
+                        "customerIndex": {
+                          "description": "Customer index",
+                          "type": "integer"
+                        },
+                        "customerTitle": {
+                          "description": "Customer's title (Mr, Mrs, etc)",
+                          "type": "string"
+                        },
+                        "customerFirstName": {
+                          "description": "Customer's first name",
+                          "type": "string"
+                        },
+                        "customerLastName": {
+                          "description": "Customer's last name",
+                          "type": "string"
+                        },
+                        "customerPhone": {
+                          "description": "Customer's phone",
+                          "type": "string"
+                        },
+                        "customerDateOfBirth": {
+                          "description": "Customer's date of birth, in YYYY-MM-DD format",
+                          "type": "string",
+                          "format": "date"
+                        },
+                        "customerEmail": {
+                          "description": "Customer's email",
+                          "type": "string"
+                        },
+                        "customerCountry": {
+                          "description": "Customer's country",
+                          "type": "string"
+                        },
+                        "customerPostcode": {
+                          "description": "Customer's postcode",
+                          "type": "string"
+                        },
+                        "voucherComment": {
+                          "description": "Additional comments made by the agent about this booking. Can be different per customer",
+                          "type": "string"
+                        },
+                        "additionalFields": {
+                          "description": "Additional information. Can be different per customer. Array of key-value pairs",
+                          "type": "object"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  },
+                  "agency": {
+                    "description": "Details of agency that took the booking",
+                    "type": "array",
+                    "items": {
+                      "description": "Details of agency",
+                      "properties": {
+                        "branch": {
+                          "description": "Name of branch which took the booking",
+                          "type": "string"
+                        },
+                        "agent": {
+                          "description": "Name of agent who took the booking",
+                          "type": "string"
+                        },
+                        "phone": {
+                          "description": "Phone number for branch which took the booking",
+                          "type": "string"
+                        },
+                        "branchCode": {
+                          "description": "Branch Code of Agent",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  },
+                  "rrp": {
+                    "description": "The recommended retail price for the product on this booking",
+                    "type": "number",
+                    "format": "float"
+                  },
+                  "net": {
+                    "description": "Your net rate for the product on the booking",
+                    "type": "number",
+                    "format": "float"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Returned when successful.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "description": "Whether or not the booking was made successfully.",
+                      "type": "boolean"
+                    },
+                    "bookingReferenceId": {
+                      "description": "The booking reference from the external booking system.",
+                      "type": "string"
+                    },
+                    "bookingNotes": {
+                      "description": "The booking notes from the external booking system.",
+                      "type": "string"
+                    },
+                    "errorMessage": {
+                      "description": "A reason for the unsuccessful booking request.",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Not 200, will all be treated as a failure. Use an appropriate code and detailed error message.<br/><strong>Note:</strong> Response payload also includes a 'success' boolean and optional error message. You can still return 200 but also indicate failure."
+          }
+        }
+      }
+    },
+    "/cms/ebs/bookings/{productIdentifier}": {
+      "post": {
+        "tags": [
+          "Version 1",
+          "Bookings"
+        ],
+        "summary": "Booking requests will be sent to the booking system when a customer has purchased the product through the\nWebsite Travel platform.",
+        "description": "Make a Booking",
+        "operationId": "post_cms_core_ebs_makebookings",
+        "parameters": [
+          {
+            "name": "productIdentifier",
+            "in": "path",
+            "description": "Identifier for the fare/product being booked on the external booking system",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Booking Request Parameters",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "description": "Booking Request Parameters",
+                "properties": {
+                  "orderReference": {
+                    "description": "The Website Travel reference for the order which contains the booking/voucher",
+                    "type": "string"
+                  },
+                  "agency": {
+                    "description": "Details of agency which took the booking",
+                    "properties": {
+                      "branch": {
+                        "description": "Name of branch which took the booking",
+                        "type": "string"
+                      },
+                      "agent": {
+                        "description": "Name of agent who took the booking",
+                        "type": "string"
+                      },
+                      "phone": {
+                        "description": "Phone number for branch which took the booking",
+                        "type": "string"
+                      },
+                      "branchCode": {
+                        "description": "Branch Code of Agent",
+                        "type": "string"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "customers": {
+                    "description": "List of customers included on this booking request",
+                    "type": "array",
+                    "items": {
+                      "description": "Details of customer",
+                      "properties": {
+                        "customerIndex": {
+                          "description": "Customer's index",
+                          "type": "integer"
+                        },
+                        "customerTitle": {
+                          "description": "Customer's title (Mr, Mrs, etc)",
+                          "type": "string"
+                        },
+                        "customerFirstName": {
+                          "description": "Customer's first name",
+                          "type": "string"
+                        },
+                        "customerLastName": {
+                          "description": "Customer's last name",
+                          "type": "string"
+                        },
+                        "customerPhone": {
+                          "description": "Customer's phone",
+                          "type": "string"
+                        },
+                        "customerDateOfBirth": {
+                          "description": "Customer's date of birth, in YYYY-MM-DD format",
+                          "type": "string",
+                          "format": "date"
+                        },
+                        "customerEmail": {
+                          "description": "Customer's email",
+                          "type": "string"
+                        },
+                        "customerCountry": {
+                          "description": "Customer's country",
+                          "type": "string"
+                        },
+                        "customerPostcode": {
+                          "description": "Customer's postcode",
+                          "type": "string"
+                        },
+                        "voucherComment": {
+                          "description": "Additional comments made by the agent about this booking. Can be different per customer",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  },
+                  "bookings": {
+                    "description": "List of bookings included on this booking request",
+                    "type": "array",
+                    "items": {
+                      "description": "Details of BookingRange",
+                      "properties": {
+                        "startDate": {
+                          "description": "Start date of booking in YYYY-MM-DD format.",
+                          "type": "string"
+                        },
+                        "endDate": {
+                          "description": "End date of booking in YYYY-MM-DD format.",
+                          "type": "string"
+                        },
+                        "bookingDetails": {
+                          "description": "Booking Details",
+                          "type": "array",
+                          "items": {
+                            "description": "Booking Details",
+                            "properties": {
+                              "bookingDate": {
+                                "description": "Date of booking in YYYY-MM-DD format.",
+                                "type": "string"
+                              },
+                              "bookingTimeId": {
+                                "description": "Identifier of booking time to make booking for. Provided in the Booking Details response.",
+                                "type": "string"
+                              },
+                              "pickupLocationId": {
+                                "description": "Identifier of pickup location to make booking for. Provided in the Booking Details response.",
+                                "type": "string"
+                              },
+                              "rrp": {
+                                "description": "The recommended retail price. Note that this is per qty, not a total for the entire booking.",
+                                "type": "number",
+                                "format": "float"
+                              },
+                              "net": {
+                                "description": "Your net rate. Note that this is per qty, not a total for the entire booking.",
+                                "type": "number",
+                                "format": "float"
+                              },
+                              "currencyCode": {
+                                "description": "Currency code for booking.",
+                                "type": "string"
+                              },
+                              "voucherNumber": {
+                                "description": "The Website Travel voucher number for this booking.\nThe first three characters of the voucherNumber will be the unique branch code for the branch which made the booking.",
+                                "type": "string"
+                              },
+                              "bookingDetailCustomers": {
+                                "description": "List of customers included on this booking detail.",
+                                "type": "array",
+                                "items": {
+                                  "properties": {
+                                    "customerIndex": {
+                                      "description": "Customer's index.",
+                                      "type": "integer"
+                                    },
+                                    "quantity": {
+                                      "description": "The quantity of product being booked for this date.",
+                                      "type": "integer"
+                                    },
+                                    "additionalFields": {
+                                      "description": "Array of key-value pairs, where key = additionalFieldId provided in Booking Details response, and value = text entered by agent.",
+                                      "type": "object"
+                                    }
+                                  },
+                                  "type": "object"
+                                }
+                              }
+                            },
+                            "type": "object"
+                          }
+                        }
+                      },
+                      "type": "object"
+                    }
+                  },
+                  "test": {
+                    "description": "Set Test or not",
+                    "type": "integer"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Returned when successful.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "orderReference": {
+                      "description": "The Website Travel reference for the order which contains the booking/voucher.",
+                      "type": "string"
+                    },
+                    "bookings": {
+                      "description": "List of bookings included on this booking response.",
+                      "type": "array",
+                      "items": {
+                        "properties": {
+                          "bookingDate": {
+                            "description": "Date of booking in YYYY-MM-DD format.",
+                            "type": "string"
+                          },
+                          "voucherNumber": {
+                            "description": "The Website Travel voucher number for this booking.",
+                            "type": "string"
+                          },
+                          "bookingDetailCustomers": {
+                            "description": "List of customers included on this booking detail.",
+                            "type": "array",
+                            "items": {
+                              "properties": {
+                                "customerIndex": {
+                                  "description": "Customer's index",
+                                  "type": "integer"
+                                },
+                                "success": {
+                                  "description": "Whether or not the booking was made successfully.",
+                                  "type": "boolean"
+                                },
+                                "bookingReferenceId": {
+                                  "description": "The booking reference from the external booking system.",
+                                  "type": "string"
+                                },
+                                "bookingNotes": {
+                                  "description": "The booking notes from the external booking system.",
+                                  "type": "string"
+                                },
+                                "errorMessage": {
+                                  "description": "A reason for the unsuccessful booking request.",
+                                  "type": "string"
+                                }
+                              },
+                              "type": "object"
+                            }
+                          }
+                        },
+                        "type": "object"
+                      }
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Not 200, will all be treated as a failure. Use an appropriate code and detailed error message.<br/><strong>Note:</strong> Response payload also includes a 'success' boolean and optional error message. You can still return 200 but also indicate failure."
+          }
+        }
+      }
+    },
+    "/cms/ebs/productbookings": {
+      "post": {
+        "tags": [
+          "Version 1",
+          "Product Bookings"
+        ],
+        "summary": "Booking requests will be sent to the booking system when a customer has purchased the product through the\nWebsite Travel platform.",
+        "description": "Make a Booking",
+        "operationId": "post_cms_core_ebs_makeproductbookings",
+        "requestBody": {
+          "description": "Booking Request Parameters",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "description": "Product Bookings Request Parameters",
+                "properties": {
+                  "orderReference": {
+                    "description": "The Website Travel reference for the order which contains the booking/voucher. An order may contain multiple vouchers for the same or different products.",
+                    "type": "string"
+                  },
+                  "agency": {
+                    "description": "Details of agency which took the booking",
+                    "properties": {
+                      "branch": {
+                        "description": "Name of branch which took the booking",
+                        "type": "string"
+                      },
+                      "agent": {
+                        "description": "Name of agent who took the booking",
+                        "type": "string"
+                      },
+                      "phone": {
+                        "description": "Phone number for branch which took the booking",
+                        "type": "string"
+                      },
+                      "branchCode": {
+                        "description": "Branch Code of Agent",
+                        "type": "string"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "customers": {
+                    "description": "List of customers included on this booking request",
+                    "type": "array",
+                    "items": {
+                      "description": "Details of customer",
+                      "properties": {
+                        "customerIndex": {
+                          "description": "Customer's index",
+                          "type": "integer"
+                        },
+                        "customerTitle": {
+                          "description": "Customer's title (Mr, Mrs, etc)",
+                          "type": "string"
+                        },
+                        "customerFirstName": {
+                          "description": "Customer's first name",
+                          "type": "string"
+                        },
+                        "customerLastName": {
+                          "description": "Customer's last name",
+                          "type": "string"
+                        },
+                        "customerPhone": {
+                          "description": "Customer's phone",
+                          "type": "string"
+                        },
+                        "customerDateOfBirth": {
+                          "description": "Customer's date of birth, in YYYY-MM-DD format",
+                          "type": "string",
+                          "format": "date"
+                        },
+                        "customerEmail": {
+                          "description": "Customer's email",
+                          "type": "string"
+                        },
+                        "customerCountry": {
+                          "description": "Customer's country",
+                          "type": "string"
+                        },
+                        "customerPostcode": {
+                          "description": "Customer's postcode",
+                          "type": "string"
+                        },
+                        "voucherComment": {
+                          "description": "Additional comments made by the agent about this booking. Can be different per customer",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  },
+                  "bookings": {
+                    "description": "List of bookings included on this booking request",
+                    "type": "array",
+                    "items": {
+                      "description": "Details of BookingRange",
+                      "properties": {
+                        "startDate": {
+                          "description": "Start date of booking in YYYY-MM-DD format.",
+                          "type": "string"
+                        },
+                        "endDate": {
+                          "description": "End date of booking in YYYY-MM-DD format.",
+                          "type": "string"
+                        },
+                        "bookingDetails": {
+                          "description": "Booking Details",
+                          "type": "array",
+                          "items": {
+                            "description": "Booking Details",
+                            "properties": {
+                              "bookingDate": {
+                                "description": "Date of booking in YYYY-MM-DD format.",
+                                "type": "string"
+                              },
+                              "bookingTimeId": {
+                                "description": "Identifier of booking time to make booking for. Provided in the Booking Details response.",
+                                "type": "string"
+                              },
+                              "pickupLocationId": {
+                                "description": "Identifier of pickup location to make booking for. Provided in the Booking Details response.",
+                                "type": "string"
+                              },
+                              "rrp": {
+                                "description": "The recommended retail price. Note that this is per qty, not a total for the entire booking.",
+                                "type": "number",
+                                "format": "float"
+                              },
+                              "net": {
+                                "description": "Your net rate. Note that this is per qty, not a total for the entire booking.",
+                                "type": "number",
+                                "format": "float"
+                              },
+                              "currencyCode": {
+                                "description": "Currency code for booking.",
+                                "type": "string"
+                              },
+                              "voucherNumber": {
+                                "description": "The Website Travel voucher number for this booking.\nThe first three characters of the voucherNumber will be the unique branch code for the branch which made the booking.",
+                                "type": "string"
+                              },
+                              "bookingDetailCustomers": {
+                                "description": "List of customers included on this booking detail.",
+                                "type": "array",
+                                "items": {
+                                  "properties": {
+                                    "customerIndex": {
+                                      "description": "Customer's index.",
+                                      "type": "integer"
+                                    },
+                                    "quantity": {
+                                      "description": "The quantity of product being booked for this date.",
+                                      "type": "integer"
+                                    },
+                                    "additionalFields": {
+                                      "description": "Array of key-value pairs, where key = additionalFieldId provided in Booking Details response, and value = text entered by agent.",
+                                      "type": "object"
+                                    }
+                                  },
+                                  "type": "object"
+                                }
+                              }
+                            },
+                            "type": "object"
+                          }
+                        },
+                        "productIdentifier": {
+                          "description": "Product Identifier",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  },
+                  "test": {
+                    "description": "Set Test or not",
+                    "type": "integer"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Returned when successful.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "orderReference": {
+                      "description": "The Website Travel reference for the order which contains the booking/voucher.",
+                      "type": "string"
+                    },
+                    "bookings": {
+                      "description": "List of bookings included on this booking response.",
+                      "type": "array",
+                      "items": {
+                        "properties": {
+                          "bookingDate": {
+                            "description": "Date of booking in YYYY-MM-DD format.",
+                            "type": "string"
+                          },
+                          "voucherNumber": {
+                            "description": "The Website Travel voucher number for this booking.",
+                            "type": "string"
+                          },
+                          "bookingDetailCustomers": {
+                            "description": "List of customers included on this booking detail.",
+                            "type": "array",
+                            "items": {
+                              "properties": {
+                                "customerIndex": {
+                                  "description": "Customer's index",
+                                  "type": "integer"
+                                },
+                                "success": {
+                                  "description": "Whether or not the booking was made successfully.",
+                                  "type": "boolean"
+                                },
+                                "bookingReferenceId": {
+                                  "description": "The booking reference from the external booking system.",
+                                  "type": "string"
+                                },
+                                "bookingNotes": {
+                                  "description": "The booking notes from the external booking system.",
+                                  "type": "string"
+                                },
+                                "errorMessage": {
+                                  "description": "A reason for the unsuccessful booking request.",
+                                  "type": "string"
+                                }
+                              },
+                              "type": "object"
+                            }
+                          }
+                        },
+                        "type": "object"
+                      }
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Not 200, will all be treated as a failure. Use an appropriate code and detailed error message.<br/><strong>Note:</strong> Response payload also includes a 'success' boolean and optional error message. You can still return 200 but also indicate failure."
+          }
+        }
+      }
+    },
+    "/cms/ebs/booking/cancel": {
+      "post": {
+        "tags": [
+          "Version 1",
+          "Booking Cancellation"
+        ],
+        "summary": "When a booking has been edited, a cancellation request will be sent and then a new booking request will be\nmade with the updated details. This request will have the same voucherNumber as the original booking.",
+        "description": "Cancel a Booking",
+        "operationId": "post_cms_core_ebs_cancelbooking",
+        "requestBody": {
+          "description": "Booking Cancellation Parameters",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "description": "Cancel Request Parameters",
+                "properties": {
+                  "bookingReferenceId": {
+                    "description": "The bookingReferenceId from the response when the booking was made.",
+                    "type": "string"
+                  },
+                  "reason": {
+                    "description": "Description of reason for cancellation.",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Returned when successful.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Response after cancellation attempt",
+                  "properties": {
+                    "success": {
+                      "description": "Whether or not the booking cancellation was made successfully.",
+                      "type": "boolean"
+                    },
+                    "errorMessage": {
+                      "description": "A reason for the unsuccessful cancellation request.",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Not 200, will all be treated as a failure. Use an appropriate code and detailed error message.<br/><strong>Note:</strong> Response payload also includes a 'success' boolean and optional error message. You can still return 200 but also indicate failure."
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Version 1",
+      "description": "Version 1"
+    },
+    {
+      "name": "Authentication / Authorisation",
+      "description": "Authentication / Authorisation"
+    },
+    {
+      "name": "Booking Parameters",
+      "description": "Booking Parameters"
+    },
+    {
+      "name": "Availability",
+      "description": "Availability"
+    },
+    {
+      "name": "Booking",
+      "description": "Booking"
+    },
+    {
+      "name": "Bookings",
+      "description": "Bookings"
+    },
+    {
+      "name": "Product Bookings",
+      "description": "Product Bookings"
+    },
+    {
+      "name": "Booking Cancellation",
+      "description": "Booking Cancellation"
+    }
+  ]
+}

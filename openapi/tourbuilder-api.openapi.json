@@ -1,0 +1,3312 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "description": "\"Tour Builder\"",
+        "version": "1.0.0",
+        "title": "TOUR BUILDER API",
+        "contact": {
+            "name": "Adventium Tech Support",
+            "url": "https://www.adventium.tech",
+            "email": "tech-support@adventium.tech"
+        }
+    },
+    "tags": [
+        {
+            "name": "booking-controller",
+            "description": "Booking Controller"
+        },
+        {
+            "name": "builder-controller",
+            "description": "Builder Controller"
+        },
+        {
+            "name": "index-controller",
+            "description": "Index Controller"
+        },
+        {
+            "name": "tapapi-controller",
+            "description": "TAPAPI Controller"
+        },
+        {
+            "name": "tdmsebs-controller",
+            "description": "TDMSEBS Controller"
+        }
+    ],
+    "paths": {
+        "/": {
+            "get": {
+                "tags": [
+                    "index-controller"
+                ],
+                "summary": "index",
+                "operationId": "indexUsingGET",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/tap/v1/cancelHeldReservation": {
+            "post": {
+                "tags": [
+                    "tapapi-controller"
+                ],
+                "summary": "Cancel a held reservation",
+                "operationId": "cancelHeldReservationUsingPOST",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CancelHeldReservationRequest"
+                            }
+                        }
+                    },
+                    "description": "reservationRequest",
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseData_CancelHeldReservationResponse_"
+                                }
+                            }
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "400": {
+                        "description": "Failed"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/tap/v1/cancelReservation": {
+            "post": {
+                "tags": [
+                    "tapapi-controller"
+                ],
+                "summary": "Cancel a confirmed reservation",
+                "operationId": "cancelReservationUsingPOST",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CancelReservationRequest"
+                            }
+                        }
+                    },
+                    "description": "reservationRequest",
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseData_CancelReservationResponse_"
+                                }
+                            }
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "400": {
+                        "description": "Failed"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/tap/v1/confirmReservation": {
+            "post": {
+                "tags": [
+                    "tapapi-controller"
+                ],
+                "summary": "Confirm a held reservsation",
+                "operationId": "confirmReservationUsingPOST",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ConfirmReservationRequest"
+                            }
+                        }
+                    },
+                    "description": "reservationRequest",
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseData_ConfirmReservationResponse_"
+                                }
+                            }
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "400": {
+                        "description": "Failed"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/tap/v1/holdReservation": {
+            "post": {
+                "tags": [
+                    "tapapi-controller"
+                ],
+                "summary": "Create a provisional reservation, holding inventory for a set amount of time before confirming",
+                "operationId": "holdReservationUsingPOST",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/HoldReservationRequest"
+                            }
+                        }
+                    },
+                    "description": "holdReservationRequest",
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseData_HoldReservationResponse_"
+                                }
+                            }
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "400": {
+                        "description": "Failed"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/tap/v1/makeReservation": {
+            "post": {
+                "tags": [
+                    "tapapi-controller"
+                ],
+                "summary": "Create a confirmed reservation immediately",
+                "operationId": "makeReservationUsingPOST",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ReservationRequest"
+                            }
+                        }
+                    },
+                    "description": "reservationRequest",
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseData_ReservationResponse_"
+                                }
+                            }
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "400": {
+                        "description": "Failed"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/tap/v1/ping": {
+            "get": {
+                "tags": [
+                    "tapapi-controller"
+                ],
+                "summary": "Ping Test Call",
+                "operationId": "pingUsingGET_2",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "boolean"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Failed"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/tap/v1/productAvailability/{productId}/{date}": {
+            "get": {
+                "tags": [
+                    "tapapi-controller"
+                ],
+                "summary": "Return Product Availability for a particular product on a given date",
+                "operationId": "productAvailabilityUsingGET",
+                "parameters": [
+                    {
+                        "name": "date",
+                        "in": "path",
+                        "description": "date",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "productId",
+                        "in": "path",
+                        "description": "productId",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseData_ProductDetailResponse_"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Failed"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/tap/v1/productAvailability/{productId}/{fromDate}/{toDate}": {
+            "get": {
+                "tags": [
+                    "tapapi-controller"
+                ],
+                "summary": "Return Product Availability for a particular product on a given date range",
+                "operationId": "productAvailabilityRangeUsingGET",
+                "parameters": [
+                    {
+                        "name": "fromDate",
+                        "in": "path",
+                        "description": "fromDate",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "productId",
+                        "in": "path",
+                        "description": "productId",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "toDate",
+                        "in": "path",
+                        "description": "toDate",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseData_ProductDetailResponse_"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Failed"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/tap/v1/productAvailabilityForTravellers/{productId}/{date}/{travellerMix}": {
+            "get": {
+                "tags": [
+                    "tapapi-controller"
+                ],
+                "summary": "Return Product Availability for a particular product on a given date and a provided number (and ages) of travellers",
+                "operationId": "productAvailabilityForTravellersUsingGET",
+                "parameters": [
+                    {
+                        "name": "date",
+                        "in": "path",
+                        "description": "date",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "productId",
+                        "in": "path",
+                        "description": "productId",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "travellerMix",
+                        "in": "path",
+                        "description": "travellerMix",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseData_ProductDetailResponse_"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Failed"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/tap/v1/productAvailabilityForTravellers/{productId}/{fromDate}/{toDate}/{travellerMix}": {
+            "get": {
+                "tags": [
+                    "tapapi-controller"
+                ],
+                "summary": "Return Product Availability for a particular product on a given date range and a provided number (and ages) of travellers",
+                "operationId": "productAvailabilityForTravellersRangeUsingGET",
+                "parameters": [
+                    {
+                        "name": "fromDate",
+                        "in": "path",
+                        "description": "fromDate",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "productId",
+                        "in": "path",
+                        "description": "productId",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "toDate",
+                        "in": "path",
+                        "description": "toDate",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "travellerMix",
+                        "in": "path",
+                        "description": "travellerMix",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseData_ProductDetailResponse_"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Failed"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/tap/v1/productDetail/{productId}": {
+            "get": {
+                "tags": [
+                    "tapapi-controller"
+                ],
+                "summary": "Returns Product Details for an individual product",
+                "operationId": "productDetailUsingGET",
+                "parameters": [
+                    {
+                        "name": "productId",
+                        "in": "path",
+                        "description": "productId",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseData_List_ProductDetailResponse_"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Failed"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/tap/v1/productSummaryList": {
+            "get": {
+                "tags": [
+                    "tapapi-controller"
+                ],
+                "summary": "Provides a summary of every product for an Operator",
+                "operationId": "productSummaryListUsingGET",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseData_List_ProductSummaryResponse_"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Failed"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/tap/v1/retrieveReservation/{reservationId}": {
+            "get": {
+                "tags": [
+                    "tapapi-controller"
+                ],
+                "summary": "Retrieve a reservation",
+                "operationId": "retrieveReservationUsingGET",
+                "parameters": [
+                    {
+                        "name": "reservationId",
+                        "in": "path",
+                        "description": "reservationId",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseData_ReservationResponse_"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Failed"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/tourbuilder/v1/booking/ping": {
+            "get": {
+                "tags": [
+                    "booking-controller"
+                ],
+                "summary": "Ping Test Call",
+                "operationId": "pingUsingGET",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "boolean"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Failed"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/tourbuilder/v1/builder/createSample": {
+            "get": {
+                "tags": [
+                    "builder-controller"
+                ],
+                "summary": "Create Sample",
+                "operationId": "createSampleUsingGET",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseData_Package_"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Failed"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/tourbuilder/v1/builder/load": {
+            "post": {
+                "tags": [
+                    "builder-controller"
+                ],
+                "summary": "Load",
+                "operationId": "loadUsingPOST",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RequestData_UniquePackageId_"
+                            }
+                        }
+                    },
+                    "description": "uniquePackageId",
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseData_Package_"
+                                }
+                            }
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "400": {
+                        "description": "Failed"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/tourbuilder/v1/builder/load/{supplierId}/{packageId}": {
+            "get": {
+                "tags": [
+                    "builder-controller"
+                ],
+                "summary": "Load via GET",
+                "operationId": "loadUsingGET",
+                "parameters": [
+                    {
+                        "name": "packageId",
+                        "in": "path",
+                        "description": "packageId",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "supplierId",
+                        "in": "path",
+                        "description": "supplierId",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseData_Package_"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Failed"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/tourbuilder/v1/builder/ping": {
+            "get": {
+                "tags": [
+                    "builder-controller"
+                ],
+                "summary": "Ping Test Call",
+                "operationId": "pingUsingGET_1",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "boolean"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Failed"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/tourbuilder/v1/builder/publish": {
+            "post": {
+                "tags": [
+                    "builder-controller"
+                ],
+                "summary": "Publish",
+                "operationId": "publishUsingPOST",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RequestData_PublishRequest_"
+                            }
+                        }
+                    },
+                    "description": "publishRequest",
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseData_boolean_"
+                                }
+                            }
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "400": {
+                        "description": "Failed"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/tourbuilder/v1/builder/quickLink": {
+            "get": {
+                "tags": [
+                    "builder-controller"
+                ],
+                "summary": "QuickLink",
+                "operationId": "quickLinkUsingGET",
+                "parameters": [
+                    {
+                        "name": "ataFaretypeId",
+                        "in": "query",
+                        "description": "ataFaretypeId",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "ataPPDId",
+                        "in": "query",
+                        "description": "ataPPDId",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "ataProductId",
+                        "in": "query",
+                        "description": "ataProductId",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "dateRange",
+                        "in": "query",
+                        "description": "dateRange",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    },
+                    {
+                        "name": "otsFaretypeId1",
+                        "in": "query",
+                        "description": "otsFaretypeId1",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "otsFaretypeId2",
+                        "in": "query",
+                        "description": "otsFaretypeId2",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "otsPPDId1",
+                        "in": "query",
+                        "description": "otsPPDId1",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "otsPPDId2",
+                        "in": "query",
+                        "description": "otsPPDId2",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "otsProductId1",
+                        "in": "query",
+                        "description": "otsProductId1",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "otsProductId2",
+                        "in": "query",
+                        "description": "otsProductId2",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseData_Package_"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Failed"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/tourbuilder/v1/builder/save": {
+            "post": {
+                "tags": [
+                    "builder-controller"
+                ],
+                "summary": "Save",
+                "operationId": "saveUsingPOST",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RequestData_Package_"
+                            }
+                        }
+                    },
+                    "description": "p",
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseData_Package_"
+                                }
+                            }
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "400": {
+                        "description": "Failed"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/tourbuilder/v1/builder/saveLinkerData": {
+            "post": {
+                "tags": [
+                    "builder-controller"
+                ],
+                "summary": "SaveLinkerData",
+                "operationId": "saveLinkerDataUsingPOST",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RequestData_LinkerData_"
+                            }
+                        }
+                    },
+                    "description": "linkerData",
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseData_Package_"
+                                }
+                            }
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "400": {
+                        "description": "Failed"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/tourbuilder/v1/tdms/availability/{productIdentifier}": {
+            "get": {
+                "tags": [
+                    "tdmsebs-controller"
+                ],
+                "summary": "Availability",
+                "operationId": "getAvailabilityUsingGET",
+                "parameters": [
+                    {
+                        "name": "bookingTimeId",
+                        "in": "query",
+                        "description": "bookingTimeId",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "endDate",
+                        "in": "query",
+                        "description": "endDate",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "productIdentifier",
+                        "in": "path",
+                        "description": "productIdentifier",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "startDate",
+                        "in": "query",
+                        "description": "startDate",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AvailabilityResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Failed"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/tourbuilder/v1/tdms/booking/cancel": {
+            "post": {
+                "tags": [
+                    "tdmsebs-controller"
+                ],
+                "summary": "Booking Cancellation",
+                "operationId": "cancelUsingPOST",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CancelRequest"
+                            }
+                        }
+                    },
+                    "description": "cancelRequest",
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CancelResponse"
+                                }
+                            }
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "400": {
+                        "description": "Failed"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/tourbuilder/v1/tdms/booking/{productIdentifier}": {
+            "post": {
+                "tags": [
+                    "tdmsebs-controller"
+                ],
+                "summary": "Bookings",
+                "operationId": "nonGroupBookingUsingPOST",
+                "parameters": [
+                    {
+                        "name": "productIdentifier",
+                        "in": "path",
+                        "description": "productIdentifier",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "$ref": "#/components/requestBodies/BookingsRequest"
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/BookingResponse"
+                                }
+                            }
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "400": {
+                        "description": "Failed"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/tourbuilder/v1/tdms/bookingdetails/{productIdentifier}": {
+            "get": {
+                "tags": [
+                    "tdmsebs-controller"
+                ],
+                "summary": "Booking Parameters",
+                "operationId": "getBookingParametersUsingGET",
+                "parameters": [
+                    {
+                        "name": "productIdentifier",
+                        "in": "path",
+                        "description": "productIdentifier",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/BookingParametersResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Failed"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/tourbuilder/v1/tdms/bookings/{productIdentifier}": {
+            "post": {
+                "tags": [
+                    "tdmsebs-controller"
+                ],
+                "summary": "Group Bookings",
+                "operationId": "groupBookingsUsingPOST",
+                "parameters": [
+                    {
+                        "name": "productIdentifier",
+                        "in": "path",
+                        "description": "productIdentifier",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "$ref": "#/components/requestBodies/BookingsRequest"
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/BookingsResponse"
+                                }
+                            }
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "400": {
+                        "description": "Failed"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/tourbuilder/v1/tdms/ping": {
+            "get": {
+                "tags": [
+                    "tdmsebs-controller"
+                ],
+                "summary": "Ping Test Call",
+                "operationId": "pingUsingGET_3",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "boolean"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Failed"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/tourbuilder/v1/tdms/token": {
+            "post": {
+                "tags": [
+                    "tdmsebs-controller"
+                ],
+                "summary": "Token Authentication",
+                "operationId": "tokenUsingPOST",
+                "requestBody": {
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "client_id": {
+                                        "type": "string"
+                                    },
+                                    "client_secret": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TokenResponse"
+                                }
+                            }
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "400": {
+                        "description": "Failed"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        }
+    },
+    "servers": [
+        {
+            "url": "//tourbuilder.adventium.tech:8082"
+        }
+    ],
+    "components": {
+        "requestBodies": {
+            "BookingsRequest": {
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/BookingsRequest"
+                        }
+                    }
+                },
+                "description": "bookingRequest",
+                "required": true
+            }
+        },
+        "schemas": {
+            "AdditionalField": {
+                "type": "object",
+                "properties": {
+                    "additionalFieldId": {
+                        "type": "string"
+                    },
+                    "additionalFieldTitle": {
+                        "type": "string"
+                    },
+                    "mandatory": {
+                        "type": "boolean"
+                    },
+                    "options": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "type": {
+                        "type": "string"
+                    }
+                },
+                "title": "AdditionalField"
+            },
+            "AdditionalFields": {
+                "type": "object",
+                "properties": {
+                    "values": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "title": "AdditionalFields"
+            },
+            "Agency": {
+                "type": "object",
+                "properties": {
+                    "agent": {
+                        "type": "string"
+                    },
+                    "branch": {
+                        "type": "string"
+                    },
+                    "branchCode": {
+                        "type": "string"
+                    },
+                    "phone": {
+                        "type": "string"
+                    }
+                },
+                "title": "Agency"
+            },
+            "Availability": {
+                "type": "object",
+                "properties": {
+                    "date": {
+                        "type": "string"
+                    },
+                    "net": {
+                        "type": "number"
+                    },
+                    "notApplicable": {
+                        "type": "boolean"
+                    },
+                    "quantityAvailable": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "rrp": {
+                        "type": "number"
+                    }
+                },
+                "title": "Availability"
+            },
+            "AvailabilityResponse": {
+                "type": "object",
+                "properties": {
+                    "availability": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Availability"
+                        }
+                    }
+                },
+                "title": "AvailabilityResponse"
+            },
+            "BookingDetail": {
+                "type": "object",
+                "properties": {
+                    "additionalFields": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/AdditionalFields"
+                        }
+                    },
+                    "bookingDate": {
+                        "type": "string"
+                    },
+                    "bookingTimeId": {
+                        "type": "string"
+                    },
+                    "currencyCode": {
+                        "type": "string"
+                    },
+                    "net": {
+                        "type": "number"
+                    },
+                    "pickupLocationId": {
+                        "type": "string"
+                    },
+                    "quantity": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "rrp": {
+                        "type": "number"
+                    },
+                    "voucherNumber": {
+                        "type": "string"
+                    }
+                },
+                "title": "BookingDetail"
+            },
+            "BookingDetailCustomer": {
+                "type": "object",
+                "properties": {
+                    "customerIndex": {
+                        "type": "integer",
+                        "format": "int32"
+                    }
+                },
+                "title": "BookingDetailCustomer"
+            },
+            "BookingParametersResponse": {
+                "type": "object",
+                "properties": {
+                    "additionalFields": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/AdditionalField"
+                        }
+                    },
+                    "bookingTimes": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/BookingTime"
+                        }
+                    },
+                    "pickupLocations": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PickupLocation"
+                        }
+                    }
+                },
+                "title": "BookingParametersResponse"
+            },
+            "BookingRange": {
+                "type": "object",
+                "properties": {
+                    "bookingDetailCustomers": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/BookingDetailCustomer"
+                        }
+                    },
+                    "bookingDetails": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/BookingDetail"
+                        }
+                    },
+                    "endDate": {
+                        "type": "string"
+                    },
+                    "startDate": {
+                        "type": "string"
+                    }
+                },
+                "title": "BookingRange"
+            },
+            "BookingResponse": {
+                "type": "object",
+                "properties": {
+                    "bookingNotes": {
+                        "type": "string"
+                    },
+                    "bookingReferenceId": {
+                        "type": "string"
+                    },
+                    "errorMessage": {
+                        "type": "string"
+                    },
+                    "success": {
+                        "type": "boolean"
+                    }
+                },
+                "title": "BookingResponse"
+            },
+            "BookingTime": {
+                "type": "object",
+                "properties": {
+                    "bookingTime": {
+                        "type": "string"
+                    },
+                    "bookingTimeId": {
+                        "type": "string"
+                    },
+                    "default": {
+                        "type": "boolean"
+                    }
+                },
+                "title": "BookingTime"
+            },
+            "BookingsRequest": {
+                "type": "object",
+                "properties": {
+                    "additionalFields": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/AdditionalFields"
+                        }
+                    },
+                    "agency": {
+                        "$ref": "#/components/schemas/Agency"
+                    },
+                    "bookingDate": {
+                        "type": "string"
+                    },
+                    "bookingTimeId": {
+                        "type": "string"
+                    },
+                    "bookings": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/BookingRange"
+                        }
+                    },
+                    "currencyCode": {
+                        "type": "string"
+                    },
+                    "customers": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Customer"
+                        }
+                    },
+                    "net": {
+                        "type": "number"
+                    },
+                    "orderReference": {
+                        "type": "string"
+                    },
+                    "pickupLocationId": {
+                        "type": "string"
+                    },
+                    "quantity": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "rrp": {
+                        "type": "number"
+                    },
+                    "voucherNumber": {
+                        "type": "string"
+                    }
+                },
+                "title": "BookingsRequest"
+            },
+            "BookingsResponse": {
+                "type": "object",
+                "properties": {
+                    "bookings": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/BookingsResponseDetails"
+                        }
+                    },
+                    "orderReference": {
+                        "type": "string"
+                    }
+                },
+                "title": "BookingsResponse"
+            },
+            "BookingsResponseCustomerDetails": {
+                "type": "object",
+                "properties": {
+                    "bookingNotes": {
+                        "type": "string"
+                    },
+                    "bookingReferenceId": {
+                        "type": "string"
+                    },
+                    "customerIndex": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "errorMessage": {
+                        "type": "string"
+                    },
+                    "success": {
+                        "type": "boolean"
+                    }
+                },
+                "title": "BookingsResponseCustomerDetails"
+            },
+            "BookingsResponseDetails": {
+                "type": "object",
+                "properties": {
+                    "bookingDate": {
+                        "type": "string"
+                    },
+                    "bookingDetailCustomers": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/BookingsResponseCustomerDetails"
+                        }
+                    },
+                    "voucherNumber": {
+                        "type": "string"
+                    }
+                },
+                "title": "BookingsResponseDetails"
+            },
+            "CancelHeldReservationRequest": {
+                "type": "object",
+                "properties": {
+                    "dummy": {
+                        "type": "string"
+                    }
+                },
+                "title": "CancelHeldReservationRequest"
+            },
+            "CancelHeldReservationResponse": {
+                "type": "object",
+                "properties": {
+                    "dummy": {
+                        "type": "string"
+                    }
+                },
+                "title": "CancelHeldReservationResponse"
+            },
+            "CancelRequest": {
+                "type": "object",
+                "properties": {
+                    "bookingReferenceId": {
+                        "type": "string"
+                    },
+                    "reason": {
+                        "type": "string"
+                    }
+                },
+                "title": "CancelRequest"
+            },
+            "CancelReservationRequest": {
+                "type": "object",
+                "properties": {
+                    "dummy": {
+                        "type": "string"
+                    }
+                },
+                "title": "CancelReservationRequest"
+            },
+            "CancelReservationResponse": {
+                "type": "object",
+                "properties": {
+                    "dummy": {
+                        "type": "string"
+                    }
+                },
+                "title": "CancelReservationResponse"
+            },
+            "CancelResponse": {
+                "type": "object",
+                "properties": {
+                    "errorMessage": {
+                        "type": "string"
+                    },
+                    "success": {
+                        "type": "boolean"
+                    }
+                },
+                "title": "CancelResponse"
+            },
+            "ComponentQuestion": {
+                "type": "object",
+                "discriminator": {
+                    "propertyName": "@type"
+                },
+                "properties": {
+                    "mandatory": {
+                        "type": "boolean"
+                    },
+                    "perPerson": {
+                        "type": "boolean"
+                    },
+                    "questionID": {
+                        "type": "string"
+                    },
+                    "questionText": {
+                        "type": "string"
+                    }
+                },
+                "title": "ComponentQuestion"
+            },
+            "ComponentQuestionDate": {
+                "title": "ComponentQuestionDate",
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/ComponentQuestion"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "mandatory": {
+                                "type": "boolean"
+                            },
+                            "perPerson": {
+                                "type": "boolean"
+                            },
+                            "questionID": {
+                                "type": "string"
+                            },
+                            "questionText": {
+                                "type": "string"
+                            }
+                        },
+                        "title": "ComponentQuestionDate"
+                    }
+                ]
+            },
+            "ComponentQuestionInteger": {
+                "title": "ComponentQuestionInteger",
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/ComponentQuestion"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "mandatory": {
+                                "type": "boolean"
+                            },
+                            "perPerson": {
+                                "type": "boolean"
+                            },
+                            "questionID": {
+                                "type": "string"
+                            },
+                            "questionText": {
+                                "type": "string"
+                            }
+                        },
+                        "title": "ComponentQuestionInteger"
+                    }
+                ]
+            },
+            "ComponentQuestionList": {
+                "title": "ComponentQuestionList",
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/ComponentQuestion"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "mandatory": {
+                                "type": "boolean"
+                            },
+                            "perPerson": {
+                                "type": "boolean"
+                            },
+                            "questionID": {
+                                "type": "string"
+                            },
+                            "questionText": {
+                                "type": "string"
+                            },
+                            "validValues": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "title": "ComponentQuestionList"
+                    }
+                ]
+            },
+            "ComponentQuestionRegex": {
+                "title": "ComponentQuestionRegex",
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/ComponentQuestion"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "answerRegex": {
+                                "type": "string"
+                            },
+                            "mandatory": {
+                                "type": "boolean"
+                            },
+                            "perPerson": {
+                                "type": "boolean"
+                            },
+                            "questionID": {
+                                "type": "string"
+                            },
+                            "questionText": {
+                                "type": "string"
+                            }
+                        },
+                        "title": "ComponentQuestionRegex"
+                    }
+                ]
+            },
+            "ConfirmReservationRequest": {
+                "type": "object",
+                "properties": {
+                    "dummy": {
+                        "type": "string"
+                    }
+                },
+                "title": "ConfirmReservationRequest"
+            },
+            "ConfirmReservationResponse": {
+                "type": "object",
+                "properties": {
+                    "dummy": {
+                        "type": "string"
+                    }
+                },
+                "title": "ConfirmReservationResponse"
+            },
+            "CurrencyAmount": {
+                "type": "object",
+                "properties": {
+                    "amount": {
+                        "type": "number"
+                    },
+                    "currencyId": {
+                        "type": "string"
+                    }
+                },
+                "title": "CurrencyAmount"
+            },
+            "Customer": {
+                "type": "object",
+                "properties": {
+                    "customerCountry": {
+                        "type": "string"
+                    },
+                    "customerDateOfBirth": {
+                        "type": "string"
+                    },
+                    "customerEmail": {
+                        "type": "string"
+                    },
+                    "customerFirstName": {
+                        "type": "string"
+                    },
+                    "customerIndex": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "customerLastName": {
+                        "type": "string"
+                    },
+                    "customerPhone": {
+                        "type": "string"
+                    },
+                    "customerTitle": {
+                        "type": "string"
+                    },
+                    "voucherComment": {
+                        "type": "string"
+                    }
+                },
+                "title": "Customer"
+            },
+            "Duration": {
+                "type": "object",
+                "properties": {
+                    "nano": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "negative": {
+                        "type": "boolean"
+                    },
+                    "seconds": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "units": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/TemporalUnit"
+                        }
+                    },
+                    "zero": {
+                        "type": "boolean"
+                    }
+                },
+                "title": "Duration"
+            },
+            "HoldReservationRequest": {
+                "type": "object",
+                "properties": {
+                    "dummy": {
+                        "type": "string"
+                    }
+                },
+                "title": "HoldReservationRequest"
+            },
+            "HoldReservationResponse": {
+                "type": "object",
+                "properties": {
+                    "dummy": {
+                        "type": "string"
+                    }
+                },
+                "title": "HoldReservationResponse"
+            },
+            "IsoChronology": {
+                "type": "object",
+                "properties": {
+                    "calendarType": {
+                        "type": "string"
+                    },
+                    "id": {
+                        "type": "string"
+                    }
+                },
+                "title": "IsoChronology"
+            },
+            "LinkerData": {
+                "type": "object",
+                "properties": {
+                    "daysAfter2": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "daysAfter3": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "ebooking": {
+                        "type": "string"
+                    },
+                    "fareTypeId": {
+                        "type": "string"
+                    },
+                    "outboundFareTypeId1": {
+                        "type": "string"
+                    },
+                    "outboundFareTypeId2": {
+                        "type": "string"
+                    },
+                    "outboundFareTypeId3": {
+                        "type": "string"
+                    },
+                    "outboundProductCode1": {
+                        "type": "string"
+                    },
+                    "outboundProductCode2": {
+                        "type": "string"
+                    },
+                    "outboundProductCode3": {
+                        "type": "string"
+                    },
+                    "outboundProductPricesDetailsId1": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "outboundProductPricesDetailsId2": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "outboundProductPricesDetailsId3": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "productCode": {
+                        "type": "string"
+                    }
+                },
+                "title": "LinkerData"
+            },
+            "LocalDate": {
+                "type": "string",
+                "format": "date",
+                "description": "Fallback schema added during Swagger 2.0 to OpenAPI 3.0 conversion because the source export references LocalDate without defining it.",
+                "title": "LocalDate"
+            },
+            "Markdown": {
+                "type": "object",
+                "properties": {
+                    "markdown": {
+                        "type": "string"
+                    }
+                },
+                "title": "Markdown"
+            },
+            "Package": {
+                "type": "object",
+                "properties": {
+                    "allowAdditionalFees": {
+                        "type": "boolean"
+                    },
+                    "components": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PackageComponentHolder"
+                        }
+                    },
+                    "content": {
+                        "$ref": "#/components/schemas/PackageContent"
+                    },
+                    "costMarkup": {
+                        "type": "number"
+                    },
+                    "dateRange": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "departurePricing": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PricingSeason"
+                        }
+                    },
+                    "departureSchedule": {
+                        "$ref": "#/components/schemas/Schedule"
+                    },
+                    "duration": {
+                        "$ref": "#/components/schemas/Period"
+                    },
+                    "leadinNett": {
+                        "$ref": "#/components/schemas/CurrencyAmount"
+                    },
+                    "leadinPrice": {
+                        "$ref": "#/components/schemas/CurrencyAmount"
+                    },
+                    "openDated": {
+                        "type": "boolean"
+                    },
+                    "packageTitle": {
+                        "type": "string"
+                    },
+                    "priceMarkup": {
+                        "type": "number"
+                    },
+                    "questions": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PackageQuestion"
+                        }
+                    },
+                    "uniquePackageId": {
+                        "$ref": "#/components/schemas/UniquePackageId"
+                    }
+                },
+                "title": "Package"
+            },
+            "PackageComponent": {
+                "type": "object",
+                "additionalProperties": true,
+                "description": "Fallback schema added during Swagger 2.0 to OpenAPI 3.0 conversion because the source export references PackageComponent without defining it.",
+                "title": "PackageComponent"
+            },
+            "PackageComponentHolder": {
+                "type": "object",
+                "discriminator": {
+                    "propertyName": "@type"
+                },
+                "title": "PackageComponentHolder"
+            },
+            "PackageComponentHolderOptional": {
+                "title": "PackageComponentHolderOptional",
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/PackageComponentHolder"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "component": {
+                                "$ref": "#/components/schemas/PackageComponent"
+                            }
+                        },
+                        "title": "PackageComponentHolderOptional"
+                    }
+                ]
+            },
+            "PackageComponentHolderSetDependant": {
+                "title": "PackageComponentHolderSetDependant",
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/PackageComponentHolder"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "atLeastOne": {
+                                "type": "boolean"
+                            },
+                            "components": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/PackageComponent"
+                                }
+                            }
+                        },
+                        "title": "PackageComponentHolderSetDependant"
+                    }
+                ]
+            },
+            "PackageComponentHolderSetManyOf": {
+                "title": "PackageComponentHolderSetManyOf",
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/PackageComponentHolder"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "atLeastOne": {
+                                "type": "boolean"
+                            },
+                            "component": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/PackageComponent"
+                                }
+                            }
+                        },
+                        "title": "PackageComponentHolderSetManyOf"
+                    }
+                ]
+            },
+            "PackageComponentHolderSetOneOf": {
+                "title": "PackageComponentHolderSetOneOf",
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/PackageComponentHolder"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "atLeastOne": {
+                                "type": "boolean"
+                            },
+                            "components": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/PackageComponent"
+                                }
+                            }
+                        },
+                        "title": "PackageComponentHolderSetOneOf"
+                    }
+                ]
+            },
+            "PackageComponentHolderSimple": {
+                "title": "PackageComponentHolderSimple",
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/PackageComponentHolder"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "component": {
+                                "$ref": "#/components/schemas/PackageComponent"
+                            }
+                        },
+                        "title": "PackageComponentHolderSimple"
+                    }
+                ]
+            },
+            "PackageContent": {
+                "type": "object",
+                "properties": {
+                    "attributes": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PackageContentAttribute"
+                        }
+                    },
+                    "checklist": {
+                        "$ref": "#/components/schemas/Markdown"
+                    },
+                    "extraInformation": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PackageContentExtraInformation"
+                        }
+                    },
+                    "finishingPoint": {
+                        "$ref": "#/components/schemas/Markdown"
+                    },
+                    "images": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PackageContentImage"
+                        }
+                    },
+                    "inclusions": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PackageContentInclusion"
+                        }
+                    },
+                    "introduction": {
+                        "$ref": "#/components/schemas/Markdown"
+                    },
+                    "itinerary": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PackageContentItineraryDay"
+                        }
+                    },
+                    "joiningPoint": {
+                        "$ref": "#/components/schemas/Markdown"
+                    },
+                    "joiningPointInstructions": {
+                        "$ref": "#/components/schemas/Markdown"
+                    },
+                    "leadInTitle": {
+                        "type": "string"
+                    },
+                    "luggageLimit": {
+                        "$ref": "#/components/schemas/Markdown"
+                    },
+                    "map": {
+                        "$ref": "#/components/schemas/PackageContentImage"
+                    },
+                    "numberOfDays": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "sales1": {
+                        "$ref": "#/components/schemas/Markdown"
+                    },
+                    "sales2": {
+                        "$ref": "#/components/schemas/Markdown"
+                    },
+                    "title": {
+                        "type": "string"
+                    }
+                },
+                "title": "PackageContent"
+            },
+            "PackageContentAttribute": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "enum": [
+                            "START",
+                            "FINISH",
+                            "DESTINATION",
+                            "STYLE",
+                            "THEME",
+                            "PHYSICAL_RATING",
+                            "TRIP_RATING",
+                            "MIN_AGE",
+                            "MAX_AGE",
+                            "MIN_GROUP_SIZE",
+                            "MAX_GROUP_SIZE"
+                        ]
+                    },
+                    "value": {
+                        "$ref": "#/components/schemas/Markdown"
+                    }
+                },
+                "title": "PackageContentAttribute"
+            },
+            "PackageContentExtraInformation": {
+                "type": "object",
+                "properties": {
+                    "text": {
+                        "$ref": "#/components/schemas/Markdown"
+                    },
+                    "title": {
+                        "type": "string"
+                    }
+                },
+                "title": "PackageContentExtraInformation"
+            },
+            "PackageContentImage": {
+                "type": "object",
+                "properties": {
+                    "title": {
+                        "type": "string"
+                    },
+                    "url": {
+                        "$ref": "#/components/schemas/URL"
+                    }
+                },
+                "title": "PackageContentImage"
+            },
+            "PackageContentInclusion": {
+                "type": "object",
+                "properties": {
+                    "text": {
+                        "$ref": "#/components/schemas/Markdown"
+                    },
+                    "title": {
+                        "type": "string",
+                        "enum": [
+                            "MEALS",
+                            "TRANSPORT",
+                            "ACCOMMODATION",
+                            "ACTIVITIES"
+                        ]
+                    }
+                },
+                "title": "PackageContentInclusion"
+            },
+            "PackageContentItineraryDay": {
+                "type": "object",
+                "properties": {
+                    "dayNumber": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "includesBreakfast": {
+                        "type": "boolean"
+                    },
+                    "includesDinner": {
+                        "type": "boolean"
+                    },
+                    "includesLunch": {
+                        "type": "boolean"
+                    },
+                    "text": {
+                        "$ref": "#/components/schemas/Markdown"
+                    },
+                    "title": {
+                        "type": "string"
+                    }
+                },
+                "title": "PackageContentItineraryDay"
+            },
+            "PackageQuestion": {
+                "type": "object",
+                "properties": {
+                    "componentQuestion": {
+                        "$ref": "#/components/schemas/ComponentQuestion"
+                    },
+                    "questionReferences": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/QuestionReference"
+                        }
+                    }
+                },
+                "title": "PackageQuestion"
+            },
+            "Period": {
+                "type": "object",
+                "properties": {
+                    "chronology": {
+                        "$ref": "#/components/schemas/IsoChronology"
+                    },
+                    "days": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "months": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "negative": {
+                        "type": "boolean"
+                    },
+                    "units": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/TemporalUnit"
+                        }
+                    },
+                    "years": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "zero": {
+                        "type": "boolean"
+                    }
+                },
+                "title": "Period"
+            },
+            "PickupLocation": {
+                "type": "object",
+                "properties": {
+                    "pickupLocation": {
+                        "type": "string"
+                    },
+                    "pickupLocationId": {
+                        "type": "string"
+                    },
+                    "pickupTime": {
+                        "type": "string"
+                    }
+                },
+                "title": "PickupLocation"
+            },
+            "PricingSeason": {
+                "type": "object",
+                "properties": {
+                    "adultCount": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "daysOfWeek": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "enum": [
+                                "MONDAY",
+                                "TUESDAY",
+                                "WEDNESDAY",
+                                "THURSDAY",
+                                "FRIDAY",
+                                "SATURDAY",
+                                "SUNDAY"
+                            ]
+                        }
+                    },
+                    "fromDate": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "price": {
+                        "$ref": "#/components/schemas/CurrencyAmount"
+                    },
+                    "toDate": {
+                        "type": "string",
+                        "format": "date"
+                    }
+                },
+                "title": "PricingSeason"
+            },
+            "ProductDetailResponse": {
+                "type": "object",
+                "properties": {
+                    "productId": {
+                        "type": "string"
+                    }
+                },
+                "title": "ProductDetailResponse"
+            },
+            "ProductSummaryResponse": {
+                "type": "object",
+                "properties": {
+                    "endLocationName": {
+                        "type": "string"
+                    },
+                    "leadinPrice": {
+                        "$ref": "#/components/schemas/CurrencyAmount"
+                    },
+                    "productId": {
+                        "type": "string"
+                    },
+                    "productImage": {
+                        "type": "string"
+                    },
+                    "productName": {
+                        "type": "string"
+                    },
+                    "startLocationName": {
+                        "type": "string"
+                    }
+                },
+                "title": "ProductSummaryResponse"
+            },
+            "PublishRequest": {
+                "type": "object",
+                "properties": {
+                    "system": {
+                        "type": "string",
+                        "enum": [
+                            "TDMS"
+                        ]
+                    },
+                    "uniquePackageId": {
+                        "$ref": "#/components/schemas/UniquePackageId"
+                    }
+                },
+                "title": "PublishRequest"
+            },
+            "QuestionReference": {
+                "type": "object",
+                "properties": {
+                    "componentId": {
+                        "type": "string"
+                    },
+                    "questionID": {
+                        "type": "string"
+                    }
+                },
+                "title": "QuestionReference"
+            },
+            "ReservationRequest": {
+                "type": "object",
+                "properties": {
+                    "dummy": {
+                        "type": "string"
+                    }
+                },
+                "title": "ReservationRequest"
+            },
+            "ReservationResponse": {
+                "type": "object",
+                "properties": {
+                    "dummy": {
+                        "type": "string"
+                    }
+                },
+                "title": "ReservationResponse"
+            },
+            "ResponseExtraInformation": {
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "type": "string"
+                    },
+                    "text": {
+                        "type": "string"
+                    }
+                },
+                "title": "ResponseExtraInformation"
+            },
+            "Schedule": {
+                "type": "object",
+                "discriminator": {
+                    "propertyName": "@type"
+                },
+                "title": "Schedule"
+            },
+            "ScheduleDaily": {
+                "title": "ScheduleDaily",
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/Schedule"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "date": {
+                                "type": "string",
+                                "format": "date"
+                            }
+                        },
+                        "title": "ScheduleDaily"
+                    }
+                ]
+            },
+            "ScheduleList": {
+                "title": "ScheduleList",
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/Schedule"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "dates": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/LocalDate"
+                                }
+                            }
+                        },
+                        "title": "ScheduleList"
+                    }
+                ]
+            },
+            "ScheduleRange": {
+                "title": "ScheduleRange",
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/Schedule"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "daysOfWeek": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string",
+                                    "enum": [
+                                        "MONDAY",
+                                        "TUESDAY",
+                                        "WEDNESDAY",
+                                        "THURSDAY",
+                                        "FRIDAY",
+                                        "SATURDAY",
+                                        "SUNDAY"
+                                    ]
+                                }
+                            },
+                            "fromDate": {
+                                "type": "string",
+                                "format": "date"
+                            },
+                            "toDate": {
+                                "type": "string",
+                                "format": "date"
+                            }
+                        },
+                        "title": "ScheduleRange"
+                    }
+                ]
+            },
+            "ScheduleSingle": {
+                "title": "ScheduleSingle",
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/Schedule"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "date": {
+                                "type": "string",
+                                "format": "date"
+                            }
+                        },
+                        "title": "ScheduleSingle"
+                    }
+                ]
+            },
+            "TemporalUnit": {
+                "type": "object",
+                "properties": {
+                    "dateBased": {
+                        "type": "boolean"
+                    },
+                    "duration": {
+                        "$ref": "#/components/schemas/Duration"
+                    },
+                    "durationEstimated": {
+                        "type": "boolean"
+                    },
+                    "timeBased": {
+                        "type": "boolean"
+                    }
+                },
+                "title": "TemporalUnit"
+            },
+            "TokenResponse": {
+                "type": "object",
+                "properties": {
+                    "access_token": {
+                        "type": "string"
+                    },
+                    "error_description": {
+                        "type": "string"
+                    },
+                    "expires_in": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "scope": {
+                        "type": "string"
+                    },
+                    "token_type": {
+                        "type": "string"
+                    }
+                },
+                "title": "TokenResponse"
+            },
+            "URL": {
+                "type": "object",
+                "properties": {
+                    "authority": {
+                        "type": "string"
+                    },
+                    "content": {
+                        "type": "object"
+                    },
+                    "defaultPort": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "deserializedFields": {
+                        "$ref": "#/components/schemas/URLStreamHandler"
+                    },
+                    "file": {
+                        "type": "string"
+                    },
+                    "host": {
+                        "type": "string"
+                    },
+                    "path": {
+                        "type": "string"
+                    },
+                    "port": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "protocol": {
+                        "type": "string"
+                    },
+                    "query": {
+                        "type": "string"
+                    },
+                    "ref": {
+                        "type": "string"
+                    },
+                    "serializedHashCode": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "userInfo": {
+                        "type": "string"
+                    }
+                },
+                "title": "URL"
+            },
+            "URLStreamHandler": {
+                "type": "object",
+                "title": "URLStreamHandler"
+            },
+            "UniquePackageId": {
+                "type": "object",
+                "properties": {
+                    "packageId": {
+                        "type": "string"
+                    },
+                    "supplierId": {
+                        "type": "string"
+                    }
+                },
+                "title": "UniquePackageId"
+            },
+            "RequestData_LinkerData_": {
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "$ref": "#/components/schemas/LinkerData"
+                    },
+                    "sessionID": {
+                        "type": "string"
+                    }
+                },
+                "title": "RequestData«LinkerData»"
+            },
+            "RequestData_Package_": {
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "$ref": "#/components/schemas/Package"
+                    },
+                    "sessionID": {
+                        "type": "string"
+                    }
+                },
+                "title": "RequestData«Package»"
+            },
+            "RequestData_PublishRequest_": {
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "$ref": "#/components/schemas/PublishRequest"
+                    },
+                    "sessionID": {
+                        "type": "string"
+                    }
+                },
+                "title": "RequestData«PublishRequest»"
+            },
+            "RequestData_UniquePackageId_": {
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "$ref": "#/components/schemas/UniquePackageId"
+                    },
+                    "sessionID": {
+                        "type": "string"
+                    }
+                },
+                "title": "RequestData«UniquePackageId»"
+            },
+            "ResponseData_CancelHeldReservationResponse_": {
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "$ref": "#/components/schemas/CancelHeldReservationResponse"
+                    },
+                    "errors": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ResponseExtraInformation"
+                        }
+                    },
+                    "status": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "warnings": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ResponseExtraInformation"
+                        }
+                    }
+                },
+                "title": "ResponseData«CancelHeldReservationResponse»"
+            },
+            "ResponseData_CancelReservationResponse_": {
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "$ref": "#/components/schemas/CancelReservationResponse"
+                    },
+                    "errors": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ResponseExtraInformation"
+                        }
+                    },
+                    "status": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "warnings": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ResponseExtraInformation"
+                        }
+                    }
+                },
+                "title": "ResponseData«CancelReservationResponse»"
+            },
+            "ResponseData_ConfirmReservationResponse_": {
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "$ref": "#/components/schemas/ConfirmReservationResponse"
+                    },
+                    "errors": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ResponseExtraInformation"
+                        }
+                    },
+                    "status": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "warnings": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ResponseExtraInformation"
+                        }
+                    }
+                },
+                "title": "ResponseData«ConfirmReservationResponse»"
+            },
+            "ResponseData_HoldReservationResponse_": {
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "$ref": "#/components/schemas/HoldReservationResponse"
+                    },
+                    "errors": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ResponseExtraInformation"
+                        }
+                    },
+                    "status": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "warnings": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ResponseExtraInformation"
+                        }
+                    }
+                },
+                "title": "ResponseData«HoldReservationResponse»"
+            },
+            "ResponseData_List_ProductDetailResponse_": {
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ProductDetailResponse"
+                        }
+                    },
+                    "errors": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ResponseExtraInformation"
+                        }
+                    },
+                    "status": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "warnings": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ResponseExtraInformation"
+                        }
+                    }
+                },
+                "title": "ResponseData«List«ProductDetailResponse»»"
+            },
+            "ResponseData_List_ProductSummaryResponse_": {
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ProductSummaryResponse"
+                        }
+                    },
+                    "errors": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ResponseExtraInformation"
+                        }
+                    },
+                    "status": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "warnings": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ResponseExtraInformation"
+                        }
+                    }
+                },
+                "title": "ResponseData«List«ProductSummaryResponse»»"
+            },
+            "ResponseData_Package_": {
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "$ref": "#/components/schemas/Package"
+                    },
+                    "errors": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ResponseExtraInformation"
+                        }
+                    },
+                    "status": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "warnings": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ResponseExtraInformation"
+                        }
+                    }
+                },
+                "title": "ResponseData«Package»"
+            },
+            "ResponseData_ProductDetailResponse_": {
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "$ref": "#/components/schemas/ProductDetailResponse"
+                    },
+                    "errors": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ResponseExtraInformation"
+                        }
+                    },
+                    "status": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "warnings": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ResponseExtraInformation"
+                        }
+                    }
+                },
+                "title": "ResponseData«ProductDetailResponse»"
+            },
+            "ResponseData_ReservationResponse_": {
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "$ref": "#/components/schemas/ReservationResponse"
+                    },
+                    "errors": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ResponseExtraInformation"
+                        }
+                    },
+                    "status": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "warnings": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ResponseExtraInformation"
+                        }
+                    }
+                },
+                "title": "ResponseData«ReservationResponse»"
+            },
+            "ResponseData_boolean_": {
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "type": "boolean"
+                    },
+                    "errors": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ResponseExtraInformation"
+                        }
+                    },
+                    "status": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "warnings": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ResponseExtraInformation"
+                        }
+                    }
+                },
+                "title": "ResponseData«boolean»"
+            }
+        }
+    }
+}
