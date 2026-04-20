@@ -1,0 +1,54 @@
+---
+title: 'Send custom booking field values'
+description: 'Use `fieldText` when you send optional booking field answers in the Agent / Reseller API'
+---
+
+Use this workflow when a product requires extra booking information such as a mobile number, flight number, accommodation name, arrival time, or driver note.
+
+## Workflow
+
+1. Call `GET /apiv1/bookingdetails/{productPricesDetailsId}` to retrieve the booking requirements for the selected fareprice.
+2. Read the optional field IDs returned for that fareprice.
+3. Send each answer in `POST /apiv1/validateCart` under `redeemers[].products[].optionalFields[]`.
+
+## Required request shape
+
+Each object in `optionalFields` must include:
+
+- `optionalFieldId`: the field ID returned by `GET /apiv1/bookingdetails/{productPricesDetailsId}`
+- `fieldText`: the user-entered value for that field
+
+`fieldText` is the value property TDMS uses for custom booking fields. Do not send `optionalFieldValue`. TDMS ignores that key.
+
+```json
+{
+  "redeemers": [
+    {
+      "firstName": "Alex",
+      "lastName": "Lee",
+      "products": [
+        {
+          "productPricesDetailsId": 12345,
+          "redeemerQty": 1,
+          "optionalFields": [
+            {
+              "optionalFieldId": 811109,
+              "fieldText": "2:35"
+            },
+            {
+              "optionalFieldId": 811110,
+              "fieldText": "QF123"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+```
+
+## Notes
+
+- Use the field IDs returned for the same fareprice and booking setup you are validating.
+- Send one `optionalFields` entry per answer.
+- If the fareprice does not return optional booking fields, you can omit `optionalFields`.

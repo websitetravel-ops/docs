@@ -69,6 +69,12 @@
             ]
           },
           {
+            "group": "Agent / Reseller API guides",
+            "pages": [
+              "api-reference/agent-reseller-custom-booking-fields"
+            ]
+          },
+          {
             "group": "Agent / Reseller API",
             "openapi": {
               "source": "openapi/agent-reseller-api.mintlify.json",
