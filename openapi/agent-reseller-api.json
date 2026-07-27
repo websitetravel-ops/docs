@@ -3298,36 +3298,167 @@
         ],
         "responses": {
           "200": {
-            "description": "Availability and pricing per fareprice, per date.\n\n`dates` is keyed by date. A date maps to an array because a fareprice can run at several booking times on the same day; each entry carries its own `numAvailable` and `rrp`. If you are selling a single departure, pick one entry rather than summing them.\n\nNote the casing differs from `/apiv1/checkavailabilityrange`, which returns `NumAvailable` and nests its price under `productPricingData`.",
+            "description": "Product metadata plus availability and pricing for every fareprice, keyed by date.\n\n`dates` maps each date to an **array**, because a fareprice can run at several booking times on the same day. Each entry carries its own `numAvailable`, `rrp`, `bookingTimeId` and pickup list. If you are selling a single departure, choose one entry — do not sum them.\n\nTwo prices are returned. `fares[].rrp` is the fareprice's standing rate; `fares[].dates[...][].rrp` is the rate for that date. **Use the per-date figure.** Accommodation in particular is repriced between individual dates, so the standing rate is only a fallback for a date the cache has no row for.\n\nField casing differs from `/apiv1/checkavailabilityrange`, which returns `NumAvailable` and nests its price under `productPricingData.RRP`. Reading the wrong one fails silently — counts populate while the price stays null, which looks like an unpriced fare rather than a parse error.\n\n**Responses can be large.** `additionalFields` embeds every option of every select, including full country lists, repeated per date entry. A 30-day window on a product with several fares can run to megabytes, so read the fields you need and discard the rest rather than holding the whole payload.",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "productId": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string",
+                      "description": "Product name."
+                    },
+                    "tourCode": {
+                      "type": "string"
+                    },
+                    "image": {
+                      "type": "string",
+                      "description": "Absolute URL to the product image."
+                    },
+                    "supplier": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "phone": {
+                          "type": "string"
+                        },
+                        "email": {
+                          "type": "string"
+                        }
+                      }
+                    },
                     "fares": {
                       "type": "array",
                       "items": {
                         "type": "object",
                         "properties": {
                           "productPricesDetailsId": {
-                            "type": "string",
+                            "type": "integer",
                             "description": "The Product Prices Detail ID of the fareprice."
+                          },
+                          "fareName": {
+                            "type": "string",
+                            "description": "For example `Adult`, `Child (8-15 years)`, `Single Tent Add-on`."
+                          },
+                          "rrp": {
+                            "type": "number",
+                            "description": "The fareprice's standing rate. Prefer the per-date `rrp` below."
+                          },
+                          "hasAvailability": {
+                            "type": "boolean",
+                            "description": "False when the fareprice has no availability anywhere in the window. Use it to skip a fare without walking its dates."
                           },
                           "dates": {
                             "type": "object",
-                            "description": "Keyed by date. Each value is an array of one entry per booking time.",
+                            "description": "Keyed by ISO date (`YYYY-MM-DD`). Each value is an array of one entry per booking time.",
                             "additionalProperties": {
                               "type": "array",
                               "items": {
                                 "type": "object",
                                 "properties": {
+                                  "datePriceCacheId": {
+                                    "type": "integer"
+                                  },
+                                  "bookingDate": {
+                                    "type": "string",
+                                    "description": "ISO `YYYY-MM-DD`, matching the key."
+                                  },
+                                  "bookingTime": {
+                                    "type": "string",
+                                    "description": "Display form, for example `01:00 PM`."
+                                  },
+                                  "bookingTimeId": {
+                                    "type": "string",
+                                    "description": "The identifier to send when booking, for example `13_00_00`. A product with a single daily departure returns `0`."
+                                  },
                                   "numAvailable": {
                                     "type": "integer",
                                     "description": "Places remaining for this fareprice at this booking time."
                                   },
                                   "rrp": {
                                     "type": "number",
-                                    "description": "Recommended retail price per person for this date."
+                                    "description": "Retail price per person for this date. Prefer this over the fareprice's standing rate."
+                                  },
+                                  "pickupLocations": {
+                                    "type": "array",
+                                    "description": "Pickup points offered on this departure. Required at booking where the product uses them.",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "pickupId": {
+                                          "type": "string"
+                                        },
+                                        "pickupLocation": {
+                                          "type": "string"
+                                        },
+                                        "pickupTime": {
+                                          "type": "string"
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "addOns": {
+                                    "type": "array",
+                                    "description": "Add-ons offered on this departure.",
+                                    "items": {
+                                      "type": "object"
+                                    }
+                                  },
+                                  "additionalFields": {
+                                    "type": "array",
+                                    "description": "Passenger details this departure requires at booking. Read this rather than hard-coding a form: the set varies by product, and `required` varies with it.",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "additionalFieldId": {
+                                          "type": "string",
+                                          "description": "For example `Sex`, `MobilePhone`, `Nationality`."
+                                        },
+                                        "type": {
+                                          "type": "string",
+                                          "description": "`select` or `text`."
+                                        },
+                                        "label": {
+                                          "type": "string",
+                                          "description": "Display label, for example `Gender`."
+                                        },
+                                        "commonName": {
+                                          "type": "string"
+                                        },
+                                        "apiName": {
+                                          "type": "string"
+                                        },
+                                        "required": {
+                                          "type": "boolean"
+                                        },
+                                        "options": {
+                                          "type": "array",
+                                          "description": "Present for `select`. Can be very long — `Nationality` returns the full country list on every date entry.",
+                                          "items": {
+                                            "type": "object",
+                                            "properties": {
+                                              "default": {
+                                                "type": "boolean"
+                                              },
+                                              "displayName": {
+                                                "type": "string"
+                                              },
+                                              "externalId": {
+                                                "type": "string"
+                                              },
+                                              "name": {
+                                                "type": "string"
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
                                   }
                                 }
                               }
@@ -3339,20 +3470,70 @@
                   }
                 },
                 "example": {
+                  "productId": 3889,
+                  "name": "Uluru Tour with Kata Tjuta - Eco Tent (Yulara to Yulara)",
+                  "tourCode": "AYB2",
+                  "image": "https://c.globaltravel.market/upload/sm/example.jpg",
+                  "supplier": {
+                    "name": "Australian Adventure Group Holdings Pty Ltd",
+                    "phone": "+613 9125 3630",
+                    "email": "reservations@adventuretours.com.au"
+                  },
                   "fares": [
                     {
-                      "productPricesDetailsId": "21141196",
+                      "productPricesDetailsId": 21460141,
+                      "fareName": "Adult",
+                      "rrp": 695.0,
+                      "hasAvailability": true,
                       "dates": {
-                        "2026-07-29": [
+                        "2026-08-28": [
                           {
-                            "numAvailable": 14,
-                            "rrp": 795.0
-                          }
-                        ],
-                        "2026-07-30": [
-                          {
-                            "numAvailable": 2,
-                            "rrp": 795.0
+                            "datePriceCacheId": 8224582,
+                            "bookingDate": "2026-08-28",
+                            "bookingTime": "01:00 PM",
+                            "bookingTimeId": "13_00_00",
+                            "numAvailable": 5,
+                            "rrp": 695.0,
+                            "pickupLocations": [
+                              {
+                                "pickupId": "23225",
+                                "pickupLocation": "14:00 Ayers Rock Airport, ",
+                                "pickupTime": "N/A"
+                              },
+                              {
+                                "pickupId": "23226",
+                                "pickupLocation": "13:45 Desert Gardens Hotel, 1 Yulara Drive ",
+                                "pickupTime": "N/A"
+                              }
+                            ],
+                            "addOns": [],
+                            "additionalFields": [
+                              {
+                                "additionalFieldId": "MobilePhone",
+                                "type": "text",
+                                "label": "Mobile Phone",
+                                "commonName": "Mobile",
+                                "apiName": "",
+                                "options": [],
+                                "required": true
+                              },
+                              {
+                                "additionalFieldId": "Nationality",
+                                "type": "select",
+                                "label": "Nationality",
+                                "commonName": "Country",
+                                "apiName": "",
+                                "options": [
+                                  {
+                                    "default": false,
+                                    "displayName": "Australia",
+                                    "externalId": "Australia",
+                                    "name": "Australia"
+                                  }
+                                ],
+                                "required": true
+                              }
+                            ]
                           }
                         ]
                       }
