@@ -3260,6 +3260,123 @@
         }
       }
     },
+    "/apiv1/checkAvailabilityProduct": {
+      "get": {
+        "tags": [
+          "Availability"
+        ],
+        "summary": "Check cached availability for every fareprice of a product",
+        "description": "Return cached availability and pricing for **all** fareprices of a product in one call, for a window starting at `from`.\n\nUse this instead of calling `/apiv1/checkavailabilityrange/{productPricesDetailsId}/...` once per fareprice: a product with six fares costs one request here rather than six, which matters because the rate limit is applied per Agent Branch key.\n\nThe response is served from the availability cache, so it is fast but not live. Confirm price and availability with a live call before you take payment.\n\nNot every product supports this endpoint. When it does not, the request fails with `400` and a `not_supported` message — fall back to `/apiv1/checkavailabilityrange` per fareprice.\n\nExample: `GET /apiv1/checkAvailabilityProduct?productId=9027&from=29-JUL-2026&days=90`",
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "query",
+            "required": true,
+            "description": "The Product ID to check. Every fareprice of the product is returned.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "required": true,
+            "description": "The first date to check, in `DD-MON-YYYY` format — for example `29-JUL-2026`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "days",
+            "in": "query",
+            "required": true,
+            "description": "The number of days to check, including the start date. Walk longer ranges in successive requests.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Availability and pricing per fareprice, per date.\n\n`dates` is keyed by date. A date maps to an array because a fareprice can run at several booking times on the same day; each entry carries its own `numAvailable` and `rrp`. If you are selling a single departure, pick one entry rather than summing them.\n\nNote the casing differs from `/apiv1/checkavailabilityrange`, which returns `NumAvailable` and nests its price under `productPricingData`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "fares": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "productPricesDetailsId": {
+                            "type": "string",
+                            "description": "The Product Prices Detail ID of the fareprice."
+                          },
+                          "dates": {
+                            "type": "object",
+                            "description": "Keyed by date. Each value is an array of one entry per booking time.",
+                            "additionalProperties": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "numAvailable": {
+                                    "type": "integer",
+                                    "description": "Places remaining for this fareprice at this booking time."
+                                  },
+                                  "rrp": {
+                                    "type": "number",
+                                    "description": "Recommended retail price per person for this date."
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "fares": [
+                    {
+                      "productPricesDetailsId": "21141196",
+                      "dates": {
+                        "2026-07-29": [
+                          {
+                            "numAvailable": 14,
+                            "rrp": 795.0
+                          }
+                        ],
+                        "2026-07-30": [
+                          {
+                            "numAvailable": 2,
+                            "rrp": 795.0
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The product does not support cached availability. The message contains `not_supported`. Fall back to `/apiv1/checkavailabilityrange` per fareprice."
+          },
+          "403": {
+            "description": "Not authorised."
+          },
+          "404": {
+            "description": "Product not found, or not available to this agent. Also returned once you walk past the end of the product's bookable dates, so treat a `404` that follows at least one successful window as the end of the calendar rather than a failure."
+          },
+          "500": {
+            "description": "**Also returned for a window that simply has no results**, with the message `Unable to fetch cached availability`. This is a known defect. Treat that specific message as an empty window and keep walking — a seasonal product can have an empty 90-day span followed by a full one, so stopping here silently drops every later departure."
+          }
+        }
+      }
+    },
     "/apiv1/bookingdetails/detailsToConfirmAvailability/{productPricesDetailsId}/{date}/{timeId}": {
       "get": {
         "tags": [
