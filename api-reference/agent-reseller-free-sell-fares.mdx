@@ -1,0 +1,36 @@
+---
+title: 'Free Sell fares'
+description: 'Skip the availability probe for `allowFreeSell` fares — they have unlimited quantity but still need a travel date'
+---
+
+`fare.allowFreeSell === true` marks a fare as **unlimited quantity**. Customers can book any number of seats on any valid travel date. The fare still needs a `travelDate`, a `bookingTime`, and (where applicable) a `pickupId` — Free Sell only changes the quantity semantics, not the booking-date shape.
+
+## When to treat a fare as Free Sell
+
+Same compound gate as [Manual vs Open Dated](/api-reference/agent-reseller-manual-vs-open-dated):
+
+- `product.apiProviderId === 0`
+- `fare.bookingSystem` is `null` or empty
+- `fare.allowFreeSell === true`
+
+Live-bookable fares can also report `allowFreeSell: true` in the feed. Ignore it there — those go through the normal availability check.
+
+## What changes vs a normal fare
+
+- **Availability probe is skippable.** `/apiv1/checkavailabilityrange/{ppdid}/…` still responds and returns a NumAvailable — but the number is a placeholder ceiling, not a real cap. If you're rendering availability to a customer or gating a booking form, you can short-circuit `available: true` and skip the TDMS call entirely.
+- **Booking shape is unchanged.** The `bookings[]` entry still carries `travelDate`, `timeId`, `pickupId`, and `bookingDetailTypeName: "Manual"` — the same shape any other Manual booking uses.
+
+## Combined with Open Dated
+
+A fare can be both `allowFreeSell` AND `allowOpenDated` when the eligibility gate passes. That's an unlimited voucher — no service date, no quantity cap. Honour the Open-Dated shape (see [Manual vs Open Dated](/api-reference/agent-reseller-manual-vs-open-dated)); `allowFreeSell` adds nothing beyond what Open Dated already gives you.
+
+| `allowOpenDated` | `allowFreeSell` | Order shape |
+|---|---|---|
+| false | false | Manual + travelDate + availability probe |
+| false | true  | Manual + travelDate, availability probe skippable |
+| true  | any   | Open Dated, omit travelDate/timeId/pickupId |
+
+## Notes
+
+- The eligibility gate is a write-time decision: honour the effective flags, not the raw ones.
+- Availability probe URL still needs the DD-Mon-YYYY date format if you do call it — ISO 8601 returns HTTP 400 with a misleading "not a valid price" message.

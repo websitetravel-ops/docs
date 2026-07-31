@@ -71,7 +71,9 @@
           {
             "group": "Agent / Reseller API guides",
             "pages": [
-              "api-reference/agent-reseller-custom-booking-fields"
+              "api-reference/agent-reseller-custom-booking-fields",
+              "api-reference/agent-reseller-manual-vs-open-dated",
+              "api-reference/agent-reseller-free-sell-fares"
             ]
           },
           {

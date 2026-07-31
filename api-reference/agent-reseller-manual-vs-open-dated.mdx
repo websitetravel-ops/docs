@@ -1,0 +1,65 @@
+---
+title: 'Manual vs Open Dated bookings'
+description: 'Choose the right `bookingDetailTypeName` and travel-date shape when you POST `/apiv1/order`'
+---
+
+Every entry in `redeemers[].products[].bookings[]` carries a `bookingDetailTypeName`. Most bookings are `"Manual"` — a specific service on a specific date. Voucher-style products use `"Open Dated"` — a redeemable ticket with no service date.
+
+## Which shape does this fare use?
+
+Only honour the Open-Dated shape when ALL of these hold on the fareprice you're booking:
+
+- `product.apiProviderId === 0` — no external booking provider in the loop
+- `fare.bookingSystem` is `null` or empty — not a live-bookable workflow (Respaxv2 / IBIS / CustomLinc / etc.)
+- `fare.allowOpenDated === true`
+
+Many live-bookable fares also carry `allowOpenDated: true` in the product feed. Those are NOT candidates for Open-Dated ordering — the flag reflects that the fare *could* be sold that way, not that it currently should be. Ignore `allowOpenDated` unless the compound gate above passes.
+
+## Manual (default)
+
+Send both `bookingDetailTypeName` and `travelDate`. This is the shape for anything with a specific service date.
+
+```json
+{
+  "redeemers": [{
+    "firstName": "Alex", "lastName": "Lee",
+    "products": [{
+      "productPricesDetailsId": "12345",
+      "redeemerQty": 1,
+      "bookings": [{
+        "bookingComment": "",
+        "travelDate": "22-Nov-2026",
+        "timeId": "09:00:00",
+        "pickupId": "Airlie Beach Hotel",
+        "bookingDetailTypeName": "Manual"
+      }]
+    }]
+  }]
+}
+```
+
+## Open Dated
+
+Send `bookingDetailTypeName: "Open Dated"` and **omit** `travelDate`. Also omit `timeId` and `pickupId` — voucher-style products don't have per-service schedules to lock.
+
+```json
+{
+  "redeemers": [{
+    "firstName": "Alex", "lastName": "Lee",
+    "products": [{
+      "productPricesDetailsId": "22249345",
+      "redeemerQty": 1,
+      "bookings": [{
+        "bookingComment": "",
+        "bookingDetailTypeName": "Open Dated"
+      }]
+    }]
+  }]
+}
+```
+
+## Notes
+
+- `/apiv1/bookingdetails/{productPricesDetailsId}` returns HTTP 400 with `"This fare price does not support live availability."` for Open-Dated fares. Don't call it; there's nothing to configure.
+- `/apiv1/checkavailabilityrange/{ppdid}/…` will also 4xx for Open-Dated fares. The voucher isn't tied to a date, so there's no availability to probe.
+- The compound eligibility check is a write-time gate for our systems — store the effective flag, not the raw one, so downstream code has a single source of truth.
