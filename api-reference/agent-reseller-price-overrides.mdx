@@ -7,7 +7,7 @@ When you set `priceOverRidden` to `true` on a product line, you must also send `
 
 Send all three together, or none of them.
 
-## Required request shape
+## The three fields that travel together
 
 ```json
 {
@@ -16,14 +16,14 @@ Send all three together, or none of them.
       "productPricesDetailsId": 11476906,
       "qty": 1,
       "priceOverRidden": true,
-      "agentRRP": 450,
-      "adjustedAgentNR": 380,
       "discountClaimReason": "Customer finishing tour 2 days early as per agreement with supplier contact Jane Smith on 10-Mar-2026",
       "staffContactName": "Jane Smith"
     }
   ]
 }
 ```
+
+This shows only the fields this rule concerns. For every field a product line accepts, see [Submit an Order](/api-reference/agent-reseller-api/order-placement/submit-an-order).
 
 The same rule applies to the product line in `POST /apiv1/validateCart`.
 
