@@ -73,7 +73,8 @@
             "pages": [
               "api-reference/agent-reseller-custom-booking-fields",
               "api-reference/agent-reseller-manual-vs-open-dated",
-              "api-reference/agent-reseller-free-sell-fares"
+              "api-reference/agent-reseller-free-sell-fares",
+              "api-reference/agent-reseller-price-overrides"
             ]
           },
           {

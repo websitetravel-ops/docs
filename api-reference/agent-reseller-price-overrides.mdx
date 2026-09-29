@@ -1,0 +1,55 @@
+---
+title: 'Override a price on an order'
+description: 'Send `discountClaimReason` and `staffContactName` whenever you set `priceOverRidden` in the Agent / Reseller API'
+---
+
+Use this workflow when you charge a product line a price other than the fare's own rate — a negotiated discount, an agreed part-refund, or a package price you set yourself.
+
+## Workflow
+
+1. Set `priceOverRidden` to `true` on the product line in `products[]`.
+2. Send the price you are charging in `agentRRP`.
+3. Send `discountClaimReason` and `staffContactName` on the same line.
+
+`discountClaimReason` and `staffContactName` are **required whenever `priceOverRidden` is `true`**. Send all three together or none of them.
+
+## Required request shape
+
+```json
+{
+  "products": [
+    {
+      "productPricesDetailsId": 11476906,
+      "qty": 1,
+      "priceOverRidden": true,
+      "agentRRP": 450,
+      "discountClaimReason": "Customer finishing tour 2 days early as per agreement with supplier contact Jane Smith on 10-Mar-2026",
+      "staffContactName": "Jane Smith"
+    }
+  ]
+}
+```
+
+## What happens if you omit them
+
+`POST /apiv1/order` fails with **HTTP 500** and a response body that names no field:
+
+```json
+{
+  "type": "https://tools.ietf.org/html/rfc2616#section-10",
+  "title": "An error occurred",
+  "status": 500,
+  "detail": "Internal Server Error"
+}
+```
+
+The underlying error is `Price Override entered for '<product name>' but either no Discount Reason or Staff Contact Name Entered`, but it is not returned to you. If you see a 500 from `POST /apiv1/order` with no detail, check these two fields first.
+
+`POST /apiv1/validateCart` accepts the same product line without them and reports the cart as valid, so a cart that validates cleanly can still fail at order. Validating is not a check that an overridden line is complete.
+
+## Notes
+
+- Send `priceOverRidden` only on lines you are actually repricing. A line charged the fare's own rate does not need it, and a `discountClaimReason` on such a line claims a discount against an order that gave none.
+- `discountClaimReason` and `staffContactName` are free text and appear on the order in TDMS. Write them for the person who will read the order later.
+- For an automated or self-service channel where no staff member set the price, send a `staffContactName` that identifies the channel rather than a person's name.
+- Both fields are also accepted by `POST /apiv1/validateCart`. Send them there too, so the cart you validate is the cart you order.

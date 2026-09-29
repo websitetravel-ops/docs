@@ -4930,7 +4930,8 @@
                           "type": "integer"
                         },
                         "priceOverRidden": {
-                          "type": "boolean"
+                          "type": "boolean",
+                          "description": "Set to `true` when this line is charged a price other than the fare's own rate. **When `true`, both `discountClaimReason` and `staffContactName` are required.** Sending `priceOverRidden` without them makes `POST /apiv1/order` fail with HTTP 500 and no field-level detail. `POST /apiv1/validateCart` accepts the same body, so the problem does not appear until the order is submitted."
                         },
                         "agentRRP": {
                           "type": "number",
@@ -4941,10 +4942,12 @@
                           "format": "float"
                         },
                         "discountClaimReason": {
-                          "type": "string"
+                          "type": "string",
+                          "description": "Why this line's price was overridden. **Required when `priceOverRidden` is `true`.** See [Override a price on an order](/api-reference/agent-reseller-price-overrides)."
                         },
                         "staffContactName": {
-                          "type": "string"
+                          "type": "string",
+                          "description": "Who authorised the override. **Required when `priceOverRidden` is `true`.** For an automated or self-service channel, send a value that identifies the channel rather than a person."
                         },
                         "rateDetails": {
                           "type": "array",
@@ -7980,7 +7983,8 @@
                           "type": "string"
                         },
                         "priceOverRidden": {
-                          "type": "boolean"
+                          "type": "boolean",
+                          "description": "Set to `true` when this line is charged a price other than the fare's own rate. **When `true`, both `discountClaimReason` and `staffContactName` are required.** Sending `priceOverRidden` without them makes `POST /apiv1/order` fail with HTTP 500 and no field-level detail. `POST /apiv1/validateCart` accepts the same body, so the problem does not appear until the order is submitted."
                         },
                         "agentRRP": {
                           "type": "number",
@@ -7991,10 +7995,12 @@
                           "format": "float"
                         },
                         "discountClaimReason": {
-                          "type": "string"
+                          "type": "string",
+                          "description": "Why this line's price was overridden. **Required when `priceOverRidden` is `true`.** See [Override a price on an order](/api-reference/agent-reseller-price-overrides)."
                         },
                         "staffContactName": {
-                          "type": "string"
+                          "type": "string",
+                          "description": "Who authorised the override. **Required when `priceOverRidden` is `true`.** For an automated or self-service channel, send a value that identifies the channel rather than a person."
                         },
                         "rateDetails": {
                           "type": "array",
