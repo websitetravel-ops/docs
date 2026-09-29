@@ -25,7 +25,7 @@ Send all three together, or none of them.
 
 This shows only the fields this rule concerns. For every field a product line accepts, see [Submit an Order](/api-reference/agent-reseller-api/order-placement/submit-an-order).
 
-The same rule applies to the product line in `POST /apiv1/validateCart`.
+If you call `POST /apiv1/validateCart` before ordering, send the same product line there too. TDMS does not enforce these fields until `POST /apiv1/order`.
 
 ## What happens if you omit them
 
