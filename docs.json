@@ -69,6 +69,14 @@
             ]
           },
           {
+            "group": "OperatorHub (OpHub) V1 API",
+            "pages": [
+              "api-reference/operatorhub/introduction",
+              "api-reference/operatorhub/endpoints",
+              "api-reference/operatorhub/objects"
+            ]
+          },
+          {
             "group": "Agent / Reseller API guides",
             "pages": [
               "api-reference/agent-reseller-custom-booking-fields",

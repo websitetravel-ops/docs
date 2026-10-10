@@ -1,0 +1,145 @@
+---
+title: "Endpoints AAG uses"
+description: "OperatorHub V1 endpoints AAG tools call, with real request shapes and example responses."
+---
+
+All requests take a per-brand `token` query parameter (shown as `<token>`). Base URL is `https://api.operatorhub.travel/jsonservice/v1` unless noted.
+
+## availability
+
+Live event availability for a product over a date range.
+
+- **Required:** `productid` (or `productcode`)
+- **Optional:** `date`, or `startdate` + `enddate` (`Y-m-d`). With no date, defaults to today.
+- **Response:** `{ "response": [ EventObject, … ] }`
+
+```bash Request
+GET /v1/availability?productid=12963&startdate=2025-02-09&enddate=2025-02-11&token=<token>
+```
+
+```json Response (excerpt, Product 12963 = 3 Day K'gari Master bucket)
+{
+  "response": [
+    {
+      "APIObjectType": "EventObject",
+      "ID": 3354957,
+      "ProductID": "12963",
+      "Date": "2026-11-01",
+      "Quantity": "93",
+      "Remaining": 70,
+      "CanBook": true,
+      "Unlimited": "0",
+      "Description": "TRIPLE DEPARTURE\n\nWelcome to Travel - 6 pax BOOKED\n\nINTRO TRAVEL (OZ211026) - 11 PAX + 1 STAFF BOOKED",
+      "ManifestStatus": "Open",
+      "IsPastCutoff": false,
+      "StatusAndTitle": "Sun 1 November 2026 ",
+      "PurchasableVariationIDs": [27617],
+      "PurchasableVariationPrices": [
+        { "VariationID": 27617, "PriceOnDate": "659.00", "BaseTitle": "Adult", "AppliedTitle": "Adult" }
+      ]
+    },
+    {
+      "APIObjectType": "EventObject",
+      "ID": 3354949,
+      "ProductID": "12963",
+      "Date": "2026-10-24",
+      "Quantity": "31",
+      "Remaining": 8,
+      "CanBook": true,
+      "Description": "DOUBLE DEPARTURE",
+      "ManifestStatus": "Open",
+      "PurchasableVariationPrices": [
+        { "VariationID": 27617, "PriceOnDate": "659.00", "BaseTitle": "Adult", "AppliedTitle": "Adult" }
+      ]
+    }
+  ]
+}
+```
+
+Key fields: `Quantity` = total seats before bookings (the allocation); `Remaining` = bookable seats left; `Description` = free-text note (departure type + group holds, `\n`-separated); `PurchasableVariationPrices[].PriceOnDate` = the per-date price (dynamic-pricing-aware). See [objects](/api-reference/operatorhub/objects#eventobject).
+
+## orders
+
+A single order by id, or the first match of a filter. Note the `/&` form (trailing slash then `&`).
+
+- **Required (one of):** `orderid`, or `filter[AgentReference]`, or `filter[ExternalOrderID]`
+- **Optional:** `limit`
+- **Response:** an `OrderObject`
+
+```bash By order id
+GET /v1/orders/&orderid=14850594&token=<token>
+```
+
+```bash By agent reference
+GET /v1/orders/&filter[AgentReference]=ATA25334-916863&token=<token>
+GET /v1/orders/&filter[AgentReference]=RCKAFTS-15563&token=<token>
+```
+
+```bash By external order id
+GET /v1/orders/&filter[ExternalOrderID]=SIG25057-908552&limit=1&token=<token>
+```
+
+See [OrderObject](/api-reference/operatorhub/objects#orderobject) (includes `Items[]`, `Customer`, `Status`, `Agency`, `ExtraCustomers[]`).
+
+## customerorders
+
+The order ids a customer belongs to.
+
+- **Required:** `customerid`
+- **Optional:** `limit`
+
+```bash Request
+GET /v1/customerorders/&customerid=2093468&token=<token>&limit=1
+```
+
+The response is a list of order ids (commonly scalar ids under `response`).
+
+## customers
+
+Find customers by a filter.
+
+- **Required:** a `filter[...]` (e.g. `filter[Email]`, `filter[Surname]`)
+- **Optional:** `limit`
+- **Response:** `CustomerObject`(s)
+
+```bash By email
+GET /v1/customers/?filter[Email]=guest@example.com&token=<token>&limit=1
+```
+
+```bash By surname
+GET /v1/customers/?filter[Surname]=six&token=<token>&limit=1
+```
+
+See [CustomerObject](/api-reference/operatorhub/objects#customerobject).
+
+## products
+
+Product detail + pickup locations.
+
+- **Optional:** `productid` (single id or comma-separated list), `productcode`, `live`. With no parameters, returns **all** products.
+- **Response:** a `ProductObject` or array of them
+
+```bash Request
+GET /v1/products?productid=12963&token=<token>
+```
+
+See [ProductObject](/api-reference/operatorhub/objects#productobject) — carries `Price`, `Variations[]`, `ProductPickupLocations[]`, `SpecialPrices[]`.
+
+## setcustomer
+
+Edit an existing customer's fields (a GET that mutates). Set field params first, `customerid` + `token` last.
+
+- **Required:** `customerid`
+- **Optional:** any [CustomerObject](/api-reference/operatorhub/objects#customerobject) field, plus tag groups (`Tag<GroupID>`)
+- **Response:** the updated `CustomerObject`
+
+## checkinview (unversioned)
+
+The check-in manifest for a date. **Unversioned** — no `/v1`, path is `/jsonservice/checkinview/search`.
+
+- **Required:** `checkinviewid`, `date` (`Y-m-d`)
+- **Response:** `{ "response": { "Headers": [...], "Rows": [...] } }` — a tabular manifest; columns vary per view.
+
+```bash Request
+GET /jsonservice/checkinview/search?checkinviewid=8481&date=2026-02-15&token=<token>
+```

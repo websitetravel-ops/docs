@@ -1,0 +1,39 @@
+---
+title: "OperatorHub (OpHub) V1 API"
+description: "Base URL, authentication, and request conventions for the OperatorHub V1 JSON API that AAG tools read from."
+---
+
+OperatorHub (OpHub, formerly Junction6 / J6) is the reservation platform behind the AAG brands. AAG tools read live **availability**, **products**, **orders**, **customers**, and **check-in manifests** from its V1 JSON API.
+
+This section records the endpoints AAG actually uses and example responses, so you don't have to re-derive them each time.
+
+## Base URL
+
+```
+https://api.operatorhub.travel/jsonservice/v1
+```
+
+The **check-in view** endpoint is **unversioned** (no `/v1`):
+
+```
+https://api.operatorhub.travel/jsonservice/checkinview
+```
+
+## Authentication
+
+Every request takes a per-brand `token` query parameter. Tokens live in the shared Secrets Store and are accessed server-side (or via MCP) — they are **never stored in this repo**, so every example here shows `token=<token>`.
+
+## Request conventions
+
+- **Method:** HTTP `GET` for all reads documented here. A few utilities are "GET-that-mutates" (e.g. `setcustomer`).
+- **The `/&param` form:** several endpoints are called as `orders/&orderid=123` (a trailing slash then `&`), not `orders/?orderid=123`. Both forms work in practice; AAG tools try `/&` first, then `/?`.
+- **Filters:** list endpoints accept `filter[Field]=value`, e.g. `filter[AgentReference]`, `filter[Email]`, `filter[Surname]`. `limit=N` caps the result count.
+- **Dates:** `Y-m-d` strings (e.g. `2026-02-15`).
+
+## Response shape
+
+Responses are JSON. List endpoints return their rows under a key — `availability` returns `items`, for example — and some payloads are wrapped in a `response` object. Each endpoint page notes its shape, and the [objects](/api-reference/operatorhub/objects) page documents the reusable schemas (`EventObject`, `OrderObject`, `CustomerObject`, `ProductObject`).
+
+## Source
+
+Canonical V1 docs live in `aust-adventure/API` (branch `V1`, folder `Docs/`); object schemas are in its `appendix.md`. This Mintlify section mirrors the endpoints AAG uses plus captured example responses.

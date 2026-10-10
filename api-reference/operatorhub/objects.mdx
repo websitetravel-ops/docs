@@ -1,0 +1,90 @@
+---
+title: "Response objects"
+description: "The OperatorHub V1 objects AAG tools read: EventObject, OrderObject, CustomerObject, ProductObject."
+---
+
+Field names and types follow the OperatorHub V1 `appendix.md`; the `EventObject` fields below are confirmed against a live `availability` response.
+
+## EventObject
+
+Returned by [`availability`](/api-reference/operatorhub/endpoints#availability) (one per departure/date).
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `ID` | Integer | Event reference id. |
+| `ProductID` | String | Product this event belongs to. |
+| `Date` | String | Event date (`Y-m-d`). |
+| `Start` / `End` | String | Times; `null` for non-time-specific events. |
+| `Quantity` | String | **Total** seats before any bookings (the allocation). |
+| `Remaining` | Integer | **Bookable** seats remaining (availability). |
+| `CanBook` | Boolean | Whether the event is bookable. |
+| `IsPastCutoff` | Boolean | Past its booking cut-off. |
+| `Unlimited` | String | `"0"`/`"1"` — unlimited availability. |
+| `Description` | String | Free-text **note** — departure type + group holds, `\n`-separated. May be `null`. |
+| `ManifestStatus` | String | One of `Unconfirmed`, `Open`, `Locked`. |
+| `StatusAndTitle` | String | Display label, e.g. `"Sun 1 November 2026 "`. |
+| `PurchasableVariationPrices` | Array | `{ VariationID, PriceOnDate, BaseTitle, AppliedTitle }`. `PriceOnDate` is the **per-date price** (dynamic-pricing-aware). |
+| `PurchasableVariationIDs` | Array | Bookable variation ids. |
+
+<Note>
+Seats **sold** isn't a field — derive it as `Quantity - Remaining`. Price isn't on the event root; read `PurchasableVariationPrices[].PriceOnDate` (prefer the `Adult` variation).
+</Note>
+
+## OrderObject
+
+Returned by [`orders`](/api-reference/operatorhub/endpoints#orders).
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `ID` | Integer | Order id. |
+| `ExternalOrderID` | String | External reference (some channels carry the agent ref here). |
+| `Created` | String | Creation date. |
+| `Status` | String | Current order status. |
+| `Items` | Array of `OrderItemObject` | Items on the order. |
+| `Customer` | `CustomerObject` | Lead customer. |
+| `ExtraCustomers` | Array of `CustomerObject` | Additional travellers. |
+| `Agency` | `AgencyObject` / `BranchObject` | Populated when an agency/branch made the order. |
+| `AgentReference` | String | Agent's booking reference, when present. |
+| `ParentOrderID` | Integer | Parent order on a linked/split booking (`null`/`0` when standalone). |
+
+### OrderItemObject
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `ID` | Integer | Order-item id. |
+| `ItemStatus` | String | `Active`, `Cancelled`, `Inactive`. |
+| `OrderID` | Integer | Owning order. |
+| `UnitPrice` | Float | Sold price per unit. |
+| `Quantity` | Integer | Units purchased. |
+| `ProductCode` / `ProductTitle` | String | On product items. |
+| `RedeemableDate` | String | Date the item became redeemable. |
+| `Event` | `EventObject` | On limited-availability (dated) items. |
+
+## CustomerObject
+
+Returned by [`customers`](/api-reference/operatorhub/endpoints#customers) and embedded in orders.
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `ID` | Integer | Customer id. |
+| `FirstName` / `Surname` | String | Name. |
+| `Email` | String | Email address. |
+| `MobilePhone` | String | Mobile number. |
+| `Country` | String | Country acronym. |
+| `Dob` / `Age` | String / Integer | Two separate settable fields — don't conflate. |
+| `MedicalConditions` / `DietaryRequirements` | String | Free text. Dietary may also be a tag group (`Tag<GroupID>`) on some brands. |
+
+<Note>Updating a customer (`setcustomer`) is customer-scoped: the one record is shared across all that customer's orders.</Note>
+
+## ProductObject
+
+Returned by [`products`](/api-reference/operatorhub/endpoints#products).
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `ID` | Integer | Product id. |
+| `Title` | String | Product name. |
+| `Price` | Float | Base price. |
+| `Variations` | Array of `VariationObject` | Fare types (e.g. Adult). |
+| `ProductPickupLocations` | Array | Pickup points / timetables. |
+| `SpecialPrices` | Array of `SpecialPriceObject` | `{ Title, Price, StartDate, EndDate, Active }`. |
