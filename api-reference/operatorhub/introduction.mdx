@@ -32,7 +32,7 @@ Every request takes a per-brand `token` query parameter. Tokens live in the shar
 
 ## Response shape
 
-Responses are JSON. List endpoints return their rows under a key — `availability` returns `items`, for example — and some payloads are wrapped in a `response` object. Each endpoint page notes its shape, and the [objects](/api-reference/operatorhub/objects) page documents the reusable schemas (`EventObject`, `OrderObject`, `CustomerObject`, `ProductObject`).
+Responses are JSON, commonly wrapped in a `response` key — `availability` returns `{ "response": [ EventObject, … ] }`, for example. Each endpoint page notes its shape, and the [objects](/api-reference/operatorhub/objects) page documents the reusable schemas (`EventObject`, `OrderObject`, `CustomerObject`, `ProductObject`).
 
 ## Source
 

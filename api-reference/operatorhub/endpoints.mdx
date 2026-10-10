@@ -14,42 +14,42 @@ Live event availability for a product over a date range.
 - **Response:** `{ "response": [ EventObject, … ] }`
 
 ```bash Request
-GET /v1/availability?productid=12963&startdate=2025-02-09&enddate=2025-02-11&token=<token>
+GET /v1/availability?productid=10001&startdate=2026-11-01&enddate=2026-11-02&token=<token>
 ```
 
-```json Response (excerpt, Product 12963 = 3 Day K'gari Master bucket)
+```json Response (excerpt — example values)
 {
   "response": [
     {
       "APIObjectType": "EventObject",
-      "ID": 3354957,
-      "ProductID": "12963",
+      "ID": 1000001,
+      "ProductID": "10001",
       "Date": "2026-11-01",
       "Quantity": "93",
       "Remaining": 70,
       "CanBook": true,
       "Unlimited": "0",
-      "Description": "TRIPLE DEPARTURE\n\nWelcome to Travel - 6 pax BOOKED\n\nINTRO TRAVEL (OZ211026) - 11 PAX + 1 STAFF BOOKED",
+      "Description": "TRIPLE DEPARTURE\n\nAgent allocation - 6 pax booked\n\nAgent allocation - 11 pax + 1 leader booked",
       "ManifestStatus": "Open",
       "IsPastCutoff": false,
       "StatusAndTitle": "Sun 1 November 2026 ",
-      "PurchasableVariationIDs": [27617],
+      "PurchasableVariationIDs": [20001],
       "PurchasableVariationPrices": [
-        { "VariationID": 27617, "PriceOnDate": "659.00", "BaseTitle": "Adult", "AppliedTitle": "Adult" }
+        { "VariationID": 20001, "PriceOnDate": "659.00", "BaseTitle": "Adult", "AppliedTitle": "Adult" }
       ]
     },
     {
       "APIObjectType": "EventObject",
-      "ID": 3354949,
-      "ProductID": "12963",
-      "Date": "2026-10-24",
+      "ID": 1000002,
+      "ProductID": "10001",
+      "Date": "2026-11-02",
       "Quantity": "31",
       "Remaining": 8,
       "CanBook": true,
       "Description": "DOUBLE DEPARTURE",
       "ManifestStatus": "Open",
       "PurchasableVariationPrices": [
-        { "VariationID": 27617, "PriceOnDate": "659.00", "BaseTitle": "Adult", "AppliedTitle": "Adult" }
+        { "VariationID": 20001, "PriceOnDate": "659.00", "BaseTitle": "Adult", "AppliedTitle": "Adult" }
       ]
     }
   ]
@@ -67,16 +67,15 @@ A single order by id, or the first match of a filter. Note the `/&` form (traili
 - **Response:** an `OrderObject`
 
 ```bash By order id
-GET /v1/orders/&orderid=14850594&token=<token>
+GET /v1/orders/&orderid=10200345&token=<token>
 ```
 
 ```bash By agent reference
-GET /v1/orders/&filter[AgentReference]=ATA25334-916863&token=<token>
-GET /v1/orders/&filter[AgentReference]=RCKAFTS-15563&token=<token>
+GET /v1/orders/&filter[AgentReference]=ABC25001-100000&token=<token>
 ```
 
 ```bash By external order id
-GET /v1/orders/&filter[ExternalOrderID]=SIG25057-908552&limit=1&token=<token>
+GET /v1/orders/&filter[ExternalOrderID]=EXT25001-100000&limit=1&token=<token>
 ```
 
 See [OrderObject](/api-reference/operatorhub/objects#orderobject) (includes `Items[]`, `Customer`, `Status`, `Agency`, `ExtraCustomers[]`).
@@ -89,7 +88,7 @@ The order ids a customer belongs to.
 - **Optional:** `limit`
 
 ```bash Request
-GET /v1/customerorders/&customerid=2093468&token=<token>&limit=1
+GET /v1/customerorders/&customerid=1000001&token=<token>&limit=1
 ```
 
 The response is a list of order ids (commonly scalar ids under `response`).
@@ -107,7 +106,7 @@ GET /v1/customers/?filter[Email]=guest@example.com&token=<token>&limit=1
 ```
 
 ```bash By surname
-GET /v1/customers/?filter[Surname]=six&token=<token>&limit=1
+GET /v1/customers/?filter[Surname]=example&token=<token>&limit=1
 ```
 
 See [CustomerObject](/api-reference/operatorhub/objects#customerobject).
@@ -120,7 +119,7 @@ Product detail + pickup locations.
 - **Response:** a `ProductObject` or array of them
 
 ```bash Request
-GET /v1/products?productid=12963&token=<token>
+GET /v1/products?productid=10001&token=<token>
 ```
 
 See [ProductObject](/api-reference/operatorhub/objects#productobject) — carries `Price`, `Variations[]`, `ProductPickupLocations[]`, `SpecialPrices[]`.
@@ -141,5 +140,5 @@ The check-in manifest for a date. **Unversioned** — no `/v1`, path is `/jsonse
 - **Response:** `{ "response": { "Headers": [...], "Rows": [...] } }` — a tabular manifest; columns vary per view.
 
 ```bash Request
-GET /jsonservice/checkinview/search?checkinviewid=8481&date=2026-02-15&token=<token>
+GET /jsonservice/checkinview/search?checkinviewid=8001&date=2026-02-15&token=<token>
 ```
