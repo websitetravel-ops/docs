@@ -10,7 +10,7 @@ Every entry in `redeemers[].products[].bookings[]` carries a `bookingDetailTypeN
 Only honour the Open-Dated shape when ALL of these hold on the fareprice you're booking:
 
 - `product.apiProviderId === 0` — no external booking provider in the loop
-- `fare.bookingSystem` is `null` or empty — not a live-bookable workflow (Respaxv2 / IBIS / CustomLinc / etc.)
+- `fare.bookingSystem` is `null` or empty — not a live-bookable workflow (Respaxv2 / IBIS / CustomLinc / Fareharbor / Rezdy / etc.). See [Booking system workflows](/api-reference/agent-reseller-booking-system-workflows) for the full `bookingSystem` → workflow reference table.
 - `fare.allowOpenDated === true`
 
 Many live-bookable fares also carry `allowOpenDated: true` in the product feed. Those are NOT candidates for Open-Dated ordering — the flag reflects that the fare *could* be sold that way, not that it currently should be. Ignore `allowOpenDated` unless the compound gate above passes.

@@ -1,0 +1,674 @@
+---
+title: 'Booking system workflows (A / B / C)'
+description: 'Different booking systems need different call sequences. Pick the workflow from `farePrices.bookingSystem`, then follow the right A, B, or C steps.'
+---
+
+Every fare carries a `bookingSystem` value under `farePrices[].bookingSystem`. That value determines which API call sequence you must follow to configure, price, and book the product. Three workflows exist:
+
+| `bookingSystem` | Workflow | Notes |
+| --- | --- | --- |
+| *(null / missing)* | **A** | Pre-tagged rows. Safe default. |
+| `Generic` | **A** | Lowest-common-denominator shape for external integrations. |
+| `Clockwork` | **A** | |
+| `CMS` | **A** | |
+| `SOAAccommodation` | **A** | |
+| `Rezdy` | **A** | Added 2026-10. Same two-call shape as Generic — TDMS native integration to Rezdy. PPDIDs that previously appeared as `Generic` are being progressively retagged. |
+| `Respaxv2` | **B** | |
+| `IBIS` | **B** | |
+| `CustomLinc` | **B** | |
+| `Fareharbor` | **C** | Added 2026-10. New flow — see below. |
+
+Always branch on `farePrices.bookingSystem` BEFORE choosing a workflow. Treat unknown or missing values as Workflow A (safe default).
+
+## Workflow A — Standard booking systems
+
+`Generic` · `Clockwork` · `CMS` · `SOAAccommodation` · `Rezdy`
+
+```
+1. GET /apiv1/bookingdetails/{productPricesDetailsId}
+            ↓
+2. GET /apiv1/checkavailabilityrange/{productPricesDetailsId}/{timeId}/{startDate}/{days}?cached=1
+```
+
+**Step 1** returns the configurable fields for the fare — booking times, pickup locations, optional fields, supplier info. The schema is essentially static per PPDID; cache aggressively (we hold a 24h TTL per `(branch, env, ppdid)`).
+
+**Step 2** returns live availability for the picked `timeId` on `{startDate}` + the next `{days}` days. Add `?cached=1` for the cached result (lower latency, acceptable for most read-paths). Omit it (or `cached=0`) when you need a real-time number — e.g. just before placing an order.
+
+<Info>
+TDMS's `/checkavailabilityrange` requires the date segment in `DD-Mon-YYYY` format. ISO dates are rejected with a misleading 400 error (`"ProductPricesDetail ... is not a valid price."`). The sibling `/detailsToConfirmAvailability` endpoint accepts ISO — only this one is fussy.
+</Info>
+
+### Example — step 1 request
+
+```http
+GET /apiv1/bookingdetails/20895150
+Authorization: Bearer {token}
+Accept: application/json
+```
+
+### Example — step 1 response (abridged — large pickup list truncated)
+
+Real response from a Rezdy product (Kuranda: Scenic Rail, Skyrail Rainforest Cableway and Hartley's Crocodile Adventures, PPDID `20895150`). Note the **PascalCase field names** on `bookingTimes[]` and `pickupLocations[]` — essentially how TDMS surfaces this endpoint's shape.
+
+```json
+{
+  "bookingTimes": [
+    { "BookingTime": "07:00 AM", "BookingTimeID": "07:00:00", "Default": false }
+  ],
+  "pickupLocations": [
+    {
+      "PickupID": "Big 4 Ingenia Holidays Cairns Coconut",
+      "PickupLocation": "Big 4 Ingenia Holidays Cairns Coconut, 23/51 Anderson Rd, Woree, Bus Zone On Anderson Rd Near Entrance, at: 05:10 AM",
+      "PickupTime": "05:10 AM"
+    },
+    {
+      "PickupID": "Cairns Central Plaza Apartment - Bus Zone on McLeod St",
+      "PickupLocation": "Cairns Central Plaza Apartment - Bus Zone on McLeod St, 58 McLeod St, Cairns, Bus Zone on McLeod St near Intersection with Aplin St, at: 05:25 AM",
+      "PickupTime": "05:25 AM"
+    },
+    {
+      "PickupID": "Skyrail Rainforest Cableway",
+      "PickupLocation": "Skyrail Rainforest Cableway, 6 Skyrail Drive, Smithfield, Bus Zone at the front of Skyrail Terminal, at: 06:22 AM",
+      "PickupTime": "06:22 AM"
+    }
+  ],
+  "supplier": {
+    "name": "Down Under Tours (Australia) Pty Ltd",
+    "phone": "07 4047 9066",
+    "freePhone": "07 4047 9066"
+  },
+  "optionalFields": [
+    {
+      "commonName": null,
+      "optionalFieldId": 2311498,
+      "title": "Boarding Pass Language Option",
+      "mandatory": false,
+      "supplierRequired": false,
+      "type": "select",
+      "options": ["English", "German", "French", "Spanish", "Italian", "Japanese", "Chinese"],
+      "apiName": ""
+    }
+  ],
+  "imagePath": "https://api.websitetravel.com/upload/sm/670f05074572d_364_06c30c9348844ac5923cf93b624c1c6ahartleys2015.jpg",
+  "autoCheckPackageDates": false
+}
+```
+
+<Info>
+**Workflow A `optionalFields` shape differs from Workflow C step 2b.** Workflow A uses `{ optionalFieldId (integer), title, mandatory, supplierRequired, type, options: [string] }` with options as a flat string array. Workflow C step 2b uses `{ name (string prefix like `optionalFields_cl_*`), displayName, required, isPriced, options: [{ externalId, displayName, price, note }] }` with per-option metadata. Two separate parsers.
+</Info>
+
+### Example — step 2 request
+
+```http
+GET /apiv1/checkavailabilityrange/20895150/07:00:00/21-Oct-2026/1?cached=1
+Authorization: Bearer {token}
+Accept: application/json
+```
+
+### Example — step 2 response
+
+Real response from the same Rezdy product above. The envelope is **identical to Workflow C's step 1 response** — pricing lives in `productPricingData`, with Workflow A signaled by `datePriceCacheId: null` + `RequiresFurtherDetailsToConfirm: false` (no reservation lock + no further details call needed).
+
+```json
+[
+  {
+    "datePriceCacheId": null,
+    "productPricesDetailsId": 20895150,
+    "BookingDate": "21-Oct-2026",
+    "EndDate": "21-Oct-2026",
+    "BookingTimeID": "07:00:00",
+    "NumAvailable": 2,
+    "NumAvailableDisplay": "2",
+    "Note": null,
+    "RequiresFurtherDetailsToConfirm": false,
+    "DateRestriction": null,
+    "productPricingData": {
+      "RRP": 759.0,
+      "RRPWas": 759.0,
+      "NetRate": 584.43,
+      "FareCurrencyRRP": 759.0,
+      "FareCurrencyNetRate": 584.43,
+      "IgnorePpdMargins": false,
+      "addOnPricing": []
+    },
+    "fields": [],
+    "extraInfo": {}
+  }
+]
+```
+
+## Workflow B — Enhanced booking systems
+
+`Respaxv2` · `IBIS` · `CustomLinc`
+
+```
+1. GET /apiv1/checkavailabilityrange/{productPricesDetailsId}/0/{startDate}/{days}?cached=1
+            ↓
+2. GET /apiv1/bookingdetails/detailsToConfirmAvailability/{productPricesDetailsId}/{date}/{timeId}
+```
+
+**Step 1** uses `timeId=0` as a sentinel — tells the enhanced systems "give me availability and the time selector inline". The response includes:
+
+- A `fields[]` array. For Respax / CustomLinc multi-time products, the `fields[name=timeId]` entry carries selectable `options` (each with `externalId` + `displayName` + `numAvailable`). For single-time Respax / CustomLinc the inline `BookingTimeID` IS the time, and `pickupId` / `dropoffId` fields are populated inline from the same response. For IBIS, step 1 returns an empty `fields[]` plus a top-level `BookingTimeID` session key — you'll need step 2 to resolve pickups / dropoffs.
+- A `RequiresFurtherDetailsToConfirm: true` flag indicating you must call step 2 before placing an order.
+
+**Step 2** uses the specific `timeId` from step 1 to retrieve the pickup / dropoff / optional-field set for that particular time slot. Supplier option sets can vary per-time, so always scope by `timeId` rather than unioning across times.
+
+### Example — step 1 request
+
+```http
+GET /apiv1/checkavailabilityrange/19975231/0/22-Nov-2026/1?cached=1
+Authorization: Bearer {token}
+Accept: application/json
+```
+
+### Example — step 1 response (Respax multi-time)
+
+```json
+[
+  {
+    "BookingDate": "22-Nov-2026",
+    "BookingTimeID": "T1",
+    "NumAvailable": 10,
+    "RequiresFurtherDetailsToConfirm": true,
+    "fields": [
+      {
+        "name": "timeId",
+        "type": "radio",
+        "options": [
+          { "externalId": "T1", "displayName": "9:00 AM", "numAvailable": 5 },
+          { "externalId": "T2", "displayName": "2:00 PM", "numAvailable": 7 }
+        ]
+      }
+    ]
+  }
+]
+```
+
+### Example — step 2 request
+
+```http
+GET /apiv1/bookingdetails/detailsToConfirmAvailability/19975231/22-Nov-2026/T2
+Authorization: Bearer {token}
+Accept: application/json
+```
+
+### Example — step 2 response
+
+```json
+{
+  "fields": [
+    { "name": "pickupId", "options": [
+      { "externalId": "HOTEL-A", "displayName": "Hotel A" },
+      { "externalId": "HOTEL-B", "displayName": "Hotel B" }
+    ] },
+    { "name": "dropoffId", "options": [
+      { "externalId": "DROP-B", "displayName": "Drop B" }
+    ] }
+  ]
+}
+```
+
+## Workflow C — FareHarbor
+
+`Fareharbor` *(added 2026-10)*
+
+FareHarbor has a richer native API than Generic / Rezdy. Optional fields can be time-dependent AND can affect the final price (`isPriced=true`), which means every booking needs a dedicated **reservation lock** before you can POST `/order`.
+
+```
+1. GET /apiv1/checkavailabilityrange/{productPricesDetailsId}/0/{startDate}/{days}
+            ↓
+2a. If step 1 did NOT return a fields entry whose name is timeId:
+    GET /apiv1/bookingdetails/detailsToConfirmAvailability/{productPricesDetailsId}/{date}
+    (no timeId segment) — select an options.externalId from the returned timeId field
+            ↓
+2b. GET /apiv1/bookingdetails/detailsToConfirmAvailability/{productPricesDetailsId}/{date}/{timeId}
+    — select / enter every required optional field
+            ↓
+3. GET /apiv1/checkAvailability/{productPricesDetailsId}/reservation
+   — pass bookingTimeId, bookingDate, and each selected / entered field
+            ↓
+4. POST /apiv1/order with datePriceCacheId on each affected product + booking
+```
+
+**Step 1** — same shape as Workflow B's step 1. If the response includes `fields[name=timeId]` with options, skip to step 2b.
+
+**Step 2a** — details WITHOUT a timeId segment. Pull `fields[name=timeId]` from the response; each `options.externalId` is a selectable time.
+
+**Step 2b** — details WITH the picked timeId. Returns the pickup / dropoff / optional-field set for that specific time. Inner field names beginning `optionalFields_bl_` are **booking-level** (one per booking); names beginning `optionalFields_cl_` are **customer-level** (one per passenger). Fields can be priced or non-priced (`isPriced=true` on priced ones).
+
+**Step 3 — reservation lock.** Call `/apiv1/checkAvailability/{ppdid}/reservation` with:
+
+- `bookingTimeId` + `bookingDate`
+- Every selected / entered optional field as paired, explicitly indexed entries:
+  - `additionalFields[0][optionalFieldId]` + `additionalFields[0][fieldText]`
+  - `additionalFields[1][optionalFieldId]` + `additionalFields[1][fieldText]`
+  - etc.
+  - Send `options.externalId` for select / radio fields; send typed text for text fields.
+- All required fields, all priced selections (`isPriced=true`), and lodging MUST be sent. Non-priced optional answers can be deferred to the order itself.
+
+The response carries a `datePriceCacheId` and the final `rrp`. The `datePriceCacheId` is bound to this exact combination of `(date, timeId, priced selections, lodging)` — do NOT reuse it for a different date, time, priced selection or lodging.
+
+**Step 4 — order.** POST `/apiv1/order` with the `datePriceCacheId` from step 3 on BOTH the product record AND each booking record. Non-priced answers can be added or changed in the order payload without re-running step 3.
+
+<Info>
+**Price-cache lifetime.** Treat `datePriceCacheId` as single-use for the specific locked combination. If the customer changes date, time, a priced optional field, or lodging after step 3, you MUST call step 3 again to lock a fresh id. Non-priced changes (comments, notes) can ride on the existing id.
+</Info>
+
+### Example — step 1 request
+
+```http
+GET /apiv1/checkavailabilityrange/23501261/0/20-Oct-2026/7
+Authorization: Bearer {token}
+Accept: application/json
+```
+
+### Example — step 1 response
+
+Real response from a Fareharbor product (Prima — 2 day 1 night Whitsunday Sailing, PPDID `23501261`), 7-day window. Note the per-day structure, `datePriceCacheId` baked into each day with availability, and `fields[name=timeId]` inline (the common path — step 2a's fallback below rarely fires).
+
+```json
+[
+  {
+    "datePriceCacheId": 12938709,
+    "productPricesDetailsId": 23501261,
+    "BookingDate": "20-Oct-2026",
+    "EndDate": "21-Oct-2026",
+    "BookingTimeID": "1836909165-7716219505",
+    "NumAvailable": 2,
+    "NumAvailableDisplay": "2",
+    "Note": null,
+    "RequiresFurtherDetailsToConfirm": true,
+    "DateRestriction": null,
+    "productPricingData": {
+      "RRP": 1304.0,
+      "RRPWas": 1304.0,
+      "NetRate": 1004.08,
+      "FareCurrencyRRP": 1304.0,
+      "FareCurrencyNetRate": 1004.08,
+      "IgnorePpdMargins": false,
+      "addOnPricing": []
+    },
+    "fields": [
+      {
+        "date": "2026-10-20",
+        "type": "radio",
+        "name": "timeId",
+        "displayName": "Time Slot",
+        "required": true,
+        "options": [
+          { "externalId": "1836909165-7716219505", "displayName": "08:30 - 16:00", "numAvailable": 2 }
+        ]
+      }
+    ],
+    "extraInfo": {}
+  },
+  {
+    "datePriceCacheId": null,
+    "productPricesDetailsId": 23501261,
+    "BookingDate": "21-Oct-2026",
+    "EndDate": "22-Oct-2026",
+    "BookingTimeID": null,
+    "NumAvailable": 0,
+    "NumAvailableDisplay": "0",
+    "Note": "No availability for this date",
+    "RequiresFurtherDetailsToConfirm": false,
+    "DateRestriction": null,
+    "productPricingData": {
+      "RRP": 1304.0, "RRPWas": 1304.0, "NetRate": 1004.08,
+      "FareCurrencyRRP": 1304.0, "FareCurrencyNetRate": 1004.08,
+      "IgnorePpdMargins": false, "addOnPricing": []
+    },
+    "fields": [],
+    "extraInfo": {}
+  }
+]
+```
+
+### Example — step 2a request (fallback, no timeId)
+
+Called ONLY when step 1 didn't return `fields[name=timeId]` inline. Rare in practice — Fareharbor usually provides inline timeId in step 1.
+
+```http
+GET /apiv1/bookingdetails/detailsToConfirmAvailability/23501261/2026-10-20
+Authorization: Bearer {token}
+Accept: application/json
+```
+
+### Example — step 2a response (future date with availability)
+
+Returns a flat `fields[]` with one `timeId` radio field; each `options.externalId` is a selectable timeId. Use these values when calling step 2b.
+
+```json
+{
+  "productPricesDetailsId": 23501261,
+  "fields": [
+    {
+      "date": "2026-10-20",
+      "type": "radio",
+      "name": "timeId",
+      "displayName": "Time Slot",
+      "required": true,
+      "options": [
+        { "externalId": "1836909165-7716219505", "displayName": "08:30 - 16:00", "numAvailable": 2 }
+      ]
+    }
+  ]
+}
+```
+
+### Example — step 2a response (past / unavailable date)
+
+```json
+{
+  "productPricesDetailsId": 23501261,
+  "fields": []
+}
+```
+
+### Example — step 2b request (with timeId)
+
+Returns the time-specific additional fields — lodging + per-passenger customer-level fields + any booking-level fields.
+
+```http
+GET /apiv1/bookingdetails/detailsToConfirmAvailability/23501261/2026-10-20/1836909165-7716219505
+Authorization: Bearer {token}
+Accept: application/json
+```
+
+### Example — step 2b response (abridged — large lodging list truncated)
+
+Note the **nested shape**: the outer `fields[]` has one wrapper entry (`name: "optionalFields"`), and the actual field list is inside `fields[0].fields[]`. Each inner field carries `isPriced` (all false here — this product has no priced extras).
+
+```json
+{
+  "productPricesDetailsId": 23501261,
+  "fields": [
+    {
+      "date": "2026-10-20",
+      "name": "optionalFields",
+      "fields": [
+        {
+          "date": "2026-10-20",
+          "type": "text",
+          "name": "optionalFields_cl_690456",
+          "displayName": "Full Name",
+          "required": false,
+          "timeId": "1836909165-7716219505",
+          "isPriced": false
+        },
+        {
+          "date": "2026-10-20",
+          "type": "select",
+          "name": "optionalFields_cl_710104",
+          "displayName": "Dietary Requirements",
+          "required": false,
+          "timeId": "1836909165-7716219505",
+          "isPriced": false,
+          "options": [
+            { "externalId": "6707890", "name": "None",      "displayName": "None",      "price": 0, "note": "" },
+            { "externalId": "6707891", "name": "Lactose Intolerant", "displayName": "Lactose Intolerant", "price": 0, "note": "" },
+            { "externalId": "6707894", "name": "Vegetarian", "displayName": "Vegetarian", "price": 0, "note": "" }
+          ]
+        },
+        {
+          "date": "2026-10-20",
+          "type": "select",
+          "name": "optionalFields_lodging",
+          "displayName": "Lodging",
+          "required": false,
+          "timeId": "1836909165-7716219505",
+          "isPriced": false,
+          "options": [
+            { "externalId": "64309", "name": "Airlie Beach Hotel",      "displayName": "Airlie Beach Hotel",      "SubProductDisplayName": "Airlie Beach Hotel" },
+            { "externalId": "64365", "name": "Port of Airlie (Ferry Terminal)", "displayName": "Port of Airlie (Ferry Terminal)", "SubProductDisplayName": "Port of Airlie (Ferry Terminal)" }
+          ]
+        }
+      ]
+    }
+  ]
+}
+```
+
+<Info>
+**Field naming convention.** Inner field names beginning `optionalFields_cl_` are **customer-level** (per passenger); `optionalFields_bl_` are **booking-level** (one per booking); the sentinel `optionalFields_lodging` is the lodging dropdown. **Lodging options carry `SubProductDisplayName` instead of the standard `price` + `note` keys** — branch your renderer on the field name.
+</Info>
+
+<Info>
+**Per-passenger duplication.** A select field like Dietary Requirements may appear MULTIPLE times in `fields[0].fields[]` for multi-pax products — once per passenger slot. The outer caller decides whether to dedupe + collect once, or render once-per-passenger. Watch for duplicate `name` values.
+</Info>
+
+### Example — step 3 reservation request (minimal, no additionalFields)
+
+Most Fareharbor products have no priced optional fields and no required fields. In those cases the minimal reservation call works — TDMS reuses the step-1 `datePriceCacheId`.
+
+```http
+GET /apiv1/checkAvailability/23501261/reservation?bookingTimeId=1836909165-7716219505&bookingDate=2026-10-20
+Authorization: Bearer {token}
+Accept: application/json
+```
+
+### Example — step 3 reservation request (with additionalFields)
+
+```http
+GET /apiv1/checkAvailability/23501261/reservation
+    ?bookingTimeId=1836909165-7716219505
+    &bookingDate=2026-10-20
+    &additionalFields[0][optionalFieldId]=optionalFields_cl_690456
+    &additionalFields[0][fieldText]=Alex%20Lee
+    &additionalFields[1][optionalFieldId]=optionalFields_cl_710104
+    &additionalFields[1][fieldText]=6707890
+    &additionalFields[2][optionalFieldId]=optionalFields_lodging
+    &additionalFields[2][fieldText]=64309
+Authorization: Bearer {token}
+Accept: application/json
+```
+
+### Example — step 3 response (minimal call, no additionalFields)
+
+Real response. `datePriceCacheId: 12938709` **matches step 1 exactly** — when no additionalFields are supplied, TDMS reuses the step-1 cache id.
+
+```json
+{
+  "datePriceCacheId": 12938709,
+  "rrp": 1304,
+  "wholesale": 1004.08,
+  "bookingFee": 0,
+  "fareharborGroupedBooking": true,
+  "pickupDetails": "",
+  "fareCurrencyNetRate": 1004.08,
+  "fareCurrencyRrp": 1304,
+  "fareCurrencyBookingFee": 0
+}
+```
+
+### Example — step 3 response (full call, additionalFields supplied)
+
+Same product, same date, same timeId — but with all four additionalFields filled. `datePriceCacheId: 13119045` is **DIFFERENT** from the minimal call's `12938709` even though every selection was `isPriced: false` with `price: 0`. Prices + fareharborGroupedBooking are unchanged.
+
+```json
+{
+  "datePriceCacheId": 13119045,
+  "rrp": 1304,
+  "wholesale": 1004.08,
+  "bookingFee": 0,
+  "fareharborGroupedBooking": true,
+  "pickupDetails": "",
+  "fareCurrencyNetRate": 1004.08,
+  "fareCurrencyRrp": 1304,
+  "fareCurrencyBookingFee": 0
+}
+```
+
+<Warning>
+**TDMS mints a new `datePriceCacheId` per selection set, even for non-priced fields.** The step-1 cache id is ONLY safe to reuse on `/order` when zero additionalFields are being sent. As soon as any field answer accompanies the booking (lodging, Full Name, Dietary — ANY of them), you MUST call `/reservation` first to lock the matching cache id and send THAT id on `/order`. Sending the step-1 id with populated additionalFields will likely cause TDMS to reject the order or price it wrong.
+</Warning>
+
+<Info>
+**When can `/reservation` be skipped?** Only when the operator/customer provided NO additionalField answers at all. In that case, thread the step-1 `datePriceCacheId` straight to `/order`. Any field selection — including non-priced ones — requires a fresh `/reservation` call.
+</Info>
+
+### Example — step 4 order payload (abridged)
+
+```json
+{
+  "bookingReference": "WT123456",
+  "redeemers": [{
+    "firstName": "Alex", "lastName": "Lee",
+    "products": [{
+      "productPricesDetailsId": "{Fareharbor-ppdid}",
+      "datePriceCacheId": "{from-step-3}",
+      "redeemerQty": 1,
+      "bookings": [{
+        "bookingComment": "",
+        "travelDate": "22-Nov-2026",
+        "timeId": "{timeId}",
+        "datePriceCacheId": "{from-step-3}",
+        "additionalFields": [
+          { "optionalFieldId": "{field-id}", "fieldText": "{option-externalId}" }
+        ]
+      }]
+    }]
+  }]
+}
+```
+
+## Bulk product view — `/apiv1/checkAvailabilityProduct` (cross-workflow)
+
+An alternative to the per-PPDID step-1 calls above: `/apiv1/checkAvailabilityProduct?productId={productId}&from={date}&days={N}` returns ALL fares for a product × ALL days × per-slot pricing + pickups + additionalFields + addOns in a single call. **The response shape is stable across all three workflows** — null-vs-populated fields signal which workflow applies.
+
+Useful when you need a product-wide view (e.g. an operator dashboard showing availability for every fare of a product at once) instead of the per-PPDID per-step flow.
+
+### Example — request
+
+```http
+GET /apiv1/checkAvailabilityProduct?productId=67594&from=20-Oct-2026&days=7
+Authorization: Bearer {token}
+Accept: application/json
+```
+
+### Example — Rezdy response (abridged)
+
+Workflow A product (Kuranda tour, productId `67594`). Note `datePriceCacheId: null` on every slot — Rezdy doesn't use the price-cache lock. Pickups are populated at the slot level with their timestamped descriptions. `tourCode` carries the Rezdy internal product code.
+
+```json
+{
+  "productId": 67594,
+  "name": "Kuranda: Scenic Rail, Skyrail Rainforest Cableway and Hartley's Crocodile Adventures incl Return Cairns Transfers",
+  "tourCode": "PNQG6T",
+  "image": "https://c.globaltravel.market/upload/sm/...jpg",
+  "supplier": {
+    "name": "Down Under Tours (Australia) Pty Ltd",
+    "phone": "074047 9066",
+    "email": "res@downundertours.com"
+  },
+  "fares": [
+    {
+      "productPricesDetailsId": 20895150,
+      "fareName": "2 Adults + 2 Children",
+      "rrp": 759.0,
+      "hasAvailability": true,
+      "dates": {
+        "2026-10-21": [
+          {
+            "datePriceCacheId": null,
+            "bookingDate": "2026-10-21",
+            "bookingTime": "07:00 AM",
+            "bookingTimeId": "07:00:00",
+            "numAvailable": 11,
+            "rrp": 759.0,
+            "pickupLocations": [
+              {
+                "pickupId": "Big 4 Ingenia Holidays Cairns Coconut",
+                "pickupLocation": "05:10 AM Big 4 Ingenia Holidays Cairns Coconut, 23/51 Anderson Rd, Woree, Bus Zone On Anderson Rd Near Entrance, at: 05:10 AM",
+                "pickupTime": "N/A"
+              }
+            ],
+            "addOns": [],
+            "additionalFields": [
+              {
+                "additionalFieldId": "2311498",
+                "type": "select",
+                "label": "Boarding Pass Language Option",
+                "options": [
+                  { "externalId": "English", "displayName": "English", "name": "English", "default": false },
+                  { "externalId": "German",  "displayName": "German",  "name": "German",  "default": false }
+                ],
+                "required": false
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}
+```
+
+### Example — Fareharbor response (abridged)
+
+Workflow C product (Prima Whitsunday, productId `54347`). Note `datePriceCacheId` populated on every slot — Fareharbor's price-cache lock mechanism. `pickupLocations: []` is empty — FareHarbor uses `optionalFields_lodging` inside `additionalFields` instead.
+
+```json
+{
+  "productId": 54347,
+  "name": "Prima - 2 day 1 night Whitsunday Sailing",
+  "tourCode": "",
+  "image": "https://c.globaltravel.market/upload/sm/...jpg",
+  "supplier": {
+    "name": "North Queensland Travel Pty Ltd",
+    "phone": "0749677555",
+    "email": "res@explorewhitsundays.com"
+  },
+  "fares": [
+    {
+      "productPricesDetailsId": 23501261,
+      "fareName": "Private Double Cabin no Ensuite (Sleeps 2 guests)",
+      "rrp": 1304.0,
+      "hasAvailability": true,
+      "dates": {
+        "2026-10-18": [
+          {
+            "datePriceCacheId": 12938706,
+            "bookingDate": "2026-10-18",
+            "bookingTime": "08:30 - 16:00",
+            "bookingTimeId": "1836909162-7716219496",
+            "numAvailable": 1,
+            "rrp": 1304.0,
+            "pickupLocations": [],
+            "addOns": [],
+            "additionalFields": [
+              { "additionalFieldId": "optionalFields_cl_690456", "type": "text",   "label": "Full Name",            "required": false, "options": [] },
+              { "additionalFieldId": "optionalFields_cl_710104", "type": "select", "label": "Dietary Requirements", "required": false, "options": [/* dietary options */] },
+              { "additionalFieldId": "optionalFields_lodging",   "type": "select", "label": "Lodging",              "required": false, "options": [/* lodging options */] }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}
+```
+
+<Info>
+**Workflow signal from the bulk view.** `datePriceCacheId: null` on every slot → Workflow A (no price-cache lock). `datePriceCacheId` populated → Workflow C (price-cache lock applies; call `/reservation` whenever any `additionalFields` are selected before `/order`). The per-PPDID step flow is still the canonical path for a booking; `/checkAvailabilityProduct` is the alternative when you want everything at once.
+</Info>
+
+## What stays the same across all three workflows
+
+Only the **request-side call sequence** varies by workflow. Everything downstream of a successful order is identical:
+
+- **`POST /apiv1/order` response envelope** — order-level, not product-level. The shape returned after submission is the same whether the booking was Workflow A, B, or C. A Fareharbor product on an order responds with the same confirmation / booking-reference / voucher structure as a Generic product. Parse once, works everywhere.
+- **Error envelopes** — error shapes are generic across all workflows. Any `/apiv1/*` call that returns a 4xx / 5xx surfaces the same payload format regardless of the fare's `bookingSystem`. Workflow-specific nuances live only in which calls you make, not in what comes back when something fails.
+
+So Workflow C's additional complexity is contained to the request side — what you SEND to configure, lock price, and build the order payload. The response-parsing + error-handling you already have for Workflow A / B keeps working untouched.
+
+## Implementation tips
+
+- **Always inspect `farePrices.bookingSystem` first.** Routing on anything else drifts the moment TDMS re-tags a product.
+- **Treat unknown / missing values as Workflow A** — safe default, matches pre-tagged rows.
+- **Cache `/bookingdetails` responses per PPDID.** The schema is essentially static; a 24h TTL per `(branch, env, ppdid)` eliminates per-click round-trips.
+- **Use `?cached=1`** on `/checkavailabilityrange` for most read-paths. Omit (or set `cached=0`) when the availability number itself is load-bearing (right before an order).
+- **FareHarbor price-cache**: always use the `datePriceCacheId` from the final `/reservation` call — it reflects the chosen priced options. Reusing an older id against a changed selection will return wrong pricing on the final booking.
+- **Watch for `RequiresFurtherDetailsToConfirm` and `RequiresReservationCheck` flags** in step 1 / step 2 responses. Both are explicit "you need another call before you can order" signals.
