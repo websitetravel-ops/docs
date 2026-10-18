@@ -217,7 +217,7 @@ Accept: application/json
 FareHarbor has a richer native API than Generic / Rezdy. Optional fields can be time-dependent AND can affect the final price (`isPriced=true`), which means every booking needs a dedicated **reservation lock** before you can POST `/order`.
 
 ```
-1. GET /apiv1/checkavailabilityrange/{productPricesDetailsId}/0/{startDate}/{days}
+1. GET /apiv1/checkavailabilityrange/{productPricesDetailsId}/0/{startDate}/{days}?cached=1
             ↓
 2a. If step 1 did NOT return a fields entry whose name is timeId:
     GET /apiv1/bookingdetails/detailsToConfirmAvailability/{productPricesDetailsId}/{date}
@@ -502,7 +502,15 @@ Same product, same date, same timeId — but with all four additionalFields fill
 ```
 
 <Warning>
-**TDMS mints a new `datePriceCacheId` per selection set, even for non-priced fields.** The step-1 cache id is ONLY safe to reuse on `/order` when zero additionalFields are being sent. As soon as any field answer accompanies the booking (lodging, Full Name, Dietary — ANY of them), you MUST call `/reservation` first to lock the matching cache id and send THAT id on `/order`. Sending the step-1 id with populated additionalFields will likely cause TDMS to reject the order or price it wrong.
+**TDMS mints a new `datePriceCacheId` per selection set, even for non-priced fields.** The step-1 cache id is ONLY safe to reuse on `/order` when zero additionalFields are being sent. As soon as any field answer accompanies the booking (lodging, Full Name, Dietary — ANY of them), you MUST call `/reservation` first to lock the matching cache id and send THAT id on `/order`. Sending the step-1 id with populated additionalFields causes TDMS to reject the order or price it wrong — do not attempt the fallback, abort the submission and retry.
+</Warning>
+
+<Warning>
+**Workflow C uses `additionalFields` on the booking, NOT `optionalFields`.** Workflow A/B emit `bookings[0].optionalFields: [...]`; Workflow C emits `bookings[0].additionalFields: [...]`. Same `{optionalFieldId, fieldText}` entry shape, different key name. A mixed cart (one WF A/B addon + one WF C addon in the same /order) will carry each key on its respective booking entry.
+</Warning>
+
+<Warning>
+**`datePriceCacheId` MUST be mirrored on BOTH the per-redeemer product record AND each booking record.** Setting it on only one is a rejection path. The step-4 example below shows both — keep them in lockstep.
 </Warning>
 
 <Info>
