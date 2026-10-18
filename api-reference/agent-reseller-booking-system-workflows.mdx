@@ -259,19 +259,23 @@ The response carries a `datePriceCacheId` and the final `rrp`. The `datePriceCac
 ### Example — step 1 request
 
 ```http
-GET /apiv1/checkavailabilityrange/23501261/0/20-Oct-2026/7
+GET /apiv1/checkavailabilityrange/23501261/0/20-Oct-2026/7?cached=1
 Authorization: Bearer {token}
 Accept: application/json
 ```
 
 ### Example — step 1 response
 
-Real response from a Fareharbor product (Prima — 2 day 1 night Whitsunday Sailing, PPDID `23501261`), 7-day window. Note the per-day structure, `datePriceCacheId` baked into each day with availability, and `fields[name=timeId]` inline (the common path — step 2a's fallback below rarely fires).
+Real response from a Fareharbor product (Prima — 2 day 1 night Whitsunday Sailing, PPDID `23501261`), 7-day window. Note the per-day structure, `datePriceCacheId` baked into each day with availability, and `fields[name=timeId]` inline (the common path — step 2a's fallback below rarely fires). Dates are DD-Mon-YYYY on this endpoint, NOT ISO.
+
+<Warning>
+**Workflow signal.** The combination `datePriceCacheId != null` + `RequiresFurtherDetailsToConfirm: true` is the clearest at-a-glance marker for Workflow C. Workflow A returns `datePriceCacheId: null` + `RequiresFurtherDetailsToConfirm: false`.
+</Warning>
 
 ```json
 [
   {
-    "datePriceCacheId": 12938709,
+    "datePriceCacheId": 13119087,
     "productPricesDetailsId": 23501261,
     "BookingDate": "20-Oct-2026",
     "EndDate": "21-Oct-2026",
@@ -381,6 +385,12 @@ Accept: application/json
 
 Note the **nested shape**: the outer `fields[]` has one wrapper entry (`name: "optionalFields"`), and the actual field list is inside `fields[0].fields[]`. Each inner field carries `isPriced` (all false here — this product has no priced extras).
 
+<Warning>
+**Per-passenger field duplication for multi-pax fares.** On a 2-pax fare like Prima's "Private Double Cabin (Sleeps 2 guests)", TDMS encodes "ask this question for each passenger" by **repeating the field entry** in `fields[0].fields[]`. The real step-2b response for this product shows `optionalFields_cl_710104` (Dietary Requirements) listed TWICE — once between the Full Name entries, once after `cl_690457` ("Full Name of Second Passenger"). The supplier is pre-indexing per-passenger slots.
+
+Parsers must decide: dedupe by `name` (ignoring the per-pax intent, treating repeat entries as noise) or preserve the duplicates (rendering each occurrence as a separate input). For the single-redeemer `/order` path (each addon purchased as qty=1), deduping is safe. For a multi-pax fare where the fare itself covers N guests, each occurrence should get its own answer. The reservation lock and `/order` manifest both appear to behave the same regardless (both 4-field and 5-field variants of this product returned the SAME `datePriceCacheId` from `/reservation`).
+</Warning>
+
 ```json
 {
   "productPricesDetailsId": 23501261,
@@ -467,7 +477,7 @@ Accept: application/json
 
 ### Example — step 3 response (minimal call, no additionalFields)
 
-Real response. `datePriceCacheId: 12938709` **matches step 1 exactly** — when no additionalFields are supplied, TDMS reuses the step-1 cache id.
+Real response. `datePriceCacheId: 12938709` matches the canonical "no-fields" cache id for this `(ppdid, date, timeId)` — the id TDMS also returns from `/apiv1/checkAvailabilityProduct` for the same slot.
 
 ```json
 {
@@ -485,7 +495,7 @@ Real response. `datePriceCacheId: 12938709` **matches step 1 exactly** — when 
 
 ### Example — step 3 response (full call, additionalFields supplied)
 
-Same product, same date, same timeId — but with all four additionalFields filled. `datePriceCacheId: 13119045` is **DIFFERENT** from the minimal call's `12938709` even though every selection was `isPriced: false` with `price: 0`. Prices + fareharborGroupedBooking are unchanged.
+Same product, same date, same timeId — but with all four additionalFields filled. `datePriceCacheId: 13119045` differs from the minimal call's `12938709` because the selection fingerprint changed (0 fields → 4 fields). Prices + `fareharborGroupedBooking` are unchanged.
 
 ```json
 {
@@ -501,9 +511,32 @@ Same product, same date, same timeId — but with all four additionalFields fill
 }
 ```
 
+<Info>
+**Cache ids are DETERMINISTIC, not time-bound tokens.** TDMS returns the same `datePriceCacheId` for the same `(ppdid, date, timeId, selection fingerprint)` across repeated calls. For products with no `isPriced` options, further-adding non-priced fields often yields the SAME id (verified against Prima Whitsunday — 4 vs 5 fields both returned `13119045`). Don't rely on the id to detect selection drift; always re-call `/reservation` whenever any field changes, and send its returned id on `/order`.
+</Info>
+
 <Warning>
-**TDMS mints a new `datePriceCacheId` per selection set, even for non-priced fields.** The step-1 cache id is ONLY safe to reuse on `/order` when zero additionalFields are being sent. As soon as any field answer accompanies the booking (lodging, Full Name, Dietary — ANY of them), you MUST call `/reservation` first to lock the matching cache id and send THAT id on `/order`. Sending the step-1 id with populated additionalFields causes TDMS to reject the order or price it wrong — do not attempt the fallback, abort the submission and retry.
+**Cache ids differ across endpoints — use the right source.** For the SAME `(ppdid, date, timeId)` the three endpoints returned three different ids in our verification (per-PPDID `/checkavailabilityrange?cached=1` → `13119087`; bulk `/checkAvailabilityProduct` → `12938709`; `/reservation` minimal → `12938709`). **Always source the id for `/order` from `/reservation`** (or an uncached `/checkAvailabilityProduct`). The `?cached=1` step-1 id is a snapshot id for display only — do NOT thread it onto `/order`.
 </Warning>
+
+<Warning>
+**The step-1 cache id can only be reused on `/order` when zero additionalFields accompany the booking.** The moment any field answer is sent (lodging, Full Name, Dietary — anything, even non-priced), you MUST call `/reservation` first and use the id it returns. Sending a stale or wrong id with populated additionalFields produces a 400 "FareHarbor options for (date) do not match the confirmed price" from TDMS — do NOT attempt a fallback, abort the submission and re-run `/reservation`.
+</Warning>
+
+### Example — step 3 error response (bad lodging externalId)
+
+HTTP 500 — thrown when a submitted option externalId isn't in the server's current option list (either a crafted request OR operator-side drift between page load and submit). The supplier context ("company shortname") is leaked in the message — sanitise before surfacing to end users.
+
+```json
+{
+  "code": null,
+  "errors": [],
+  "message": "Reservation check failed, not bookable. Reason: 99999 is not a valid lodging pk for company shortname 'explorewhitsundays'",
+  "status": "error",
+  "statusCode": 500,
+  "statusText": "Internal Server Error"
+}
+```
 
 <Warning>
 **Workflow C uses `additionalFields` on the booking, NOT `optionalFields`.** Workflow A/B emit `bookings[0].optionalFields: [...]`; Workflow C emits `bookings[0].additionalFields: [...]`. Same `{optionalFieldId, fieldText}` entry shape, different key name. A mixed cart (one WF A/B addon + one WF C addon in the same /order) will carry each key on its respective booking entry.
@@ -517,30 +550,113 @@ Same product, same date, same timeId — but with all four additionalFields fill
 **When can `/reservation` be skipped?** Only when the operator/customer provided NO additionalField answers at all. In that case, thread the step-1 `datePriceCacheId` straight to `/order`. Any field selection — including non-priced ones — requires a fresh `/reservation` call.
 </Info>
 
-### Example — step 4 order payload (abridged)
+### Example — step 4 order payload (verified shape)
+
+Verified against a real Fareharbor /order attempt + a cross-check against another dev's working-shape payload. **`datePriceCacheId` must appear in THREE positions** — top-level `products[]`, per-redeemer `products[]`, and each `bookings[]` — all with the SAME id from the preceding `/reservation` call.
 
 ```json
 {
   "bookingReference": "WT123456",
-  "redeemers": [{
-    "firstName": "Alex", "lastName": "Lee",
-    "products": [{
-      "productPricesDetailsId": "{Fareharbor-ppdid}",
-      "datePriceCacheId": "{from-step-3}",
-      "redeemerQty": 1,
-      "bookings": [{
-        "bookingComment": "",
-        "travelDate": "22-Nov-2026",
-        "timeId": "{timeId}",
-        "datePriceCacheId": "{from-step-3}",
-        "additionalFields": [
-          { "optionalFieldId": "{field-id}", "fieldText": "{option-externalId}" }
-        ]
-      }]
-    }]
-  }]
+  "agentReference": "Group tour reference",
+  "paymentMethod": "credit_card_pay_stripetest_gtm",
+  "emailVouchers": 0,
+  "processAsQuote": true,
+  "totalCharged": 1304.00,
+  "products": [
+    {
+      "productPricesDetailsId": "23501261",
+      "datePriceCacheId": 13119045,
+      "qty": 1
+    }
+  ],
+  "redeemers": [
+    {
+      "emailAddress": "alex@test.example.com",
+      "firstName": "Alex",
+      "lastName": "Lee",
+      "phone": "0400000000",
+      "redeemerCountry": 36,
+      "products": [
+        {
+          "productPricesDetailsId": "23501261",
+          "datePriceCacheId": 13119045,
+          "redeemerQty": 1,
+          "bookWithFirstRedeemer": false,
+          "optionalFields": null,
+          "bookings": [
+            {
+              "datePriceCacheId": 13119045,
+              "pickupId": "0",
+              "timeId": "1836909165-7716219505",
+              "travelDate": "20-Oct-2026"
+            }
+          ]
+        }
+      ]
+    }
+  ]
 }
 ```
+
+<Warning>
+**Fareharbor /order shape differs from Workflow A/B in six ways:**
+
+1. **`datePriceCacheId` on THREE positions** — top-level `products[]`, per-redeemer `products[]`, each `bookings[]`. All must be the same id from the preceding `/reservation`.
+2. **`productPricesDetailsId` as STRING at both top-level and per-redeemer levels.** Workflow A/B sends it as a number at the top level; Fareharbor needs string everywhere.
+3. **`pickupId: "0"` on each booking** — literal string "0" even though Fareharbor uses lodging (sent via step-3 reservation), not a pickup. TDMS treats missing `pickupId` as "resolve from the slot definition" which may fail for Fareharbor's grouped-booking semantics.
+4. **`optionalFields: null`** on the per-redeemer product (literal null, not an empty array).
+5. **`bookWithFirstRedeemer: false`** on each per-redeemer product.
+6. **Multi-passenger is N REDEEMERS, not N bookings on one redeemer.** Each additional passenger is a new entry in `redeemers[]` with its own `products: [{ redeemerQty: 1, bookings: [{...}] }]`. Top-level `qty` = sum of all redeemers' `redeemerQty`.
+</Warning>
+
+<Info>
+**`additionalFields` on `/order` — presence is neutral.** Verified empirically: sending `additionalFields: [...]` on `bookings[0]` AND omitting it entirely both produce the same 400 "options do not match the confirmed price" result when the underlying handshake fails. The locked selection set is retrieved by TDMS from the `datePriceCacheId` alone; `/order` doesn't need to re-send it, and sending it doesn't break anything either. The reference flow at the top of this section only mentions `datePriceCacheId on the product and booking` for step 4, consistent with "cache id is self-sufficient."
+</Info>
+
+<Warning>
+**Unresolved: TDMS ↔ Fareharbor price-confirmation handshake.** Two independent Workflow C `/order` attempts (both with a fresh `datePriceCacheId` from `/reservation` and the proven payload shape above) have reproduced the 400 "FareHarbor options for (date) do not match the confirmed price" error on PPDID `23501261` for 2026-10-20. The failure occurs in TDMS's manifest-creation path (`manifests.go:207`) where TDMS re-validates the cache id with Fareharbor's native API before committing the order. The lock accepted by `/reservation` is subsequently rejected at `/order`. Mitigation path is still under investigation with WT support; implementers hitting this error should NOT retry blindly — contact support with the booking reference + cache id so TDMS can trace the Fareharbor-side rejection.
+</Warning>
+
+### Example — step 4 error response (price mismatch)
+
+HTTP 400 — thrown when TDMS's manifest layer fails Fareharbor's price confirmation callback. Common causes: wrong `datePriceCacheId` (stale, from `?cached=1` snapshot, or not from `/reservation`), or an `additionalFields` set on `/order` that TDMS considers inconsistent with what `/reservation` locked.
+
+```json
+{
+  "code": null,
+  "errors": [],
+  "message": "Product 'Prima - 2 day 1 night Whitsunday Sailing' FareHarbor options for (20-Oct-2026) do not match the confirmed price. Please recheck the reservation and use the returned datePriceCacheId.",
+  "status": "error",
+  "statusCode": 400,
+  "statusText": "Bad Request"
+}
+```
+
+Remediation: re-call `/reservation` with the current selection set, take the returned `datePriceCacheId`, and re-submit `/order` with that id. If the error persists on a fresh id, see the "Unresolved" warning above.
+
+### Workflow C implementation invariants
+
+The following apply when building a Workflow C integration against a multi-branch TDMS setup (one branch's tour products pointing to another branch's addon/payment account via `addon_branch_code`). Learned the hard way during Phase C of the Group Booker Addon Portal integration — all have test coverage in that project.
+
+<Warning>
+**1. All TDMS calls for a single Fareharbor booking MUST use the SAME TDMS identity.** `/checkavailabilityrange` + `/detailsToConfirmAvailability` (step-2b) + `/reservation` + `/bookingreference` + `/order` all need to authenticate under the SAME branch's TDMS account. The `datePriceCacheId` is **account-scoped**; a lock minted under branch A and sent to `/order` under branch B is rejected. For cross-branch setups, resolve the addon-side branch at the top of the request handler and route every TDMS call through those creds.
+</Warning>
+
+<Warning>
+**2. Call `/reservation` BEFORE `/apiv1/bookingreference`.** TDMS mints a bookingReference on demand; it's a bookable "slot" against the account. If `/reservation` fails for any reason (step-2b drift, bad lodging, Fareharbor rejection), you'll have burned an unused bookingReference. Order: `/reservation` → `/bookingreference` → `/order`. The reference itself does not need to be known to `/reservation`.
+</Warning>
+
+<Warning>
+**3. Validate the submitted selection set against the step-2b schema BEFORE calling `/reservation`.** `/reservation` will accept selections TDMS considers "well-formed," but a drifted operator config (field removed, option retired) between the customer's page load and submit can still land there. Catch unknown field names, forged option externalIds, missing required fields, and missing-when-required lodging server-side upfront — surface a specific 400 to the customer. The step-2b response is the authoritative schema at the moment of submit.
+</Warning>
+
+<Info>
+**4. Picker-side TDMS reads must use the addon branch identity too.** For a lazy-hydration customer portal (step-1 availability + step-2b fields fetched when the page loads), use the SAME identity those two picker-side calls will later use at `/select`/`/reservation`/`/order`. Mismatch produces the "customer sees branch A's schema but branch B's `/select` validator re-fetches a different schema and rejects a valid-looking answer" bug class.
+</Info>
+
+<Info>
+**5. qty / redeemer model: a Fareharbor booking is N redeemers × (redeemerQty: 1), not one redeemer × bookings[N].** Each passenger becomes a separate `redeemers[]` entry with its own `products[0].bookings[0]`. Top-level `products[0].qty` = sum of each redeemer's `redeemerQty`. Single-passenger addon flows collapse to one redeemer with `qty: 1`.
+</Info>
 
 ## Bulk product view — `/apiv1/checkAvailabilityProduct` (cross-workflow)
 
