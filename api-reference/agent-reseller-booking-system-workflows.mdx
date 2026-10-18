@@ -539,7 +539,12 @@ HTTP 500 — thrown when a submitted option externalId isn't in the server's cur
 ```
 
 <Warning>
-**Workflow C uses `additionalFields` on the booking, NOT `optionalFields`.** Workflow A/B emit `bookings[0].optionalFields: [...]`; Workflow C emits `bookings[0].additionalFields: [...]`. Same `{optionalFieldId, fieldText}` entry shape, different key name. A mixed cart (one WF A/B addon + one WF C addon in the same /order) will carry each key on its respective booking entry.
+**`additionalFields` and `optionalFields` are DIFFERENT fields in DIFFERENT places** — easy to conflate:
+
+- **Step 3 `/reservation`** — selections go as URL **query params** named `additionalFields[i][optionalFieldId]` + `additionalFields[i][fieldText]`.
+- **Step 4 `/order`** — the same selections go as a JSON **body** property named `bookings[0].optionalFields: [{optionalFieldId, fieldText}, ...]`. **Same key name as Workflow A/B** — not `additionalFields`.
+
+Sending `bookings[0].additionalFields: [...]` on `/order` for a Fareharbor product means TDMS reads zero recognised answers and rejects with "FareHarbor options for (date) do not match the confirmed price" even when `/reservation` succeeded with the identical selections — because the reservation lock expected N field answers to accompany the order and the `additionalFields` key is silently ignored (like `fieldValue` is on A/B).
 </Warning>
 
 <Warning>
@@ -588,7 +593,13 @@ Verified against a real Fareharbor /order attempt + a cross-check against anothe
               "datePriceCacheId": 13119045,
               "pickupId": "0",
               "timeId": "1836909165-7716219505",
-              "travelDate": "20-Oct-2026"
+              "travelDate": "20-Oct-2026",
+              "optionalFields": [
+                { "optionalFieldId": "optionalFields_cl_690456", "fieldText": "Alex Lee" },
+                { "optionalFieldId": "optionalFields_cl_710104", "fieldText": "6707890" },
+                { "optionalFieldId": "optionalFields_cl_690457", "fieldText": "Sam Rao" },
+                { "optionalFieldId": "optionalFields_lodging",   "fieldText": "64309" }
+              ]
             }
           ]
         }
@@ -599,27 +610,51 @@ Verified against a real Fareharbor /order attempt + a cross-check against anothe
 ```
 
 <Warning>
-**Fareharbor /order shape differs from Workflow A/B in six ways:**
+**Fareharbor /order shape differs from Workflow A/B in seven ways:**
 
 1. **`datePriceCacheId` on THREE positions** — top-level `products[]`, per-redeemer `products[]`, each `bookings[]`. All must be the same id from the preceding `/reservation`.
 2. **`productPricesDetailsId` as STRING at both top-level and per-redeemer levels.** Workflow A/B sends it as a number at the top level; Fareharbor needs string everywhere.
 3. **`pickupId: "0"` on each booking** — literal string "0" even though Fareharbor uses lodging (sent via step-3 reservation), not a pickup. TDMS treats missing `pickupId` as "resolve from the slot definition" which may fail for Fareharbor's grouped-booking semantics.
-4. **`optionalFields: null`** on the per-redeemer product (literal null, not an empty array).
+4. **`optionalFields: null`** on the per-redeemer product (literal null, not an empty array). This is the DIFFERENT slot from the booking-level `optionalFields` (point 7) — same key name, different position, different meaning.
 5. **`bookWithFirstRedeemer: false`** on each per-redeemer product.
 6. **Multi-passenger is N REDEEMERS, not N bookings on one redeemer.** Each additional passenger is a new entry in `redeemers[]` with its own `products: [{ redeemerQty: 1, bookings: [{...}] }]`. Top-level `qty` = sum of all redeemers' `redeemerQty`.
+7. **Field answers go on `bookings[0].optionalFields` — SAME key name as Workflow A/B.** The step-3 reservation URL uses `additionalFields[i][optionalFieldId]/[fieldText]` query params; on `/order` the body carries the same selections under `optionalFields: [{optionalFieldId, fieldText}, ...]`. **Do NOT use `additionalFields` on `/order` for Fareharbor** — TDMS silently ignores it (same contract as `fieldValue` being ignored for A/B) and the reservation lock then rejects the order with "options do not match the confirmed price" because the locked set couldn't be matched to any submitted answers.
 </Warning>
+
+### Example — step 4 order response (success)
+
+Real response from a successful `processAsQuote: true` Workflow C order against the proven shape above. Envelope is identical to Workflow A/B except for the `shouldValidateShortNotice: true` field (Fareharbor-specific — the supplier may enforce a short-notice booking cutoff that TDMS proxies).
+
+```json
+{
+  "id": 3656708,
+  "hasCreditCardPayment": false,
+  "eBookings": {
+    "bookings": [],
+    "bookingError": false
+  },
+  "shouldValidateShortNotice": true,
+  "vouchers": {
+    "voucherHTML": "https://tdms.websitetravel.com/apiv1/voucher/3656708.html",
+    "voucherPDF": "https://tdms.websitetravel.com/apiv1/voucher/3656708.pdf"
+  },
+  "messages": [],
+  "quoteUrl": "https://tdms.websitetravel.com/customerQuote/3656708/OjpXVFQ1Njk0LTE1NTI3OA../303fb0f3788838d5f26fe251a3257919",
+  "bookingReference": "WTT5694-155278"
+}
+```
 
 <Info>
-**`additionalFields` on `/order` — presence is neutral.** Verified empirically: sending `additionalFields: [...]` on `bookings[0]` AND omitting it entirely both produce the same 400 "options do not match the confirmed price" result when the underlying handshake fails. The locked selection set is retrieved by TDMS from the `datePriceCacheId` alone; `/order` doesn't need to re-send it, and sending it doesn't break anything either. The reference flow at the top of this section only mentions `datePriceCacheId on the product and booking` for step 4, consistent with "cache id is self-sufficient."
+**`eBookings.bookings: []` on a quote is expected** — Fareharbor's native booking isn't committed until `processAsQuote: false` lands. For a quote the eBookings slot stays empty and `bookingError: false` confirms no supplier-side error. For a committed order the array populates with per-booking Fareharbor confirmations.
 </Info>
-
-<Warning>
-**Unresolved: TDMS ↔ Fareharbor price-confirmation handshake.** Two independent Workflow C `/order` attempts (both with a fresh `datePriceCacheId` from `/reservation` and the proven payload shape above) have reproduced the 400 "FareHarbor options for (date) do not match the confirmed price" error on PPDID `23501261` for 2026-10-20. The failure occurs in TDMS's manifest-creation path (`manifests.go:207`) where TDMS re-validates the cache id with Fareharbor's native API before committing the order. The lock accepted by `/reservation` is subsequently rejected at `/order`. Mitigation path is still under investigation with WT support; implementers hitting this error should NOT retry blindly — contact support with the booking reference + cache id so TDMS can trace the Fareharbor-side rejection.
-</Warning>
 
 ### Example — step 4 error response (price mismatch)
 
-HTTP 400 — thrown when TDMS's manifest layer fails Fareharbor's price confirmation callback. Common causes: wrong `datePriceCacheId` (stale, from `?cached=1` snapshot, or not from `/reservation`), or an `additionalFields` set on `/order` that TDMS considers inconsistent with what `/reservation` locked.
+HTTP 400 — thrown when TDMS's manifest layer can't match the order's optionalFields to the selection set locked by `/reservation`. Causes we've reproduced:
+
+1. **Wrong key name on the booking** — using `additionalFields: [...]` instead of `optionalFields: [...]`. TDMS silently ignores the wrong key, so from its view the order carries zero recognised answers; the locked set then fails to match. (Also the trap: step-3 `/reservation` URL uses `additionalFields[i][...]` query params, which doesn't translate to the body shape on `/order`.)
+2. **Wrong `datePriceCacheId`** — using the snapshot id from `?cached=1` step-1, or a stale id from a prior selection set.
+3. **Selection set drift** — the lock was minted against selection set X, but the order submits selection set Y.
 
 ```json
 {
@@ -632,7 +667,7 @@ HTTP 400 — thrown when TDMS's manifest layer fails Fareharbor's price confirma
 }
 ```
 
-Remediation: re-call `/reservation` with the current selection set, take the returned `datePriceCacheId`, and re-submit `/order` with that id. If the error persists on a fresh id, see the "Unresolved" warning above.
+Remediation: confirm `bookings[0].optionalFields` (not `additionalFields`) is being sent with the exact same entries sent to `/reservation`, and that `datePriceCacheId` on `/order` is the id just returned from `/reservation` (not from `?cached=1` step-1).
 
 ### Workflow C implementation invariants
 
