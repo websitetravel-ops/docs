@@ -831,3 +831,47 @@ So Workflow C's additional complexity is contained to the request side — what 
 - **Use `?cached=1`** on `/checkavailabilityrange` for most read-paths. Omit (or set `cached=0`) when the availability number itself is load-bearing (right before an order).
 - **FareHarbor price-cache**: always use the `datePriceCacheId` from the final `/reservation` call — it reflects the chosen priced options. Reusing an older id against a changed selection will return wrong pricing on the final booking.
 - **Watch for `RequiresFurtherDetailsToConfirm` and `RequiresReservationCheck` flags** in step 1 / step 2 responses. Both are explicit "you need another call before you can order" signals.
+
+## Suggested approaches — collapsing three workflows into one
+
+The three workflows aren't an API design artefact — they reflect genuine differences in how the three supplier families model inventory. Rezdy and friends are stateless; Respax exposes per-time schemas; Fareharbor requires a reservation lock because its own pricing can shift based on customer selections. TDMS has chosen the most literal pass-through of each supplier's native model, which is why the client sees three shapes.
+
+That doesn't mean any client integrating against TDMS has to carry three workflows up through its own API surface. Below is how to think about where the abstraction should live.
+
+### What's reducible vs irreducible
+
+Most of the variance can be collapsed by pre-fetching and flattening:
+
+- **Discovery** (times, pickups, per-time field schemas, lodging options) is pre-computable per fare. `/apiv1/checkAvailabilityProduct` already returns a flattened view of this across all three workflows.
+- **Per-time schema fetches** (step 2b in Workflow B/C) can be pre-walked for every time slot and cached server-side.
+
+Two things cannot be pre-computed and will always need to happen after the customer selects:
+
+- **The reservation lock** (Workflow C). `datePriceCacheId` is bound to the exact `(date, timeId, selection set)` — minting one upfront would silently return the wrong price the moment a priced option is picked.
+- **Priced-option recomputation**. Once a Fareharbor fare exposes `isPriced: true` fields, pricing is a function of the customer's answer set. No cache can replace the live computation.
+
+So any "one workflow" story has to decide what to do about the irreducible reservation side-step — not eliminate it.
+
+### Three places the abstraction can live
+
+**(a) Facade at TDMS.** TDMS exposes a single order endpoint that internally does `reservation → order` for Fareharbor, invisibly. Client never sees a `datePriceCacheId`. Trade-offs: TDMS owns the lock state across the payment window, error specificity drops (generic "booking failed" vs today's "price mismatch — recheck reservation"), and integrators lose the ability to walk a reservation forward across sessions. Why TDMS likely hasn't done this today: payment windows can be minutes long; holding supplier inventory server-side across that window is risky.
+
+**(b) Facade at the integrator worker.** Build the abstraction on your own side. Your worker exposes one clean workflow to its own clients (customer portals, mobile apps, downstream services); internally it does the reservation dance only for Fareharbor placements. Trade-off: you own the complexity instead of TDMS, but you keep the specific error signals and the ability to retry with context. This is the Group Booker Addon Portal's choice — the `fareharborReservations` map inside `handleSessionSelect` is where the abstraction lives, and the customer-facing portal never sees a cache id.
+
+**(c) Normalise to the strictest shape.** Pretend every workflow needs a reservation lock. The integrator worker fakes one for Rezdy/Respax (reuses the step-1 id as "cache id"). Client code is uniform. Trade-off: 2× TDMS round-trips for A+B workflows that don't need them. Latency + load cost for no supplier-side benefit. Rarely worth it; only consider if the client is dumb enough that a single code path matters more than per-workflow performance.
+
+### Recommended approach for a new integration
+
+**Start with (b).** Hide the three workflows inside the server-side integration layer; expose one shape to whoever consumes it. The customer-facing surface (portal, app) sees uniform `/select` → `/order` semantics regardless of the underlying supplier. The three-workflow variance stays contained to one handler and one payload builder.
+
+This is where the Group Booker Addon Portal landed after Phase A/B/C. The portal frontend code treats every selection the same way; the worker decides at `/select` time whether a reservation lock is needed and threads the cache id onto the TDMS payload transparently.
+
+### When to revisit
+
+Consider moving to (a) only when:
+
+- Multiple independent integrators are each building the same facade (code duplication worth centralising); OR
+- A new TDMS-supported supplier adds a fourth workflow variant that would otherwise force every integrator to patch again; OR
+- Error-specificity trade-offs become acceptable because the customer-facing UX doesn't act on specific error codes.
+
+Until any of those is true, (b) is the right place for the abstraction to live.
