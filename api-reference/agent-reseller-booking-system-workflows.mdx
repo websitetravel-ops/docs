@@ -693,6 +693,191 @@ The following apply when building a Workflow C integration against a multi-branc
 **5. qty / redeemer model: a Fareharbor booking is N redeemers × (redeemerQty: 1), not one redeemer × bookings[N].** Each passenger becomes a separate `redeemers[]` entry with its own `products[0].bookings[0]`. Top-level `products[0].qty` = sum of each redeemer's `redeemerQty`. Single-passenger addon flows collapse to one redeemer with `qty: 1`.
 </Info>
 
+## Shared `/order` payload examples (cross-workflow)
+
+`POST /apiv1/order` accepts a single union schema. Key names are identical across every workflow; only which fields are populated varies. The captures below are real `/order` bodies from the WTT test environment that illustrate shape variations the per-workflow sections above don't fully convey.
+
+### Example — Workflow A/B shape, two redeemers × one booking each
+
+Two travellers on the same fare, both with a time slot and a pickup location. Note the TitleCase `PickupID` / `PickupLocation` — see the field-casing note below.
+
+```json
+{
+  "bookingReference": "WTT5694-348411",
+  "agentReference": "test",
+  "paymentMethod": "cash",
+  "emailVouchers": 0,
+  "totalCharged": 32,
+  "processAsQuote": false,
+  "products": [
+    { "productPricesDetailsId": 9066803, "qty": 2 }
+  ],
+  "redeemers": [
+    {
+      "emailAddress": "api+testtest@websitetravel.com",
+      "firstName": "Hermione", "lastName": "Granger",
+      "phone": "0123456789", "redeemerCountry": 554,
+      "dateOfBirth": "9-Nov-2000",
+      "products": [
+        {
+          "productPricesDetailsId": "9066803",
+          "redeemerQty": 1,
+          "bookings": [
+            {
+              "bookingComment": "Test Booking",
+              "travelDate": "28-Mar-2026",
+              "timeId": "1",
+              "PickupID": "RAI",
+              "PickupLocation": "Premier Bus Stop, Spectrum Street, Rainbow Beach"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "emailAddress": "api+test@websitetravel.com",
+      "firstName": "Mike", "lastName": "Granger",
+      "phone": "012344289", "redeemerCountry": 554,
+      "dateOfBirth": "19-Nov-2003",
+      "products": [
+        {
+          "productPricesDetailsId": "9066803",
+          "redeemerQty": 1,
+          "bookings": [
+            {
+              "bookingComment": "Test Booking",
+              "travelDate": "28-Mar-2026",
+              "timeId": "1",
+              "PickupID": "RAI",
+              "PickupLocation": "Premier Bus Stop, Spectrum Street, Rainbow Beach"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+```
+
+### Example — minimal shape, multi-product quote (`processAsQuote: true`)
+
+One redeemer, two different products, no times, no pickups, no cache ids. The simplest possible `/order` body that still produces a valid quote.
+
+```json
+{
+  "bookingReference": "WTT5694-699368",
+  "agentReference": "test",
+  "paymentMethod": "credit_card_pay_stripetest_gtm",
+  "emailVouchers": 0,
+  "totalCharged": 2006,
+  "processAsQuote": true,
+  "payments": [],
+  "products": [
+    { "productPricesDetailsId": 11476906, "qty": 1 },
+    { "productPricesDetailsId": 18132919, "qty": 1 }
+  ],
+  "redeemers": [
+    {
+      "emailAddress": "api+check@websitetravel.com",
+      "firstName": "Hermione", "lastName": "Granger-Weasley",
+      "phone": "0123456789", "redeemerCountry": 554,
+      "dateOfBirth": "9-Nov-2000",
+      "products": [
+        {
+          "productPricesDetailsId": "11476906",
+          "redeemerQty": 1,
+          "bookings": [
+            { "bookingComment": "Test Booking", "travelDate": "21-May-2026" }
+          ]
+        },
+        {
+          "productPricesDetailsId": "18132919",
+          "redeemerQty": 1,
+          "bookings": [
+            { "bookingComment": "Test Booking", "travelDate": "22-May-2026" }
+          ]
+        }
+      ]
+    }
+  ]
+}
+```
+
+Observation: top-level `products[]` can carry different `productPricesDetailsId`s on the same `/order` call. Each gets its own entry under the redeemer's `products[]`.
+
+### Example — `datePriceCacheId` on a non-FareHarbor fare
+
+One redeemer, `redeemerQty: 2`, two bookings on different dates — and each booking carries its OWN `datePriceCacheId`. This is NOT a Workflow C fare: no `bookWithFirstRedeemer`, no per-redeemer `optionalFields: null`, no `pickupId: "0"`.
+
+```json
+{
+  "bookingReference": "WTT23797-676567",
+  "agentReference": "test",
+  "paymentMethod": "credit_card_pay_stripetest_gtm",
+  "emailVouchers": 0,
+  "totalCharged": 102.9,
+  "processAsQuote": false,
+  "products": [
+    { "productPricesDetailsId": 13317390, "qty": 2, "datePriceCacheId": 6810827 }
+  ],
+  "redeemers": [
+    {
+      "title": "Mr",
+      "emailAddress": "support+test@websitetravel.com",
+      "firstName": "Sasikala", "lastName": "WT Test",
+      "phone": 2345234411, "redeemerCountry": "036",
+      "dateOfBirth": "1990-10-11", "postcode": "123445",
+      "products": [
+        {
+          "productPricesDetailsId": 13317390,
+          "redeemerQty": 2,
+          "bookings": [
+            {
+              "bookingDetailsComment": "Hey again buddy!!",
+              "travelDate": "12-Apr-2025",
+              "timeId": "1",
+              "commences": "Daily Availability",
+              "datePriceCacheId": 6810828
+            },
+            {
+              "bookingDetailsComment": "Hey again buddy!!",
+              "travelDate": "11-Apr-2025",
+              "timeId": "1",
+              "commences": "Daily Availability",
+              "datePriceCacheId": 6810827
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+```
+
+Observations:
+- **Per-booking `datePriceCacheId` can differ between bookings** — each travel-date can have its own lock. Top-level `products[0].datePriceCacheId` matches one of them; the per-booking id is authoritative.
+- **`datePriceCacheId` is NOT exclusive to Workflow C.** Any supplier that returned `RequiresFurtherDetailsToConfirm: true` with a cache id on step-1 can require threading it through `/order`. FareHarbor is the specific case that ALSO needs a `/reservation` lock + the Workflow-C-only extras.
+- **`commences: "Daily Availability"`** — a human-readable time label; co-exists with `timeId`.
+- **`bookingDetailsComment` (not `bookingComment`)** — see comment-field note below.
+
+### Cross-workflow field nuances
+
+<Info>
+**Field casing is case-insensitive on TDMS.** The OpenAPI spec and our builders use lowercase (`pickupId`, `pickupLocation`, `dropoffId`); some WTT docs examples use TitleCase (`PickupID`, `PickupLocation`). Both forms are accepted — prefer lowercase for consistency with the spec, but don't be surprised to see TitleCase in captures.
+</Info>
+
+<Info>
+**Two optional comment fields on each booking.** `bookingComment` and `bookingDetailsComment` are both valid per the OpenAPI spec and we've seen both used in real captures. They're separate string fields; both pass through to the voucher. Use whichever matches the operator's convention.
+</Info>
+
+<Info>
+**`datePriceCacheId` is not FareHarbor-exclusive.** Any fare whose discovery call returned `RequiresFurtherDetailsToConfirm: true` with a cache id can require threading it onto `/order` — the third example above is one such non-FareHarbor case. The Workflow-C-only tells are `bookWithFirstRedeemer`, per-redeemer `optionalFields: null`, and `pickupId: "0"` on each booking.
+</Info>
+
+<Info>
+**"Redeemers × N" vs "Bookings × N" is a modelling choice, not a workflow invariant.** FareHarbor explicitly requires redeemers × N because each passenger has per-passenger answers that must be attributed. A/B captures often use bookings × N (one redeemer with `redeemerQty: N`, multiple bookings) but can also use redeemers × N. Pick whichever matches your passenger-attribution model.
+</Info>
+
 ## Bulk product view — `/apiv1/checkAvailabilityProduct` (cross-workflow)
 
 An alternative to the per-PPDID step-1 calls above: `/apiv1/checkAvailabilityProduct?productId={productId}&from={date}&days={N}` returns ALL fares for a product × ALL days × per-slot pricing + pickups + additionalFields + addOns in a single call. **The response shape is stable across all three workflows** — null-vs-populated fields signal which workflow applies.
