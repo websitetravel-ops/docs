@@ -678,7 +678,7 @@ Call `/reservation` once per **distinct priced combination**, not once per passe
 | N passengers, same priced choices | One `/reservation` call, with the same `datePriceCacheId` on every redeemer's booking. Calling once per passenger returns that same id anyway, because identical quotes reuse one cache row. |
 | N passengers, different priced choices (for example two wetsuits, one without) | Not possible on one cart line: the ids carry different prices and checkout refuses them. Split into one cart line per distinct priced combination — same `productPricesDetailsId`, separate `products[]` entries — each with its own `datePriceCacheId` and its own `qty`. |
 | Booking-level fields (`optionalFields_bl_*`) or lodging | Quoted once per booking. Only the first redeemer's booking-level fields count, and the fee is charged once per date and availability, not per passenger. |
-| Non-priced fields (names, comments) | Can differ between passengers freely, without a new `/reservation`. |
+| Non-priced fields (names, comments) | Can differ between passengers freely, without an ADDITIONAL `/reservation` — the lock their group already holds covers them. They do not let you skip the lock: as the step-3 rules above state, any submitted answer at all, priced or not, retires the step-1 cache id. |
 
 So the number of TDMS calls per booking equals the number of **distinct priced combinations**, not the number of passengers. For a typical party making the same choices, that is one call.
 
@@ -707,7 +707,7 @@ Two passengers chose a priced option, the third did not. Each combination was lo
         "productPricesDetailsId": "23501261",
         "datePriceCacheId": 13119045,
         "redeemerQty": 1,
-        "bookWithFirstRedeemer": true,
+        "bookWithFirstRedeemer": false,
         "optionalFields": null,
         "bookings": [{
           "datePriceCacheId": 13119045,
