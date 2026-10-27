@@ -253,7 +253,13 @@ The response carries a `datePriceCacheId` and the final `rrp`. The `datePriceCac
 **Step 4 — order.** POST `/apiv1/order` with the `datePriceCacheId` from step 3 on BOTH the product record AND each booking record. Non-priced answers can be added or changed in the order payload without re-running step 3.
 
 <Info>
-**Price-cache lifetime.** Treat `datePriceCacheId` as single-use for the specific locked combination. If the customer changes date, time, a priced optional field, or lodging after step 3, you MUST call step 3 again to lock a fresh id. Non-priced changes (comments, notes) can ride on the existing id.
+**Price-cache lifetime** *(confirmed with TDMS dev 2026-10-27)*.
+
+- **No TTL, no price lock, no availability hold.** The name "reservation" is a misnomer — the row only maps `(ppdid, date, timeId, priced selections, lodging)` → `(datePriceCacheId, rrp)`. The slot stays bookable by anyone until `/order` succeeds.
+- **Supplier-side price changes rewrite the SAME row in place.** Calling `/reservation` again with identical inputs returns the same `datePriceCacheId` but with the latest supplier price. Treat the id as stable for its selection fingerprint, but re-call `/reservation` once more just before payment to pick up any supplier-side price drift.
+- **Different inputs → new row.** Any change to ppdid, priced selection, or lodging mints a fresh cache id. Non-priced answers (comments, names) can still ride on the existing id for `/order`.
+- **Housekeeping.** Rows unused in any quote or order AND not touched by `/reservation` for 3 days are garbage-collected. Keep the cart's effective TTL well below that (we treat anything over ~1 hour as stale and refetch availability + reservation fresh — operator-side state has usually moved by then).
+- **`/validateCart` threading.** If your flow calls `/validateCart` between `/reservation` and `/order`, pass the same `datePriceCacheId` on both — a missing or stale id yields `alertLevel: "alert-danger"` on the fare.
 </Info>
 
 ### Example — step 1 request
