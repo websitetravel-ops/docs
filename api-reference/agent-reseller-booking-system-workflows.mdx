@@ -671,7 +671,11 @@ Remediation: confirm `bookings[0].optionalFields` (not `additionalFields`) is be
 
 ### Multi-passenger bookings and reservation locks
 
-Call `/reservation` once per **distinct priced combination**, not once per passenger. "Priced" means a step-2b field carrying `isPriced: true`; every other answer is free to vary without a new lock.
+Call `/reservation` once per **distinct priced combination**, not once per passenger. "Priced" means a step-2b field carrying `isPriced: true`: it is what decides *how many* locks a party needs, because only a priced answer can put two passengers on different prices. Every other answer may differ between passengers without an ADDITIONAL lock.
+
+<Warning>
+**This is about how many locks to take, NOT about what to put in one.** Grouping by priced answers does not mean sending only priced answers to `/reservation`. The step-3 captures above settle that: the four fields in the full call are all `isPriced: false`, and sending them still returned `13119045` rather than the minimal call's `12938709` — so **non-priced answers are part of the selection fingerprint**. The lock request must carry the answers that will accompany the order, exactly as the step-3 rules state; priced answers are simply the ones that can force a SECOND lock.
+</Warning>
 
 | Case | What to send |
 | --- | --- |
