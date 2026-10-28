@@ -210,6 +210,95 @@ Accept: application/json
 }
 ```
 
+### Rezdy — hybrid envelope on step 2
+
+<Warning>
+**Rezdy is a Workflow B hybrid**. Discovery runs through the enhanced pair (step 1 + step 2), but Rezdy's step 2 response **does NOT carry `optionalFields` at the top level**. Instead, `optionalFields` are nested inside `fields[name="optionalFields"].fields[]` — the SAME envelope [Workflow C (FareHarbor)](#workflow-c-fareharbor) step 2b uses. Field keys also differ from the IBIS / Respax / CustomLinc shape: `name` instead of `optionalFieldId`, `displayName` instead of `title`, `required` instead of `mandatory`.
+
+A parser that only reads top-level `payload.optionalFields` will see nothing for Rezdy fares and the customer-facing UI will render no inputs. Validation at `/validateCart` then surfaces agent-portal jargon back to the customer (e.g. *"Product now also requires - Please provide ages of participants. Re-check the date with Edit Availability to enter it."*) — which looks like a configuration bug but is actually the step 2 parser missing the nested envelope.
+</Warning>
+
+### Example — Rezdy step 2 request
+
+```http
+GET /apiv1/bookingdetails/detailsToConfirmAvailability/23530772/2026-11-14/14:00:00
+Authorization: Bearer {token}
+Accept: application/json
+```
+
+Note the `timeId` segment is a plain time string (`14:00:00`) — unlike IBIS session-key tokens (`departure.YYYYMMDDT...`) or CustomLinc opaque IDs. Encoding tip: pass through `encodeTdmsPathSegment` (or equivalent) so the colons survive URL normalisation byte-for-byte.
+
+### Example — Rezdy step 2 response (nested envelope)
+
+Captured 2026-10-28 against PPDID `23530772` (Dolphin Kayaking + Great Beach Drive Adventure — Rainbow Beach / Epic Ocean Adventures). Note how `optionalFields` sits at `fields[2].fields[0]`, not at the top level.
+
+```json
+{
+  "productPricesDetailsId": 23530772,
+  "fields": [
+    {
+      "date": "2026-11-14",
+      "type": "radio",
+      "name": "timeId",
+      "displayName": "Time",
+      "required": true,
+      "options": [
+        {
+          "externalId": "14:00:00",
+          "displayName": "2:00pm",
+          "numAvailable": 47,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "date": "2026-11-14",
+      "type": "select",
+      "name": "pickupId",
+      "displayName": "Pickup",
+      "required": true,
+      "options": [
+        {
+          "externalId": "Bus Stop Rainbow Beach - Kirchner St (Opposite The Deck @ Sea Salt)",
+          "name": "Bus Stop Rainbow Beach - Kirchner St (Opposite The Deck @ Sea Salt)",
+          "displayName": "Bus Stop Rainbow Beach - Kirchner St (Opposite The Deck @ Sea Salt) - 33XR+9Q Rainbow Beach Queensland, Australia"
+        }
+      ]
+    },
+    {
+      "date": "2026-11-14",
+      "name": "optionalFields",
+      "displayName": null,
+      "fields": [
+        {
+          "name": "rezdy_please_provide_ages_of_participants_e19b3e78",
+          "displayName": "Please provide ages of participants",
+          "type": "text",
+          "required": true,
+          "apiName": "Please provide ages of participants",
+          "options": []
+        }
+      ]
+    }
+  ]
+}
+```
+
+<Info>
+**Parser mapping — normalise Rezdy's nested shape to the common Workflow B field shape**:
+
+| Common key | IBIS / Respax / CustomLinc | Rezdy nested |
+| --- | --- | --- |
+| `optionalFieldId` | `optionalFieldId` | `name` |
+| `title` | `title` | `displayName` (fallback `apiName`) |
+| `mandatory` | `mandatory` | `required` |
+| `type` | `type` | `type` |
+| `commonName` | present (used for shared-field fan-out) | absent — set to `null` |
+| `options` (select type) | `[string]` | `[{externalId, displayName}]` → flatten to `displayName` strings |
+
+Prefer the flat top-level `payload.optionalFields` when present and non-empty. Fall back to the nested wrapper only when the flat shape is empty — that keeps IBIS / Respax / CustomLinc on the canonical path and only exercises the nested parser for Rezdy (and any future Workflow B system TDMS might ship under the nested shape).
+</Info>
+
 ## Workflow C — FareHarbor
 
 `Fareharbor` *(added 2026-10)*
