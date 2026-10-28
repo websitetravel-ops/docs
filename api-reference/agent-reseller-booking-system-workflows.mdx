@@ -777,6 +777,40 @@ Two passengers chose a priced option, the third did not. Each combination was lo
 
 `optionalFields_lodging` appears on the FIRST redeemer's booking only. It is booking-level, so repeating it on Sam and Jo would not charge three lodging fees — but it is not what TDMS reads, and the second and third copies are ignored.
 
+### Pre-order validation with `/validateCart` for Fareharbor
+
+Fareharbor fares require the `datePriceCacheId` from a successful `/reservation` call to be threaded into `/validateCart` as well as `/order` — same id, same three positions (top-level `products[]`, per-redeemer `products[]`, each `bookings[]`). Calling `/validateCart` for a Fareharbor fare WITHOUT the cacheId — or with one that has gone stale after a selection change — does NOT return the top-level `errors[]` array that Workflow A/B rejections use. TDMS returns 200 OK with a per-PPDID keyed map of per-fare outcomes, each carrying `status`, `message`, and `alertLevel`.
+
+<Warning>
+**Silent-success trap.** A Fareharbor fare whose cacheId is missing or stale yields `alertLevel: "alert-danger"` INSIDE the per-PPDID envelope. There is no top-level `errors[]`, no HTTP 4xx, and no `requestStatus.success: false`. A parser written only against the Workflow A/B error shapes will treat this response as success and let the customer proceed to `/order`, which then fails with the "FareHarbor options for (date) do not match the confirmed price" response in the step-4 error example above. Parse the per-PPDID shape the same way `/validateQuote` responses are parsed and flag any fare whose `alertLevel` is `alert-danger` (or whose `status` is not `Available`).
+</Warning>
+
+```json
+{
+  "21576614": {
+    "status": "Details Required",
+    "message": [
+      {
+        "error": "FareHarbor options for (10-Nov-2026) do not match the confirmed price. Please recheck the reservation and use the returned datePriceCacheId.",
+        "bookingDate": "10-Nov-2026"
+      }
+    ],
+    "alertLevel": "alert-danger",
+    "nextAvailability": "",
+    "productDetail": {
+      "productId": 54987,
+      "productPricesDetailsId": 21576614
+    }
+  }
+}
+```
+
+Captured 2026-10-27 from a `/validateCart` call where a Fareharbor fare was threaded with the top-level `?cached=1` `datePriceCacheId` instead of the one returned from `/reservation`. On a successful validate every value in the map has `status: "Available"` + `alertLevel: "alert-success"` — same envelope, filled with the OK branch.
+
+<Info>
+**Same envelope as `/validateQuote`.** The per-PPDID shape here is identical to the `/validateQuote` response examples in the OpenAPI spec. Top-level keys are the stringified `productPricesDetailsId` of each fare in the cart (not the booking reference used by `/validateQuote`). If you already parse `/validateQuote` responses, share the parser — just key on PPDID instead.
+</Info>
+
 ### Workflow C implementation invariants
 
 The following apply when building a Workflow C integration against a multi-branch TDMS setup (one branch's tour products pointing to another branch's addon/payment account via `addon_branch_code`). Learned the hard way during Phase C of the Group Booker Addon Portal integration — all have test coverage in that project.
