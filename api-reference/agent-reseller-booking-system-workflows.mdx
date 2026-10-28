@@ -900,6 +900,51 @@ Captured 2026-10-27 from a `/validateCart` call where a Fareharbor fare was thre
 **Same envelope as `/validateQuote`.** The per-PPDID shape here is identical to the `/validateQuote` response examples in the OpenAPI spec. Top-level keys are the stringified `productPricesDetailsId` of each fare in the cart (not the booking reference used by `/validateQuote`). If you already parse `/validateQuote` responses, share the parser — just key on PPDID instead.
 </Info>
 
+### Pre-order validation with `/validateCart` — live-rate enforcement (all workflows)
+
+`/validateCart` enforces that the `rrp` + `agentRRP` your client sends in `products[]` matches TDMS's live view of the supplier rate for the `(productPricesDetailsId, bookingDate)` pair. Mismatch returns the same per-PPDID envelope as the Fareharbor case above, with `alertLevel: "alert-danger"` and `category: "fare"` on the message:
+
+```json
+{
+  "23530772": {
+    "status": "Availability Issues",
+    "message": [
+      {
+        "error": "Rate Updated for:<br><b>Dolphin Kayaking + Great Beach Drive Adventure - Rainbow Beach Adult - Travel Date 14-Nov-2026</b><br><br>The current rate (142.00) no longer matches the saved cart rate (122.00). Please remove this item from your cart and add it again to apply the latest price.",
+        "category": "fare"
+      }
+    ],
+    "alertLevel": "alert-danger",
+    "nextAvailability": "",
+    "productDetail": {
+      "productId": 4308,
+      "productPricesDetailsId": 23530772,
+      "name": "Dolphin Kayaking + Great Beach Drive Adventure - Rainbow Beach Adult"
+    }
+  }
+}
+```
+
+Captured 2026-10-28 against a Rezdy fare with seasonal pricing. The client sent the operator's stored base rate ($122); TDMS compared to the live Rezdy rate for 14-Nov-2026 ($142) and rejected.
+
+<Warning>
+**The error message is written for the TDMS agent UI's explicit cart basket.** "Please remove this item from your cart and add it again" has no literal equivalent in a customer portal — the fix is to re-fetch the live rate and re-send it on the next `/validateCart`. If your UI exposes only "untick + retick" on the tile, that affordance ONLY helps if the client-side state refreshes the price from `/checkavailabilityrange` on retick; a plain state toggle will re-send the same stored rate and loop.
+</Warning>
+
+**The source of truth** is `/apiv1/checkavailabilityrange/{ppdid}/{timeId}/{date}/{days}?cached=0`, which returns `productPricingData.RRP` + `.NetRate` on the same row as `NumAvailable`. One call = both signals. Thread the returned `RRP` into `products[].rrp` + `.agentRRP` on `/validateCart` and the mismatch class disappears.
+
+<Info>
+**Fire the live-rate fetch where the price is also displayed to the customer.** If your UI shows the stored base at tile load, then refreshes to the live rate at `/validateCart` time, the customer sees a price change at Continue — a worse UX than a tile that paints with the live number up front. Fetch at load (via `/checkavailabilityrange?cached=0`) and also at Continue (defensive — rates can shift during a session). The second fetch is the one that guarantees `/validateCart` passes.
+</Info>
+
+<Info>
+**Not all suppliers echo `productPricingData`.** Open-dated vouchers, free-sell inventory, and some Workflow A suppliers return the row with `NumAvailable` only. Fall back to the operator-stored base in that case — those classes genuinely don't have dynamic rates. Guard the overwrite with a strict numeric check (`Number(null)` is `0` and `Number("")` is `0`; both pass `Number.isFinite`, both will silently overwrite a stored rate with `$0` if accepted blindly). Only accept a real finite number or a nonblank numeric string.
+</Info>
+
+<Info>
+**`/select` / `/order` must send the same number too.** `/validateCart` passing with the live rate is necessary but not sufficient — the subsequent `/order` payload's `products[].rrp` + top-level `totalCharged` and the `/pgw/authenticate` `paymentAmount` query parameter all need to carry the same post-refresh number. Compute `totalCharged` AFTER you refresh addon rates; otherwise TDMS stores a lower `order.totalCharged` than `/pgw/authenticate` tries to collect and rejects with *"Total Payments cannot be more than Total Charged."*
+</Info>
+
 ### Workflow C implementation invariants
 
 The following apply when building a Workflow C integration against a multi-branch TDMS setup (one branch's tour products pointing to another branch's addon/payment account via `addon_branch_code`). Learned the hard way during Phase C of the Group Booker Addon Portal integration — all have test coverage in that project.
@@ -1248,9 +1293,18 @@ So Workflow C's additional complexity is contained to the request side — what 
 - **Always inspect `farePrices.bookingSystem` first.** Routing on anything else drifts the moment TDMS re-tags a product.
 - **Treat unknown / missing values as Workflow A** — safe default, matches pre-tagged rows.
 - **Cache `/bookingdetails` responses per PPDID.** The schema is essentially static; a 24h TTL per `(branch, env, ppdid)` eliminates per-click round-trips.
-- **Use `?cached=1`** on `/checkavailabilityrange` for most read-paths. Omit (or set `cached=0`) when the availability number itself is load-bearing (right before an order).
+- **Use `?cached=1`** on `/checkavailabilityrange` for most read-paths. Omit (or set `cached=0`) when the availability number itself is load-bearing (right before an order). The response shape (including `productPricingData`) is identical either way; only freshness differs.
+- **Read `productPricingData.RRP` and `.NetRate` off the same `/checkavailabilityrange` row** that carries `NumAvailable`. They're the authoritative live date-specific rate — see [Pre-order validation with `/validateCart` — live-rate enforcement](#pre-order-validation-with-validatecart-live-rate-enforcement-all-workflows) for the full contract.
 - **FareHarbor price-cache**: always use the `datePriceCacheId` from the final `/reservation` call — it reflects the chosen priced options. Reusing an older id against a changed selection will return wrong pricing on the final booking.
 - **Watch for `RequiresFurtherDetailsToConfirm` and `RequiresReservationCheck` flags** in step 1 / step 2 responses. Both are explicit "you need another call before you can order" signals.
+
+<Warning>
+**PPDIDs are branch-scoped — not product-scoped.** The same supplier product (keyed by `productId`) has a different `productPricesDetailsId` per reseller branch. Calling any PPDID-keyed endpoint (`/checkavailabilityrange`, `/bookingdetails`, `/validateCart`, `/order`, etc.) with a token whose branch doesn't own that PPDID returns `500 Internal Server Error` with a generic `"An error occurred"` body — not a 404, not a cleaner 403. When Postman-testing an endpoint and reproducing a 500 that the production worker doesn't hit for the same URL, the first thing to check is whether your token's branch owns the PPDID. The production worker is almost certainly authenticating under a different branch.
+
+Live example: PPDID `23530772` is the WGB branch's view of Dolphin Kayaking Adult; `23456564` is WTT's view of the same supplier fare (`productId: 4308`). A token for WTT calling `/checkavailabilityrange/23530772/...` returns 500; the same token on `/23456564/...` succeeds.
+
+Cross-branch addon flows (one branch's tour products pointing to another branch's addon account) work because the addon branch is explicitly configured as a reseller of the tour branch inside TDMS. If that reseller mapping is absent, the cross-branch call will 500 the same way.
+</Warning>
 
 ## Suggested approaches — collapsing three workflows into one
 
