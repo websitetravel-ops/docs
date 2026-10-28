@@ -12,17 +12,17 @@ Every fare carries a `bookingSystem` value under `farePrices[].bookingSystem`. T
 | `Clockwork` | **A** | |
 | `CMS` | **A** | |
 | `SOAAccommodation` | **A** | |
-| `Rezdy` | **A** | Added 2026-10. Same two-call shape as Generic — TDMS native integration to Rezdy. PPDIDs that previously appeared as `Generic` are being progressively retagged. |
 | `Respaxv2` | **B** | |
 | `IBIS` | **B** | |
 | `CustomLinc` | **B** | |
+| `Rezdy` | **B** | Added 2026-10 (originally classified under Workflow A). TDMS native integration to Rezdy — same enhanced discovery pair as Respaxv2 / IBIS / CustomLinc. PPDIDs that previously appeared as `Generic` are being progressively retagged. |
 | `Fareharbor` | **C** | Added 2026-10. New flow — see below. |
 
 Always branch on `farePrices.bookingSystem` BEFORE choosing a workflow. Treat unknown or missing values as Workflow A (safe default).
 
 ## Workflow A — Standard booking systems
 
-`Generic` · `Clockwork` · `CMS` · `SOAAccommodation` · `Rezdy`
+`Generic` · `Clockwork` · `CMS` · `SOAAccommodation`
 
 ```
 1. GET /apiv1/bookingdetails/{productPricesDetailsId}
@@ -48,7 +48,7 @@ Accept: application/json
 
 ### Example — step 1 response (abridged — large pickup list truncated)
 
-Real response from a Rezdy product (Kuranda: Scenic Rail, Skyrail Rainforest Cableway and Hartley's Crocodile Adventures, PPDID `20895150`). Note the **PascalCase field names** on `bookingTimes[]` and `pickupLocations[]` — essentially how TDMS surfaces this endpoint's shape.
+Historical capture from a Rezdy product (Kuranda: Scenic Rail, Skyrail Rainforest Cableway and Hartley's Crocodile Adventures, PPDID `20895150`) back when Rezdy was classified under Workflow A. Rezdy has since moved to Workflow B — see the Workflow B examples below for the current Rezdy response shape. The example here still illustrates the Workflow A envelope accurately for Generic / Clockwork / CMS / SOAAccommodation fares. Note the **PascalCase field names** on `bookingTimes[]` and `pickupLocations[]` — essentially how TDMS surfaces this endpoint's shape.
 
 ```json
 {
@@ -108,7 +108,7 @@ Accept: application/json
 
 ### Example — step 2 response
 
-Real response from the same Rezdy product above. The envelope is **identical to Workflow C's step 1 response** — pricing lives in `productPricingData`, with Workflow A signaled by `datePriceCacheId: null` + `RequiresFurtherDetailsToConfirm: false` (no reservation lock + no further details call needed).
+Real response from the same product above (captured when Rezdy was Workflow A — kept as a reference capture; the envelope illustrated here still matches live Workflow A fares). The envelope is **identical to Workflow C's step 1 response** — pricing lives in `productPricingData`, with Workflow A signaled by `datePriceCacheId: null` + `RequiresFurtherDetailsToConfirm: false` (no reservation lock + no further details call needed).
 
 ```json
 [
@@ -140,7 +140,7 @@ Real response from the same Rezdy product above. The envelope is **identical to 
 
 ## Workflow B — Enhanced booking systems
 
-`Respaxv2` · `IBIS` · `CustomLinc`
+`Respaxv2` · `IBIS` · `CustomLinc` · `Rezdy`
 
 ```
 1. GET /apiv1/checkavailabilityrange/{productPricesDetailsId}/0/{startDate}/{days}?cached=1
@@ -214,7 +214,7 @@ Accept: application/json
 
 `Fareharbor` *(added 2026-10)*
 
-FareHarbor has a richer native API than Generic / Rezdy. Optional fields can be time-dependent AND can affect the final price (`isPriced=true`), which means every booking needs a dedicated **reservation lock** before you can POST `/order`.
+FareHarbor has a richer native API than the Workflow A / B systems. Optional fields can be time-dependent AND can affect the final price (`isPriced=true`), which means every booking needs a dedicated **reservation lock** before you can POST `/order`.
 
 ```
 1. GET /apiv1/checkavailabilityrange/{productPricesDetailsId}/0/{startDate}/{days}?cached=1
@@ -1040,7 +1040,7 @@ Accept: application/json
 
 ### Example — Rezdy response (abridged)
 
-Workflow A product (Kuranda tour, productId `67594`). Note `datePriceCacheId: null` on every slot — Rezdy doesn't use the price-cache lock. Pickups are populated at the slot level with their timestamped descriptions. `tourCode` carries the Rezdy internal product code.
+Historical capture from when Rezdy was classified under Workflow A (Kuranda tour, productId `67594`). Rezdy has since moved to **Workflow B** — the live response now matches the Workflow B shape (enhanced discovery pair, `dropoffId` on `/order`). Kept here to document the earlier format for anyone reading archived payloads. Note `datePriceCacheId: null` on every slot — Rezdy still doesn't use the price-cache lock. Pickups are populated at the slot level with their timestamped descriptions. `tourCode` carries the Rezdy internal product code.
 
 ```json
 {
